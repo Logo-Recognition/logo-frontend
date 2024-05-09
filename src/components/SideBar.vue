@@ -99,6 +99,10 @@ hr {
     background-color: #0D4F72;
     text-decoration-color: #FEFEFE;
 }
+#upload-img-button:hover{
+    background-color: #003045;
+}
+
 .menu-title{
     font-size: 10px;
     color: #5C5E64;
@@ -114,7 +118,12 @@ hr {
     color : #7E7E7E;
     border-radius: 8px;
     margin-top: 8px;
-    padding-left: 12px
+    padding-left: 12px;
+    
+}
+.button:hover {
+    background-color: #F0F0F0;
+    color: #0D4F72;
 }
 .text{
     padding-left: 12px
