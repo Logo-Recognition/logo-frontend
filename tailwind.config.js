@@ -21,6 +21,9 @@ export default {
         information: '#4A90E2',
       }
     },
+    fontFamily: {
+      custom: ['inter', '']
+    }
   },
   plugins: [],
 }
