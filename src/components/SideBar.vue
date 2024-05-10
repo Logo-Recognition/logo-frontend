@@ -6,6 +6,11 @@ import IconAugment from './icons/IconAugment.vue';
 import IconDataset from './icons/IconDataset.vue';
 import IconModelRun from './icons/IconModelRun.vue';
 import IconLogout from './icons/IconLogout.vue';
+const emit = defineEmits(['openModal'])
+
+const openModal = () => {
+  emit('openModal')
+}
 
 </script>
 
@@ -17,7 +22,7 @@ import IconLogout from './icons/IconLogout.vue';
             </div>
             <hr>
             <div id="menu" class="flex flex-col items-center p-6">
-                <button id="upload-img-button">
+                <button @click="openModal" id="upload-img-button" >
                     <IconUploadImage />
                     <span id="upload-img-text" class="p-1 text-neutral-white text-xs">Upload Image</span>
                 </button>

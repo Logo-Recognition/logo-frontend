@@ -1,12 +1,33 @@
 <script setup>
 import { RouterView } from 'vue-router'
+import { ref } from 'vue';
 import SideBar from '@/components/SideBar.vue'
+import ModalUploadImage from './components/ModalUploadImage.vue';
+const showModal = ref(false)
+
+const openModal = () => {
+  showModal.value = true
+}
+
+const closeModal = () => {
+  showModal.value = false
+}
+
+const handleFileSelected = (file) => {
+  console.log('Selected file:', file)
+}
+
 </script>
 
 <template>
   <div class="app">
-    <SideBar />
+    <SideBar @open-modal="openModal"/>
     <RouterView />
+    <ModalUploadImage 
+      :is-open="showModal"
+      @close="closeModal"
+      @file-selected="handleFileSelected"
+    />
   </div>
 </template>
 
@@ -15,5 +36,4 @@ import SideBar from '@/components/SideBar.vue'
   display: flex;
   flex-direction: row;
 }
-
 </style>
