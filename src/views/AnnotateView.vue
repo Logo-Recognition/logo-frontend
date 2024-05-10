@@ -1,7 +1,6 @@
 <template>
-  <div class="annotated-container">
-    <h1 class="page-title text-primary">Annotate</h1>
-
+  <div class="annotate-container">
+    <h1 class="page-title text-dark-primary">Annotate</h1>
     <ul class="mb-5 flex list-none flex-row flex-wrap border-b-0 ps-0" role="tablist">
       <li role="presentation">
         <a
@@ -12,6 +11,14 @@
           aria-selected="currentTab === 'Unannotated'"
         >
           Unannotated
+          <span
+            class="badge"
+            :class="{
+              'bg-sub-primary text-white': currentTab === 'Unannotated',
+              'outline-sub-primary': currentTab !== 'Unannotated'
+            }"
+            >{{ unannotatedImages.length }}</span
+          >
         </a>
       </li>
       <li role="presentation">
@@ -23,17 +30,24 @@
           aria-selected="currentTab === 'Annotated'"
         >
           Annotated
+          <span
+            class="badge"
+            :class="{
+              'bg-sub-primary text-white': currentTab === 'Annotated',
+              'outline-sub-primary border-light-grey': currentTab !== 'Annotated'
+            }"
+            >{{ annotatedImages.length }}</span
+          >
         </a>
       </li>
     </ul>
-
     <div
       v-if="currentTab === 'Unannotated'"
       class="tab-content"
       id="tabs-unannotated"
       role="tabpanel"
     >
-      <TabUnannotated />
+      <TabUnannotated :unannotatedImages="unannotatedImages" />
     </div>
     <div
       v-else-if="currentTab === 'Annotated'"
@@ -41,7 +55,7 @@
       id="tabs-annotated"
       role="tabpanel"
     >
-      <TabAnnotated />
+      <TabAnnotated :annotatedImages="annotatedImages" />
     </div>
   </div>
 </template>
@@ -58,15 +72,36 @@ export default {
   },
   data() {
     return {
-      currentTab: 'Unannotated'
+      currentTab: 'Unannotated',
+      unannotatedImages: [
+        {
+          id: 1,
+          src: 'https://media.discordapp.net/attachments/881624576671510529/1238378607852650577/placeholder.png?ex=663f1174&is=663dbff4&hm=3c766982c7c2ee5970c54be5bf7d3dde0f26ca64f68d6da57f6ce385adc6359d&=&format=webp&quality=lossless&width=375&height=312',
+          alt: 'Image 1'
+        }
+      ],
+      annotatedImages: [
+        {
+          id: 2,
+          src: 'https://media.discordapp.net/attachments/881624576671510529/1238378607852650577/placeholder.png?ex=663f1174&is=663dbff4&hm=3c766982c7c2ee5970c54be5bf7d3dde0f26ca64f68d6da57f6ce385adc6359d&=&format=webp&quality=lossless&width=375&height=312',
+          alt: 'Image 2'
+        },
+        {
+          id: 3,
+          src: 'https://media.discordapp.net/attachments/881624576671510529/1238378607852650577/placeholder.png?ex=663f1174&is=663dbff4&hm=3c766982c7c2ee5970c54be5bf7d3dde0f26ca64f68d6da57f6ce385adc6359d&=&format=webp&quality=lossless&width=375&height=312',
+          alt: 'Image 3'
+        }
+      ]
     }
   },
   methods: {
     getTabClass(tab) {
       const isActive = this.currentTab === tab
       return [
-        'my-2 block px-7 pb-3.5 pt-4 text-xs font-medium uppercase leading-tight',
-        isActive ? 'text-primary border-b-2 border-primary' : 'text-neutral-500 border-transparent'
+        'my-2 block px-7 pb-3.5 pt-4 text-s font-medium leading-tight',
+        isActive
+          ? 'text-sub-primary border-b-2 border-sub-primary'
+          : 'text-dark-grey border-b-2 border-light-grey hover:border-sub-primary hover:text-sub-primary'
       ].join(' ')
     }
   }
@@ -74,8 +109,10 @@ export default {
 </script>
 
 <style scoped>
-.annotated-container {
-  padding: 16px;
+.annotate-container {
+  padding-top: 32px;
+  padding-left: 40px;
+  padding-right: 60px;
 }
 
 .page-title {
@@ -86,5 +123,16 @@ export default {
 
 .tab-content {
   transition: opacity 0.3s ease-in-out;
+}
+
+.badge {
+  padding: 4px 8px;
+  border-radius: 50%;
+  font-size: 12px;
+  margin-left: 8px;
+}
+
+.outline-sub-primary {
+  border: 1px solid;
 }
 </style>
