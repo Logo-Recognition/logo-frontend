@@ -4,16 +4,15 @@ import SideBar from '@/components/SideBar.vue'
 </script>
 
 <template>
-  <div class="app">
+  <div class="app bg-background">
     <SideBar />
     <RouterView />
   </div>
 </template>
 
 <style scoped>
-.app{
+.app {
   display: flex;
   flex-direction: row;
 }
-
 </style>
