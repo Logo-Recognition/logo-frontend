@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue'
+import { toast } from 'vue3-toastify';
 import PreviewImage from './PreviewImage.vue';
 const props = defineProps({
   isOpen: {
@@ -7,6 +8,7 @@ const props = defineProps({
     required: true
   }
 })
+
 
 const emit = defineEmits(['close', 'file-selected'])
 
@@ -16,6 +18,20 @@ const closeModal = () => {
   emit('close')
   previewImages.value = []
 }
+
+const onUploadedSuccess = () => {
+  toast.success('Images uploaded successfully!', {
+    autoClose: 3000,
+  });
+  emit('close')
+  previewImages.value = []
+};
+
+const onUploadedFail = () => {
+  toast.error('Failed to upload images.', {
+    autoClose: 3000,
+  });
+};
 
 const onFileChange = (event) => {
   const files = event.target.files
@@ -56,13 +72,17 @@ const sendImagesToServer = async () => {
 
     if (response.ok) {
       console.log('Images uploaded successfully');
+      onUploadedSuccess();
     } else {
       console.error('Error uploading images');
+      onUploadedFail()
     }
   } catch (error) {
     console.error('Error:', error);
   }
 }
+
+
 
 const removeImage = (index) => {
   previewImages.value.splice(index, 1)
