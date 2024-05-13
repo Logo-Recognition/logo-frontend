@@ -29,6 +29,41 @@ const onFileChange = (event) => {
   }
 }
 
+const sendImagesToServer = async () => {
+  try {
+    const images = previewImages.value.map(imageUrl => {
+      const byteString = atob(imageUrl.split(',')[1]);
+      const mimeString = imageUrl.split(',')[0].split(':')[1].split(';')[0];
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+
+      const blob = new Blob([ab], { type: mimeString });
+      const file = new File([blob], `image-${Date.now()}.${mimeString.split('/')[1]}`, { type: mimeString });
+      return file;
+    });
+
+    const formData = new FormData();
+    images.forEach(file => formData.append('files[]', file));
+
+    const response = await fetch('http://192.168.2.44:5000/api/upload-image', {
+      method: 'POST',
+      body: formData
+    });
+
+    if (response.ok) {
+      console.log('Images uploaded successfully');
+    } else {
+      console.error('Error uploading images');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
 const removeImage = (index) => {
   previewImages.value.splice(index, 1)
 }
@@ -54,8 +89,8 @@ const removeImage = (index) => {
               </div>
             </div>
             <div class="flex flex-row pt-5">
-              <button class="save-button">Save</button>
-              <button class="cancel-button">Cancel</button>
+              <button class="save-button" @click="sendImagesToServer">Save</button>
+              <button class="cancel-button" @click="closeModal">Cancel</button>
             </div>
         </div>
     </div>
