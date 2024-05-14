@@ -52,9 +52,9 @@ const togglePopup = () => {
 
 <style scoped>
 #class-box {
-  width: 1200px; /* Adjust the width percentage as needed */
+  width: 1200px; 
   min-height: 381px;
-  height: auto; /* Adjust the height as needed */
+  height: auto; 
   border-radius: 16px;
   padding: 20px;
   background-color: #fefefe;
