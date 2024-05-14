@@ -21,12 +21,15 @@
 import IconClose from './icons/IconClose.vue'
 import { defineProps, ref } from 'vue'
 
-const props = defineProps(['togglePopup'])
+const props = defineProps({
+  addClass: Function,
+  togglePopup: Function
+})
 const inputData = ref('')
 
 const submitData = () => {
-  // Pass the input data to the parent component
-  props.togglePopup(inputData.value)
+  props.addClass(inputData.value)
+  closePopup() // Optionally close the popup after submitting data
 }
 
 const closePopup = () => {
