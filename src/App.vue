@@ -17,7 +17,7 @@ const closeModal = () => {
 </script>
 
 <template>
-  <div class="app">
+  <div class="app bg-background">
     <SideBar @open-modal="openModal"/>
     <RouterView />
     <ModalUploadImage 
@@ -28,7 +28,7 @@ const closeModal = () => {
 </template>
 
 <style scoped>
-.app{
+.app {
   display: flex;
   flex-direction: row;
 }
