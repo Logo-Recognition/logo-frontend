@@ -14,9 +14,9 @@ const addClass = (classNames) => {
     .split(',') // Split the input string by commas
     .map((name) => name.trim()) // Trim leading/trailing spaces from each class name
     .filter((name) => name !== '' && !classes.value.includes(name)) // Filter out empty strings and existing class names
-    .map((name) => ({ content: name })); // Create objects with the 'content' property
+    .map((name) => ({ content: name })) // Create objects with the 'content' property
 
-  classes.value.push(...newClasses); // Add the new classes to the array
+  classes.value.push(...newClasses) // Add the new classes to the array
 }
 const removeClass = (classToRemove) => {
   classes.value = classes.value.filter((c) => c !== classToRemove)
@@ -33,7 +33,13 @@ const togglePopup = () => {
     <div id="title">Classes</div>
     <div id="class-box" class="flex-col justify-self-center">
       <form id="form" @submit.prevent="togglePopup" class="flex justify-between">
-        <input id="input-box" type="text" placeholder="Class Name" v-model="input_content" disabled/>
+        <input
+          id="input-box"
+          type="text"
+          placeholder="Class Name"
+          v-model="input_content"
+          disabled
+        />
         <button type="submit" id="add-button" class="flex"><IconPlus /> &nbsp; Add Classes</button>
       </form>
       <hr />
@@ -47,17 +53,18 @@ const togglePopup = () => {
       </div>
     </div>
   </main>
-  <Popup v-if="popupTriggers.buttonTrigger" :addClass="addClass" :togglePopup="togglePopup"> </Popup>
+  <Popup v-if="popupTriggers.buttonTrigger" :addClass="addClass" :togglePopup="togglePopup">
+  </Popup>
 </template>
 
 <style scoped>
 #class-box {
-  width: 1200px; 
+  width: 1200px;
   min-height: 381px;
-  height: auto; 
+  height: auto;
   border-radius: 16px;
-  padding: 20px;
   background-color: #fefefe;
+  padding: 20px;
   margin: 30px;
 }
 #Class-page {
