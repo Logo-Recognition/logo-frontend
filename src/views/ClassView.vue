@@ -6,15 +6,15 @@ import IconBin from './icon/IconBin.vue'
 import { ref } from 'vue'
 const classes = ref([])
 const input_content = ref('')
-// const addClass = () => {
-//   if (input_content.value.trim() === '') {
-//     return
-//   }
-//   classes.value.push({
-//     content: input_content.value
-//   })
-//   input_content.value = ''
-// }
+const addClass = () => {
+  if (input_content.value.trim() === '') {
+    return
+  }
+  classes.value.push({
+    content: input_content.value
+  })
+  input_content.value = ''
+}
 const removeClass = (classToRemove) => {
   classes.value = classes.value.filter((c) => c !== classToRemove)
 }
@@ -32,12 +32,11 @@ const togglePopup = () => {
   <main id="Class-page" class="flex-col">
     <div id="title">Classes</div>
     <div id="class-box" class="flex-col justify-self-center">
-      <form id="form" @submit.prevent="togglePopup" class="flex justify-between">
+      <form id="form" @submit.prevent="addClass" class="flex justify-between">
         <input id="input-box" type="text" placeholder="Class Name" v-model="input_content" />
         <button type="submit" id="add-button" class="flex"><IconPlus /> &nbsp; Add Classes</button>
       </form>
       <hr />
-      {{ popupTriggers }}
       <div v-for="(item, index) in classes" :key="index">
         <div id="class-item" class="flex justify-between">
           <label>{{ item.content }}</label>
