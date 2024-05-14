@@ -8,6 +8,7 @@ export default {
         'sub-primary' : '#0D4F72',
         'primary-dark' : '#002434',
         'neutral-white' : '#FEFEFE',
+        'neutral-black' : '#111111',
         'neutral-dark-grey' : '#7E7E7E',
         'light-accent' : '#D9D9D9',
       },
