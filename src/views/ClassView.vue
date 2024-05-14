@@ -6,22 +6,22 @@ import IconBin from './icon/IconBin.vue'
 import { ref } from 'vue'
 const classes = ref([])
 const input_content = ref('')
-const addClass = () => {
-  if (input_content.value.trim() === '') {
-    return
-  }
-  classes.value.push({
-    content: input_content.value
-  })
-  input_content.value = ''
+const popupTriggers = ref({
+  buttonTrigger: false
+})
+const addClass = (classNames) => {
+  const newClasses = classNames
+    .split(',') // Split the input string by commas
+    .map((name) => name.trim()) // Trim leading/trailing spaces from each class name
+    .filter((name) => name !== '' && !classes.value.includes(name)) // Filter out empty strings and existing class names
+    .map((name) => ({ content: name })); // Create objects with the 'content' property
+
+  classes.value.push(...newClasses); // Add the new classes to the array
 }
 const removeClass = (classToRemove) => {
   classes.value = classes.value.filter((c) => c !== classToRemove)
 }
 // AddClassPopup implement zone
-const popupTriggers = ref({
-  buttonTrigger: false
-})
 
 const togglePopup = () => {
   popupTriggers.value.buttonTrigger = !popupTriggers.value.buttonTrigger
@@ -32,8 +32,8 @@ const togglePopup = () => {
   <main id="Class-page" class="flex-col">
     <div id="title">Classes</div>
     <div id="class-box" class="flex-col justify-self-center">
-      <form id="form" @submit.prevent="addClass" class="flex justify-between">
-        <input id="input-box" type="text" placeholder="Class Name" v-model="input_content" />
+      <form id="form" @submit.prevent="togglePopup" class="flex justify-between">
+        <input id="input-box" type="text" placeholder="Class Name" v-model="input_content" disabled/>
         <button type="submit" id="add-button" class="flex"><IconPlus /> &nbsp; Add Classes</button>
       </form>
       <hr />
@@ -47,9 +47,7 @@ const togglePopup = () => {
       </div>
     </div>
   </main>
-  <Popup v-if="popupTriggers.buttonTrigger" :togglePopup="togglePopup">
-
-  </Popup>
+  <Popup v-if="popupTriggers.buttonTrigger" :addClass="addClass" :togglePopup="togglePopup"> </Popup>
 </template>
 
 <style scoped>
@@ -70,6 +68,7 @@ const togglePopup = () => {
 #input-box {
   outline: none;
   width: 600px;
+  background-color: transparent; /* ตั้งค่าพื้นหลังให้เป็นโปร่งใส */
 }
 #title {
   font-size: 18px;
