@@ -13,9 +13,6 @@ const closeModal = () => {
   showModal.value = false
 }
 
-const handleFileSelected = (file) => {
-  console.log('Selected file:', file)
-}
 
 </script>
 
@@ -26,7 +23,6 @@ const handleFileSelected = (file) => {
     <ModalUploadImage 
       :is-open="showModal"
       @close="closeModal"
-      @file-selected="handleFileSelected"
     />
   </div>
 </template>
