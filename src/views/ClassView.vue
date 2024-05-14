@@ -1,7 +1,7 @@
 <script setup>
 import Popup from '@/components/AddClassessPopup.vue'
-import IconPlus from './icon/IconPlus.vue'
-import IconBin from './icon/IconBin.vue'
+import IconPlus from '@/components/icons/IconPlus.vue'
+import IconBin from '@/components/icons/IconBin.vue'
 
 import { ref } from 'vue'
 const classes = ref([])
