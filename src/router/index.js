@@ -1,6 +1,7 @@
 import HomeView from '@/views/HomeView.vue'
 import DatasetView from '@/views/DatasetView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
+import AnnotateView from '@/views/AnnotateView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -15,7 +16,11 @@ const router = createRouter({
       name: 'dataset',
       component: DatasetView
     },
-    
+    {
+      path: '/annotate',
+      name: 'annotate',
+      component: AnnotateView
+    }
   ]
 })
 

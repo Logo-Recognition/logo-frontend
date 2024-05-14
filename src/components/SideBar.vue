@@ -25,7 +25,7 @@ const openModal = () => {
             <div id="menu" class="flex flex-col items-center p-6">
                 <button @click="openModal" id="upload-img-button" >
                     <IconUploadImage />
-                    <span id="upload-img-text" class="p-1 text-neutral-white text-xs">Upload Image</span>
+                    <span id="upload-img-text" class="p-1 text-white text-xs">Upload Image</span>
                 </button>
                 <div id="logo-management" class="w-full flex flex-col justify-start">
                     <span class="menu-title">LOGO MANAGEMENT</span>
