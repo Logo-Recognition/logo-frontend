@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { toast } from 'vue3-toastify';
 import PreviewImage from './PreviewImage.vue';
+import {API_URL} from '@/config.js'
 const props = defineProps({
   isOpen: {
     type: Boolean,
@@ -10,7 +11,7 @@ const props = defineProps({
 })
 
 
-const emit = defineEmits(['close', 'file-selected'])
+const emit = defineEmits(['close'])
 
 const previewImages = ref([])
 
@@ -65,7 +66,7 @@ const sendImagesToServer = async () => {
     const formData = new FormData();
     images.forEach(file => formData.append('files[]', file));
 
-    const response = await fetch('http://192.168.2.44:5000/api/upload-image', {
+    const response = await fetch(`${API_URL}/api/upload-image`, {
       method: 'POST',
       body: formData
     });
