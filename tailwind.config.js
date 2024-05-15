@@ -12,7 +12,7 @@ export default {
         'light-accent': '#FFF1F1',
         'background': '#F6F6F6',
         'black': '#111111',
-        'White': '#FEFEFE',
+        'white': '#FEFEFE',
         'light-grey': '#C8CDD0',
         'dark-grey': '#7E7E7E',
         'success': '#459E19',
