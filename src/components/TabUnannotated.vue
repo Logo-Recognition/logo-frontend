@@ -1,9 +1,7 @@
 <template>
-  <div class="unannotated-container">
-    <div class="image-container">
-      <div v-for="image in unannotatedImages" :key="image.id" class="image-wrapper">
-        <img :src="image.src" :alt="image.alt" class="dummy-image" />
-      </div>
+  <div class="image-container">
+    <div v-for="image in unannotatedImages" :key="image.id" class="image-wrapper">
+      <img :src="image.src" :alt="image.alt" class="dummy-image" />
     </div>
   </div>
 </template>
@@ -21,12 +19,6 @@ export default {
 </script>
 
 <style scoped>
-.unannotated-container {
-  background-color: white;
-  border-radius: 16px;
-  padding: 16px;
-}
-
 .image-container {
   display: flex;
   flex-wrap: wrap;
