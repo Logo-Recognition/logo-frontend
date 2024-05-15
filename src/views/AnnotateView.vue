@@ -1,11 +1,11 @@
 <template>
   <div class="annotate-container">
     <h1 class="page-title text-dark-primary">Annotate</h1>
-    <ul class="mb-5 flex list-none flex-row flex-wrap border-b-0 ps-0" role="tablist">
+    <ul class="mb-5 text-sm flex list-none flex-row flex-wrap border-b-0 ps-0" role="tablist">
       <li role="presentation">
         <a
           :class="getTabClass('Unannotated')"
-          @click="currentTab = 'Unannotated'"
+          @click="switchTab('Unannotated')"
           role="tab"
           aria-controls="tabs-unannotated"
           aria-selected="currentTab === 'Unannotated'"
@@ -24,7 +24,7 @@
       <li role="presentation">
         <a
           :class="getTabClass('Annotated')"
-          @click="currentTab = 'Annotated'"
+          @click="switchTab('Annotated')"
           role="tab"
           aria-controls="tabs-annotated"
           aria-selected="currentTab === 'Annotated'"
@@ -73,25 +73,8 @@ export default {
   data() {
     return {
       currentTab: 'Unannotated',
-      unannotatedImages: [
-        {
-          id: 1,
-          src: 'https://media.discordapp.net/attachments/881624576671510529/1238378607852650577/placeholder.png?ex=663f1174&is=663dbff4&hm=3c766982c7c2ee5970c54be5bf7d3dde0f26ca64f68d6da57f6ce385adc6359d&=&format=webp&quality=lossless&width=375&height=312',
-          alt: 'Image 1'
-        }
-      ],
-      annotatedImages: [
-        {
-          id: 2,
-          src: 'https://media.discordapp.net/attachments/881624576671510529/1238378607852650577/placeholder.png?ex=663f1174&is=663dbff4&hm=3c766982c7c2ee5970c54be5bf7d3dde0f26ca64f68d6da57f6ce385adc6359d&=&format=webp&quality=lossless&width=375&height=312',
-          alt: 'Image 2'
-        },
-        {
-          id: 3,
-          src: 'https://media.discordapp.net/attachments/881624576671510529/1238378607852650577/placeholder.png?ex=663f1174&is=663dbff4&hm=3c766982c7c2ee5970c54be5bf7d3dde0f26ca64f68d6da57f6ce385adc6359d&=&format=webp&quality=lossless&width=375&height=312',
-          alt: 'Image 3'
-        }
-      ]
+      unannotatedImages: [],
+      annotatedImages: []
     }
   },
   methods: {
@@ -103,7 +86,31 @@ export default {
           ? 'text-sub-primary border-b-2 border-sub-primary'
           : 'text-dark-grey border-b-2 border-light-grey hover:border-sub-primary hover:text-sub-primary'
       ].join(' ')
+    },
+    async fetchImages(tab) {
+      try {
+        const response = await fetch(`/api/images/logo-img`)
+        if (response.ok) {
+          const images = await response.json()
+          if (tab === 'Unannotated') {
+            this.unannotatedImages = images
+          } else if (tab === 'Annotated') {
+            this.annotatedImages = images
+          }
+        } else {
+          console.error('Error fetching images')
+        }
+      } catch (error) {
+        console.error('Error:', error)
+      }
+    },
+    switchTab(tab) {
+      this.currentTab = tab
+      this.fetchImages(tab)
     }
+  },
+  mounted() {
+    this.fetchImages('Unannotated')
   }
 }
 </script>
@@ -117,7 +124,7 @@ export default {
 
 .page-title {
   margin-bottom: 16px;
-  font-size: 24px;
+  font-size: 18px;
   font-weight: bold;
 }
 
@@ -127,7 +134,7 @@ export default {
 
 .badge {
   padding: 4px 8px;
-  border-radius: 50%;
+  border-radius: 100%;
   font-size: 12px;
   margin-left: 8px;
 }
