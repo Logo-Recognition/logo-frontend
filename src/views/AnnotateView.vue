@@ -89,7 +89,9 @@ export default {
     },
     async fetchImages(tab) {
       try {
-        const response = await fetch(`/api/images/logo-img`)
+        const response = await fetch(`${API_URL}/api/images/logo-img`, {
+          method: 'GET'
+        })
         if (response.ok) {
           const images = await response.json()
           if (tab === 'Unannotated') {
