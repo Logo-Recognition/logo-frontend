@@ -12,7 +12,7 @@ import SideBar from '@/components/SideBar.vue'
 
 <style scoped>
 .app {
-  display: flex;
+  display: flex;  
   flex-direction: row;
 }
 </style>

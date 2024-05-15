@@ -13,7 +13,9 @@
   "dependencies": {
     "pinia": "^2.1.7",
     "vue": "^3.4.21",
-    "vue-router": "^4.3.0"
+    "vue-annotator": "^0.13.2",
+    "vue-router": "^4.3.0",
+    "vue-toastify": "^2.0.0-alpha.2"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.8.0",
