@@ -59,7 +59,7 @@ const togglePopup = () => {
 
 <style scoped>
 #class-box {
-  width: 1200px;
+  width: 92%;
   min-height: 381px;
   height: auto;
   border-radius: 16px;
@@ -72,11 +72,7 @@ const togglePopup = () => {
   background-color: #f0f0f0;
   padding: 10px;
 }
-#input-box {
-  outline: none;
-  width: 600px;
-  background-color: transparent; /* ตั้งค่าพื้นหลังให้เป็นโปร่งใส */
-}
+
 #title {
   font-size: 18px;
   margin: 30px;

@@ -55,7 +55,7 @@ const closePopup = () => {
 #popup-inner {
   background-color: white;
   padding: 40px;
-  width: 800px;
+  width: 60%;
   height: 255px;
   border-radius: 16px;
   opacity: 0px;
