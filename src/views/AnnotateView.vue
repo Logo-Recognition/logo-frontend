@@ -63,6 +63,7 @@
 <script>
 import TabUnannotated from '@/components/TabUnannotated.vue'
 import TabAnnotated from '@/components/TabAnnotated.vue'
+import { API_URL } from '@/config.js'
 
 export default {
   name: 'Annotated',
@@ -119,6 +120,9 @@ export default {
 
 <style scoped>
 .annotate-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   padding-top: 32px;
   padding-left: 40px;
   padding-right: 60px;
