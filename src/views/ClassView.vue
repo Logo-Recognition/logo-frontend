@@ -9,13 +9,14 @@ const input_content = ref('')
 const popupTriggers = ref({
   buttonTrigger: false
 })
+const pathLoccal = "http://127.0.0.1:5000/api/class"
 
 const isLoading = ref(true)
 const error = ref(null)
 
 const fetchClasses = async () => {
   try {
-    const response = await fetch('http://192.168.2.44:5000/api/class');
+    const response = await fetch(pathLoccal);
     const data = await response.json();
     
 
@@ -49,7 +50,7 @@ onMounted(fetchClasses);
 
 const removeClass = async (className) => {
   try {
-    const response = await fetch('http://192.168.2.44:5000/api/class', {
+    const response = await fetch(pathLoccal, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'
@@ -70,9 +71,20 @@ const removeClass = async (className) => {
   }
 }
 
-const addClass = async (newClassName) => {
+const addClass = (classNames) => {
+  const newClasses = classNames
+    .split(',') // Split the input string by commas
+    .map((name) => name.trim()) // Trim leading/trailing spaces from each class name
+    .filter((name) => name !== '') // Filter out empty strings and existing class names
+
+    console.log(...newClasses) // Add the new classes to the array
+    PostClass(...newClasses) // Add the new classes to the array
+}
+
+
+const PostClass = async (newClassName) => {
   try {
-    const response = await fetch('http://192.168.2.44:5000/api/class', {
+    const response = await fetch('http://127.0.0.1:5000/api/class', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
