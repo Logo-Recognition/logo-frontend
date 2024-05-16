@@ -9,14 +9,15 @@ const input_content = ref('')
 const popupTriggers = ref({
   buttonTrigger: false
 })
-const pathLoccal = "http://127.0.0.1:5000/api/class"
+const pathPublic = "http://192.168.2.44:5000/api/class"
+
 
 const isLoading = ref(true)
 const error = ref(null)
 
 const fetchClasses = async () => {
   try {
-    const response = await fetch(pathLoccal);
+    const response = await fetch('pathPublic');
     const data = await response.json();
     
 
@@ -50,7 +51,7 @@ onMounted(fetchClasses);
 
 const removeClass = async (className) => {
   try {
-    const response = await fetch(pathLoccal, {
+    const response = await fetch(pathPublic, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'
@@ -84,7 +85,7 @@ const addClass = (classNames) => {
 
 const PostClass = async (newClassName) => {
   try {
-    const response = await fetch('http://127.0.0.1:5000/api/class', {
+    const response = await fetch('pathPublic', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
