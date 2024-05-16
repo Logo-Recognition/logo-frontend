@@ -9,15 +9,15 @@ const input_content = ref('')
 const popupTriggers = ref({
   buttonTrigger: false
 })
-const pathPublic = "http://192.168.2.44:5000/api/class"
-
+// const pathPublic = "http://192.168.2.44:5000/api/class"
+const pathPublic = "http://127.0.0.1:5000/api/class"
 
 const isLoading = ref(true)
 const error = ref(null)
 
 const fetchClasses = async () => {
   try {
-    const response = await fetch('pathPublic');
+    const response = await fetch(pathPublic);
     const data = await response.json();
     
 
@@ -77,15 +77,14 @@ const addClass = (classNames) => {
     .split(',') // Split the input string by commas
     .map((name) => name.trim()) // Trim leading/trailing spaces from each class name
     .filter((name) => name !== '') // Filter out empty strings and existing class names
-
-    console.log(...newClasses) // Add the new classes to the array
-    PostClass(...newClasses) // Add the new classes to the array
+    
+    newClasses.forEach(className => PostClass(className));
 }
 
 
 const PostClass = async (newClassName) => {
   try {
-    const response = await fetch('pathPublic', {
+    const response = await fetch(pathPublic, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
