@@ -11,7 +11,7 @@
       </div>
       <div id="button-line" class="flex">
         <button @click="submitData" id="SaveButton">Save</button>
-        <button @click="closePopup" id="CloseButton">Close</button>
+        <button @click="closePopup" id="CloseButton">Cancel</button>
       </div>
     </div>
   </div>
