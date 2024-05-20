@@ -1,9 +1,22 @@
 <template>
   <div class="unannotated-container">
-    <div class="image-container">
-      <div v-for="image in unannotatedImages" :key="image.id" class="image-wrapper">
-        <img :src="image.src" :alt="image.alt" class="dummy-image" />
+    <div class="image-container" :class="{ 'single-row': selectedImage }">
+      <div
+        v-for="image in unannotatedImages"
+        :key="image.id"
+        class="image-wrapper"
+        @click="selectImage(image)"
+      >
+        <img
+          :src="image.src"
+          :alt="image.alt"
+          class="dummy-image"
+          :class="{ 'selected-image': selectedImage && selectedImage.id === image.id }"
+        />
       </div>
+    </div>
+    <div v-if="selectedImage" class="selected-image-container">
+      <img :src="selectedImage.src" :alt="selectedImage.alt" class="large-image" />
     </div>
   </div>
 </template>
@@ -16,13 +29,22 @@ export default {
       type: Array,
       required: true
     }
+  },
+  data() {
+    return {
+      selectedImage: null
+    }
+  },
+  methods: {
+    selectImage(image) {
+      this.selectedImage = image
+    }
   }
 }
 </script>
 
 <style scoped>
 .unannotated-container {
-  padding: 16px;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -35,13 +57,37 @@ export default {
   flex: 1;
 }
 
+.image-container.single-row {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+
 .image-wrapper {
-  margin: 8px;
+  margin-right: 8px;
+  cursor: pointer;
 }
 
 .dummy-image {
   border-radius: 16px;
   width: 100px;
   height: 100px;
+  transition: transform 0.2s;
+}
+
+.dummy-image.selected-image {
+  transform: scale(1.1);
+  border: 2px solid #000;
+}
+
+.selected-image-container {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.large-image {
+  border-radius: 16px;
+  width: 300px;
+  height: 300px;
 }
 </style>

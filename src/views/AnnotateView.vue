@@ -90,7 +90,7 @@ export default {
     },
     async fetchImages(tab) {
       try {
-        const response = await fetch(`${API_URL}/api/images/logo-img`, {
+        const response = await fetch(`${API_URL}/api/images/annotated`, {
           method: 'GET'
         })
         if (response.ok) {
