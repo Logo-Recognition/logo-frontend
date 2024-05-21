@@ -1,3 +1,12 @@
+<script setup>
+const props = defineProps({
+  annotatedImages: {
+    type: Array,
+    required: true
+  }
+})
+</script>
+
 <template>
   <div class="annotated-container">
     <div class="image-container">
@@ -7,18 +16,6 @@
     </div>
   </div>
 </template>
-
-<script>
-export default {
-  name: 'TabAnnotated',
-  props: {
-    annotatedImages: {
-      type: Array,
-      required: true
-    }
-  }
-}
-</script>
 
 <style scoped>
 .annotated-container {

@@ -1,3 +1,20 @@
+<script setup>
+import { ref } from 'vue'
+
+const props = defineProps({
+  unannotatedImages: {
+    type: Array,
+    required: true
+  }
+})
+
+const selectedImage = ref(null)
+
+function selectImage(image) {
+  selectedImage.value = image
+}
+</script>
+
 <template>
   <div class="unannotated-container">
     <div class="image-container" :class="{ 'single-row': selectedImage }">
@@ -20,28 +37,6 @@
     </div>
   </div>
 </template>
-
-<script>
-export default {
-  name: 'TabUnannotated',
-  props: {
-    unannotatedImages: {
-      type: Array,
-      required: true
-    }
-  },
-  data() {
-    return {
-      selectedImage: null
-    }
-  },
-  methods: {
-    selectImage(image) {
-      this.selectedImage = image
-    }
-  }
-}
-</script>
 
 <style scoped>
 .unannotated-container {

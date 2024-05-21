@@ -1,3 +1,59 @@
+<script setup>
+import { ref, onMounted } from 'vue'
+import TabUnannotated from '@/components/TabUnannotated.vue'
+import TabAnnotated from '@/components/TabAnnotated.vue'
+import { API_URL } from '@/config.js'
+
+const currentTab = ref('Unannotated')
+const unannotatedImages = ref([])
+const annotatedImages = ref([])
+
+function getTabClass(tab) {
+  const isActive = currentTab.value === tab
+  return [
+    'my-2 block px-7 pb-3.5 pt-4 text-s font-medium leading-tight',
+    isActive
+      ? 'text-sub-primary border-b-2 border-sub-primary'
+      : 'text-dark-grey border-b-2 border-light-grey hover:border-sub-primary hover:text-sub-primary'
+  ].join(' ')
+}
+
+async function fetchImages(tab) {
+  try {
+    const lowerCaseTab = tab.toLowerCase()
+    const response = await fetch(`${API_URL}/api/images/${lowerCaseTab}`, {
+      method: 'GET'
+    })
+    if (response.ok) {
+      const imageUrls = await response.json()
+      const images = imageUrls.map((url, index) => ({
+        id: `image-${index}`,
+        src: url,
+        alt: `Image ${index + 1}`
+      }))
+      if (lowerCaseTab === 'unannotated') {
+        unannotatedImages.value = images
+      } else if (lowerCaseTab === 'annotated') {
+        annotatedImages.value = images
+      }
+    } else {
+      console.error('Error fetching images')
+    }
+  } catch (error) {
+    console.error('Error:', error)
+  }
+}
+
+function switchTab(tab) {
+  currentTab.value = tab
+  fetchImages(tab)
+}
+
+onMounted(() => {
+  fetchImages('Unannotated')
+})
+</script>
+
 <template>
   <div class="annotate-container">
     <h1 class="page-title text-dark-primary">Annotate</h1>
@@ -59,70 +115,6 @@
     </div>
   </div>
 </template>
-
-<script>
-import TabUnannotated from '@/components/TabUnannotated.vue'
-import TabAnnotated from '@/components/TabAnnotated.vue'
-import { API_URL } from '@/config.js'
-
-export default {
-  name: 'Annotated',
-  components: {
-    TabUnannotated,
-    TabAnnotated
-  },
-  data() {
-    return {
-      currentTab: 'Unannotated',
-      unannotatedImages: [],
-      annotatedImages: []
-    }
-  },
-  methods: {
-    getTabClass(tab) {
-      const isActive = this.currentTab === tab
-      return [
-        'my-2 block px-7 pb-3.5 pt-4 text-s font-medium leading-tight',
-        isActive
-          ? 'text-sub-primary border-b-2 border-sub-primary'
-          : 'text-dark-grey border-b-2 border-light-grey hover:border-sub-primary hover:text-sub-primary'
-      ].join(' ')
-    },
-    async fetchImages(tab) {
-      try {
-        const response = await fetch(`${API_URL}/api/images/${tab.toLowerCase()}`, {
-          method: 'GET'
-        })
-
-        if (response.ok) {
-          const imageUrls = await response.json()
-          const images = imageUrls.map((url, index) => ({
-            id: `image-${index}`,
-            src: url,
-            alt: `Image ${index + 1}`
-          }))
-          if (tab === 'Unannotated') {
-            this.unannotatedImages = images
-          } else if (tab === 'Annotated') {
-            this.annotatedImages = images
-          }
-        } else {
-          console.error('Error fetching images')
-        }
-      } catch (error) {
-        console.error('Error:', error)
-      }
-    },
-    switchTab(tab) {
-      this.currentTab = tab
-      this.fetchImages(tab)
-    }
-  },
-  mounted() {
-    this.fetchImages('Unannotated')
-  }
-}
-</script>
 
 <style scoped>
 .annotate-container {
