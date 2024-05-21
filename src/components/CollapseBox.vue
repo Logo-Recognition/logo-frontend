@@ -1,10 +1,12 @@
+<script setup>
+
+</script>
+
+
 <template>
-    <div id="box"></div>
+    <div>Hello</div>
 </template>
 
 <style scoped>
-.box {
-    border: 1cap black;
-    width: 80%;
-}
+
 </style>

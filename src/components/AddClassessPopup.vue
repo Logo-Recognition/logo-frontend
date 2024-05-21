@@ -1,3 +1,26 @@
+<script setup>
+import IconClose from './icons/IconClose.vue'
+import { ref } from 'vue'
+
+const props = defineProps({
+  addClass: Function,
+  togglePopup: Function
+})
+const inputData = ref('')
+
+const submitData = () => {
+  props.addClass(inputData.value)
+  closePopup() // Optionally close the popup after submitting data
+}
+
+const closePopup = () => {
+  // Close the popup
+  props.togglePopup(null)
+}
+</script>
+
+
+
 <template>
   <div id="AddClassPopup">
     <div id="popup-inner" class="flex-col space-y-5">
@@ -17,26 +40,6 @@
   </div>
 </template>
 
-<script setup>
-import IconClose from './icons/IconClose.vue'
-import { defineProps, ref } from 'vue'
-
-const props = defineProps({
-  addClass: Function,
-  togglePopup: Function
-})
-const inputData = ref('')
-
-const submitData = () => {
-  props.addClass(inputData.value)
-  closePopup() // Optionally close the popup after submitting data
-}
-
-const closePopup = () => {
-  // Close the popup
-  props.togglePopup(null)
-}
-</script>
 
 <style scoped>
 #AddClassPopup {

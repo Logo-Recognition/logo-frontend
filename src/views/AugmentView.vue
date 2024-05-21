@@ -1,57 +1,9 @@
-<template>
-  <div id="main" class="flex flex-col">
-    <h1 id="title">Augmentation</h1>
-    <div id="picture-list" class="flex">
-      <div v-for="(image, index) in images" :key="index" class="picture-item">
-        <img
-          id="img-list-set"
-          :src="image"
-          :alt="getImageName(image)"
-          @click="handleImageClick(image)"
-        />
-      </div>
-    </div>
-    <div id="preview-body" class="flex justify-around">
-        <CollapseBox/>
-        <AugmentOptionBar/>
-    </div>
-    <div v-if="selectedImageSrc">
-      <img :src="selectedImageSrc" alt="Selected Image" />
-    </div>
-    <div v-if="isImage">
-      <label>
-        Rotation:
-        <select v-model="selectedRotation">
-          <option value="0">0°</option>
-          <option value="90">90°</option>
-          <option value="180">180°</option>
-          <option value="270">270°</option>
-        </select>
-      </label>
-      <label>
-        Flip:
-        <select v-model="selectedFlip">
-          <option value="none">None</option>
-          <option value="horizontal">Horizontal</option>
-          <option value="vertical">Vertical</option>
-        </select>
-      </label>
-      <label>
-        Width:
-        <input type="number" v-model="imageWidth" />
-      </label>
-      <label>
-        Height:
-        <input type="number" v-model="imageHeight" />
-      </label>
-    </div>
-  </div>
-</template>
-
 <script setup>
 import CollapseBox from '@/components/CollapseBox.vue'
 import AugmentOptionBar from '@/components/AugmentOptionBar.vue'
-import { ref, watch } from 'vue'
+import SlidingRotatebar from '@/components/SlidingRotatebar.vue'
+import FlipSelectBar from '@/components/FlipSelectBar.vue'
+import { ref, watch} from 'vue'
 
 // Dynamically import all images from the 'components/images' directory
 const images = ref([])
@@ -70,6 +22,12 @@ const imageWidth = ref(300)
 const imageHeight = ref(300)
 const originalImage = ref(null)
 const isImage = ref(false)
+
+//
+
+
+
+//
 
 const handleImageClick = (src) => {
   selectedImageSrc.value = src
@@ -114,9 +72,66 @@ const getImageName = (path) => {
 watch([selectedRotation, selectedFlip, imageWidth, imageHeight], updatePreviewImage)
 </script>
 
+<template>
+  <div id="main" class="flex flex-col">
+    <h1 id="title">Augmentation</h1>
+    <div id="picture-list" class="flex">
+      <div v-for="(image, index) in images" :key="index" class="picture-item">
+        <img
+          id="img-list-set"
+          :src="image"
+          :alt="getImageName(image)"
+          @click="handleImageClick(image)"
+        />
+      </div>
+    </div>
+    <div id="preview-body" class="flex justify-around">
+      <div id="Left-Box">
+        <CollapseBox />
+      </div>
+      <div id="Right-Box" class="flex flex-col">
+        <AugmentOptionBar />
+        <SlidingRotatebar/>
+        <FlipSelectBar/>
+        
+      </div>
+    </div>
+    <div v-if="selectedImageSrc">
+      <img :src="selectedImageSrc" alt="Selected Image" />
+    </div>
+    <div v-if="isImage">
+      <label>
+        Rotation:
+        <select v-model="selectedRotation">
+          <option value="0">0°</option>
+          <option value="90">90°</option>
+          <option value="180">180°</option>
+          <option value="270">270°</option>
+        </select>
+      </label>
+      <label>
+        Flip:
+        <select v-model="selectedFlip">
+          <option value="none">None</option>
+          <option value="horizontal">Horizontal</option>
+          <option value="vertical">Vertical</option>
+        </select>
+      </label>
+      <label>
+        Width:
+        <input type="number" v-model="imageWidth" />
+      </label>
+      <label>
+        Height:
+        <input type="number" v-model="imageHeight" />
+      </label>
+    </div>
+  </div>
+</template>
+
 <style scoped>
 #main {
-  width: 100%;
+  width: 83%;
   background-color: #f0f0f0;
   padding: 10px;
 }
@@ -138,7 +153,6 @@ watch([selectedRotation, selectedFlip, imageWidth, imageHeight], updatePreviewIm
 .picture-item {
   margin-left: 0px !important;
   margin: 10px;
-  
 }
 
 .picture-item img {
@@ -153,4 +167,22 @@ watch([selectedRotation, selectedFlip, imageWidth, imageHeight], updatePreviewIm
   border: 1px;
   opacity: 0px;
 }
+
+#Left-Box {
+  width: 20%;
+  min-height: 381px;
+  background-color: #fefefe !important;
+  border-radius: 16px;
+  padding: 20px;
+  margin: 30px;
+}
+#Right-Box {
+  width: 70%;
+  background-color: #fefefe;
+  min-height: 381px;
+  border-radius: 16px;
+  padding: 20px;
+  margin: 30px;
+}
+
 </style>
