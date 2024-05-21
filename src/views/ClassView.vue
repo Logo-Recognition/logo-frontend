@@ -9,8 +9,8 @@ const input_content = ref('')
 const popupTriggers = ref({
   buttonTrigger: false
 })
-// const pathPublic = "http://192.168.2.44:5000/api/class"
-const pathPublic = "http://127.0.0.1:5000/api/class"
+const pathPublic = "http://192.168.2.44:5000/api/class"
+// const pathPublic = "http://127.0.0.1:5000/api/class"
 
 const isLoading = ref(true)
 const error = ref(null)
