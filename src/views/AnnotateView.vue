@@ -90,11 +90,17 @@ export default {
     },
     async fetchImages(tab) {
       try {
-        const response = await fetch(`${API_URL}/api/images/annotated`, {
+        const response = await fetch(`${API_URL}/api/images/${tab.toLowerCase()}`, {
           method: 'GET'
         })
+
         if (response.ok) {
-          const images = await response.json()
+          const imageUrls = await response.json()
+          const images = imageUrls.map((url, index) => ({
+            id: `image-${index}`,
+            src: url,
+            alt: `Image ${index + 1}`
+          }))
           if (tab === 'Unannotated') {
             this.unannotatedImages = images
           } else if (tab === 'Annotated') {
