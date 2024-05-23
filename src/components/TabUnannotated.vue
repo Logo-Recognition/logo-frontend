@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue'
+import { Annotator } from 'vue-annotator'
 
 const props = defineProps({
   unannotatedImages: {
