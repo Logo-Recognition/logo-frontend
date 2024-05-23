@@ -13,8 +13,8 @@ function getTabClass(tab) {
   return [
     'my-2 block px-7 pb-3.5 pt-4 text-s font-medium leading-tight',
     isActive
-      ? 'text-sub-primary border-b-2 border-sub-primary'
-      : 'text-dark-grey border-b-2 border-light-grey hover:border-sub-primary hover:text-sub-primary'
+      ? 'text-primary border-b-2 border-primary'
+      : 'text-grey-text border-b-2 border-grey-border hover:border-primary hover:text-primary'
   ].join(' ')
 }
 
@@ -56,7 +56,7 @@ onMounted(() => {
 
 <template>
   <div class="annotate-container">
-    <h1 class="page-title text-dark-primary">Annotate</h1>
+    <h1 class="page-title text-dark">Annotate</h1>
     <ul class="mb-5 text-sm flex list-none flex-row flex-wrap border-b-0 ps-0" role="tablist">
       <li role="presentation">
         <a
@@ -70,8 +70,8 @@ onMounted(() => {
           <span
             class="badge"
             :class="{
-              'bg-sub-primary text-white': currentTab === 'Unannotated',
-              'outline-sub-primary': currentTab !== 'Unannotated'
+              'bg-primary text-light': currentTab === 'Unannotated',
+              'outline-badge border-grey-text': currentTab !== 'Unannotated'
             }"
             >{{ unannotatedImages.length }}</span
           >
@@ -89,8 +89,8 @@ onMounted(() => {
           <span
             class="badge"
             :class="{
-              'bg-sub-primary text-white': currentTab === 'Annotated',
-              'outline-sub-primary border-light-grey': currentTab !== 'Annotated'
+              'bg-primary text-light': currentTab === 'Annotated',
+              'outline-badge border-grey-text': currentTab !== 'Annotated'
             }"
             >{{ annotatedImages.length }}</span
           >
@@ -143,7 +143,7 @@ onMounted(() => {
   margin-left: 8px;
 }
 
-.outline-sub-primary {
+.outline-badge {
   border: 1px solid;
 }
 </style>

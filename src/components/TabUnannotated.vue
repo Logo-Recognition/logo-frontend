@@ -27,7 +27,7 @@ function selectImage(image) {
         <img
           :src="image.src"
           :alt="image.alt"
-          class="dummy-image"
+          class="image-dump"
           :class="{ 'selected-image': selectedImage && selectedImage.id === image.id }"
         />
       </div>
@@ -54,24 +54,25 @@ function selectImage(image) {
 
 .image-container.single-row {
   flex-wrap: nowrap;
-  overflow-x: auto;
+  overflow-x: scroll;
 }
 
 .image-wrapper {
-  margin-right: 8px;
+  margin-right: 16px;
+  margin-bottom: 16px;
   cursor: pointer;
 }
 
-.dummy-image {
-  border-radius: 16px;
+.image-dump {
+  border-radius: 10px;
   width: 100px;
   height: 100px;
+  object-fit: cover;
   transition: transform 0.2s;
 }
 
-.dummy-image.selected-image {
-  transform: scale(1.1);
-  border: 2px solid #000;
+.image-dump.selected-image {
+  border: 1px solid;
 }
 
 .selected-image-container {
@@ -81,7 +82,7 @@ function selectImage(image) {
 }
 
 .large-image {
-  border-radius: 16px;
+  border-radius: 10px;
   width: 300px;
   height: 300px;
 }

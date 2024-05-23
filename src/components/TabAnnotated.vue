@@ -11,7 +11,7 @@ const props = defineProps({
   <div class="annotated-container">
     <div class="image-container">
       <div v-for="image in annotatedImages" :key="image.id" class="image-wrapper">
-        <img :src="image.src" :alt="image.alt" class="dummy-image" />
+        <img :src="image.src" :alt="image.alt" class="image-dump" />
       </div>
     </div>
   </div>
@@ -36,7 +36,7 @@ const props = defineProps({
   margin: 8px;
 }
 
-.dummy-image {
+.image-dump {
   border-radius: 16px;
   width: 100px;
   height: 100px;
