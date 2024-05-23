@@ -1,6 +1,6 @@
 <script setup>
-import { ref } from 'vue'
-import { Annotator } from 'vue-annotator'
+import { ref, onMounted } from 'vue'
+import IconBoundingBox from './icons/IconBoundingBox.vue'
 
 const props = defineProps({
   unannotatedImages: {
@@ -10,9 +10,25 @@ const props = defineProps({
 })
 
 const selectedImage = ref(null)
+const canvas = ref(null)
 
 function selectImage(image) {
   selectedImage.value = image
+}
+
+onMounted(() => {
+  if (selectedImage.value) {
+    drawImageOnCanvas(selectedImage.value)
+  }
+})
+
+function drawImageOnCanvas(image) {
+  const ctx = canvas.value.getContext('2d')
+  const img = new Image()
+  img.src = image.src
+  img.onload = () => {
+    ctx.drawImage(img, 0, 0, canvas.value.width, canvas.value.height)
+  }
 }
 </script>
 
@@ -33,8 +49,14 @@ function selectImage(image) {
         />
       </div>
     </div>
-    <div v-if="selectedImage" class="selected-image-container">
-      <img :src="selectedImage.src" :alt="selectedImage.alt" class="large-image" />
+    <div v-if="selectedImage" class="annotation-tools bg-white">
+      <div class="toolbar-container">
+        <button><IconBoundingBox /></button>
+      </div>
+      <div class="canvas-container">
+        <!-- <canvas ref="canvas" class="image-canvas"></canvas> -->
+        <img :src="selectedImage.src" :alt="selectedImage.alt" class="large-image" />
+      </div>
     </div>
   </div>
 </template>
@@ -83,6 +105,34 @@ function selectImage(image) {
 }
 
 .large-image {
+  border-radius: 10px;
+  width: 300px;
+  height: 300px;
+}
+
+.annotation-tools {
+  display: flex;
+  flex-direction: column;
+  margin-top: 16px;
+  padding: 24px;
+  border-radius: 16px;
+}
+
+.toolbar-container {
+  display: flex;
+  justify-content: flex-start;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
+
+.canvas-container {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.image-canvas {
   border-radius: 10px;
   width: 300px;
   height: 300px;
