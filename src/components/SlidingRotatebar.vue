@@ -1,7 +1,18 @@
 <script setup>
-import { ref, computed } from 'vue'
-const selectedRotation = ref(0)
+import { ref, computed, watch } from 'vue'
+import { defineEmits } from 'vue'
+
+const props = defineProps({
+  initialRotation: {
+    type: Number,
+    default: 0
+  }
+})
+
+const emit = defineEmits(['update:selected-rotation'])
+const selectedRotation = ref(props.initialRotation)
 const isDragging = ref(false)
+
 const selectedRotationPercentage = computed(() => {
   return (selectedRotation.value / 180) * 100
 })
@@ -13,6 +24,11 @@ const showValue = () => {
 const hideValue = () => {
   isDragging.value = !true
 }
+const UpdateRotationvalue = () => {
+  emit('update:selected-rotation', selectedRotation.value)
+}
+
+watch([selectedRotation], UpdateRotationvalue)
 </script>
 
 <template>
@@ -58,8 +74,5 @@ const hideValue = () => {
 .slider-value.show {
   display: block; /* แสดงค่าตอนที่มีคลาส .show */
 }
-
-
-
 
 </style>

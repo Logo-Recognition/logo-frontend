@@ -7,12 +7,21 @@ import IconBright from '@/components/icons/IconBright.vue'
 import IconSaturation from '@/components/icons/IconSaturation.vue'
 import IconContrast from '@/components/icons/IconContrast.vue'
 import { ref } from 'vue'
+import { defineEmits } from 'vue';
 
+const emit = defineEmits(['data-emitted']);
 const FocusingAugment = ref('Rotate')
 
 const updateFocusingAugment = (augment) => {
   FocusingAugment.value = augment
+  sendData()
 }
+
+const sendData = () => {
+  const data = FocusingAugment.value; // Replace with actual data you want to pass
+  emit('data-emitted', data);
+};
+
 </script>
 
 <template>
@@ -22,7 +31,7 @@ const updateFocusingAugment = (augment) => {
       <IconFlip class="cursor-pointer" @click="updateFocusingAugment('Flip')" />
       <IconNoise class="cursor-pointer" @click="updateFocusingAugment('Noise')" />
       <IconScailing class="cursor-pointer" @click="updateFocusingAugment('Scailing')" />
-      <IconBright class="cursor-pointer" @click="updateFocusingAugment('Bright')" />
+      <IconBright class="cursor-pointer" @click="updateFocusingAugment('Brightness')" />
       <IconSaturation class="cursor-pointer" @click="updateFocusingAugment('Saturation')" />
       <IconContrast class="cursor-pointer" @click="updateFocusingAugment('Contrast')" />
     </div>
