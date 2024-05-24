@@ -85,6 +85,12 @@ const onCheckboxChange = (event) => {
   border: 1px solid #7585ff;
 }
 
+
+/* Change the text color of the label when the checkbox is checked */
+.custom-checkbox input[type='checkbox']:checked + label {
+  color: #7585ff; /* Change this to the desired color */
+}
+
 .custom-checkbox label {
   margin-left: 8px;
   cursor: pointer;
