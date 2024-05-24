@@ -1,46 +1,93 @@
 <template>
-    <div>
-      <div class="flex ">
+  <div class="grid justify-items-stretch">
+    <!-- <div>Checked name: {{ checkedName }}</div> -->
+    <div class="flex justify-self-center justify-around w-3/4 items-center">
+      <div class="custom-checkbox">
         <input
-          id="option1"
-          v-model="selectedOption"
-          type="radio"
-          value="option1"
-          class="form-radio h-5 w-5 text-indigo-600 transition duration-150 ease-in-out"
+          type="checkbox"
+          id="none"
+          value="None"
+          :checked="checkedName === 'None'"
+          @change="onCheckboxChange($event)"
         />
-        <label for="option1" class="ml-2 block text-sm font-medium text-gray-700">
-          Option 1
-        </label>
+        <label for="none">None</label>
       </div>
-      <div class="flex items-center">
+
+      <div class="custom-checkbox">
         <input
-          id="option2"
-          v-model="selectedOption"
-          type="radio"
-          value="option2"
-          class="form-radio h-5 w-5 text-indigo-600 transition duration-150 ease-in-out"
+          type="checkbox"
+          id="Vertical"
+          value="Vertical"
+          :checked="checkedName === 'Vertical'"
+          @change="onCheckboxChange($event)"
         />
-        <label for="option2" class="ml-2 block text-sm font-medium text-gray-700">
-          Option 2
-        </label>
+        <label for="Vertical">Vertical</label>
       </div>
-      <div class="flex items-center">
+
+      <div class="custom-checkbox">
         <input
-          id="option3"
-          v-model="selectedOption"
-          type="radio"
-          value="option3"
-          class="form-radio h-5 w-5 text-indigo-600 transition duration-150 ease-in-out"
+          type="checkbox"
+          id="Horizontal"
+          value="Horizontal"
+          :checked="checkedName === 'Horizontal'"
+          @change="onCheckboxChange($event)"
         />
-        <label for="option3" class="ml-2 block text-sm font-medium text-gray-700">
-          Option 3
-        </label>
+        <label for="Horizontal">Horizontal</label>
       </div>
     </div>
-  </template>
-  
-  <script setup>
-  import { ref } from 'vue';
-  
-  const selectedOption = ref(null);
-  </script>
+  </div>
+</template>
+
+<script setup>
+import { ref, defineEmits } from 'vue'
+
+const checkedName = ref('None')
+const emit = defineEmits(['update:checkedName'])
+
+const onCheckboxChange = (event) => {
+  if (event.target.checked) {
+    checkedName.value = event.target.value
+    emit('update:checkedName', checkedName.value)
+  } else {
+    // Prevent unchecking the currently checked checkbox
+    event.target.checked = true
+  }
+}
+</script>
+
+<style scoped>
+.flex {
+  display: flex;
+  gap: 10px;
+}
+
+.custom-checkbox {
+  display: flex;
+  align-items: center;
+  margin: 5px 0;
+}
+
+.custom-checkbox input[type='checkbox'] {
+  width: 12px;
+  height: 12px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: #fefefe;
+  border: 1px solid #7e7e7e;
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+}
+
+.custom-checkbox input[type='checkbox']:checked {
+  background-color: #7585ff;
+  border: 1px solid #7585ff;
+}
+
+.custom-checkbox label {
+  margin-left: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+</style>
