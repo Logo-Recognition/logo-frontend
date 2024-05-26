@@ -52,6 +52,7 @@ const addNewBox = () => {
   const left = canvasWidth / 2 - 25
   const top = canvasHeight / 2 - 25
 
+  // test drawing box at canvas
   const rect = new fabric.Rect({
     top,
     left,
@@ -90,8 +91,27 @@ async function drawImageOnCanvas(image) {
   const img = new Image()
   img.src = image.src
   img.onload = () => {
-    ctx.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height)
-    ctx.drawImage(img, 0, 0, canvasRef.value.width, canvasRef.value.height)
+    const canvasWidth = canvasRef.value.width
+    const canvasHeight = canvasRef.value.height
+    const imageAspectRatio = img.width / img.height
+    const canvasAspectRatio = canvasWidth / canvasHeight
+
+    let drawWidth, drawHeight, offsetX, offsetY
+
+    if (imageAspectRatio > canvasAspectRatio) {
+      drawWidth = canvasWidth
+      drawHeight = canvasWidth / imageAspectRatio
+      offsetX = 0
+      offsetY = (canvasHeight - drawHeight) / 2
+    } else {
+      drawWidth = canvasHeight * imageAspectRatio
+      drawHeight = canvasHeight
+      offsetX = (canvasWidth - drawWidth) / 2
+      offsetY = 0
+    }
+
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight)
+    ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight)
   }
 }
 
@@ -133,10 +153,14 @@ watch(selectedImage, async (newImage) => {
         </button>
         <button @click="toTextFile">YOLO</button>
       </div>
-      <div class="canvas-container">
-        <canvas ref="canvasRef" class="image-canvas" width="500" height="300"></canvas>
-        <div id="labels">
-          yo
+      <div class="canvas-labels-container">
+        <div class="canvas-container">
+          <canvas ref="canvasRef" class="image-canvas" width="500" height="300"></canvas>
+        </div>
+        <div class="labels-container">
+          <div v-for="object in canvas?.getObjects()" :key="object.id" class="label-item">
+            Label for object
+          </div>
         </div>
       </div>
     </div>
@@ -208,14 +232,45 @@ watch(selectedImage, async (newImage) => {
   border-radius: 10px;
 }
 
-.canvas-container {
+.canvas-labels-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
   margin-top: 16px;
+}
+
+.canvas-container {
   display: flex;
   justify-content: center;
+  border: 1px solid #d8dbd8;
+  border-radius: 8px;
+  padding: 8px;
+  width: 70%;
+  height: 300px;
+  overflow-y: auto;
 }
 
 .image-canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.labels-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  margin-left: 16px;
   border: 1px solid #d8dbd8;
   border-radius: 8px;
+  padding: 8px;
+  width: 30%;
+  height: 300px;
+  overflow-y: auto;
+}
+
+.label-item {
+  padding: 4px;
+  border-bottom: 1px solid #d8dbd8;
 }
 </style>
