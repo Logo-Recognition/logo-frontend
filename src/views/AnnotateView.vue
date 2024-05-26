@@ -14,7 +14,7 @@ function getTabClass(tab) {
     'my-2 block px-7 pb-3.5 pt-4 text-s font-medium leading-tight',
     isActive
       ? 'text-primary border-b-2 border-primary'
-      : 'text-grey-text border-b-2 border-grey-border hover:border-primary hover:text-primary'
+      : 'text-grey-text border-b-2 border-grey-border hover:border-dark hover:text-dark hover:border-dark'
   ].join(' ')
 }
 

@@ -3,11 +3,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: '#031739',
+        primary: '#071b40',
         secondary: '#7585FF',
         accent: '#00B500',
         light: '#EFF1FF',
-        dark: '#021026',
+        dark: '#020C1D',
         black: '#111111',
         white: '#FEFEFE',
         'grey-background': '#F3F5F7',
