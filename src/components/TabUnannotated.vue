@@ -1,6 +1,7 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch, nextTick, defineProps } from 'vue'
 import IconBoundingBox from './icons/IconBoundingBox.vue'
+import { fabric } from 'fabric'
 
 const props = defineProps({
   unannotatedImages: {
@@ -10,26 +11,102 @@ const props = defineProps({
 })
 
 const selectedImage = ref(null)
-const canvas = ref(null)
+const canvasRef = ref(null)
+let canvas = null
+
+const toTextFile = async () => {
+  const canvasWidth = canvas.width
+  const canvasHeight = canvas.height
+
+  const objects = canvas.getObjects()
+
+  let textContent = ''
+
+  objects.forEach((obj) => {
+    if (obj.type === 'rect') {
+      const classId = 0
+      const centerX = (obj.left + obj.width / 2) / canvasWidth
+      const centerY = (obj.top + obj.height / 2) / canvasHeight
+      const width = obj.width / canvasWidth
+      const height = obj.height / canvasHeight
+
+      const yoloString = `${classId} ${centerX.toFixed(6)} ${centerY.toFixed(6)} ${width.toFixed(6)} ${height.toFixed(6)}`
+      textContent += yoloString + '\n'
+    }
+  })
+
+  const blob = new Blob([textContent], { type: 'text/plain' })
+  const blobURL = URL.createObjectURL(blob)
+
+  const a = document.createElement('a')
+  a.href = blobURL
+  a.download = 'annotations.txt'
+  a.click()
+
+  URL.revokeObjectURL(blobURL)
+}
+
+const addNewBox = () => {
+  const canvasWidth = canvas.width
+  const canvasHeight = canvas.height
+  const left = canvasWidth / 2 - 25
+  const top = canvasHeight / 2 - 25
+
+  const rect = new fabric.Rect({
+    top,
+    left,
+    width: 50,
+    height: 50,
+    fill: '#f56',
+    borderColor: '#3845ff',
+    cornerSize: 15,
+    cornerStyle: 'circle'
+  })
+  canvas.add(rect)
+  canvas.setActiveObject(rect)
+}
+
+const onObjectScaled = () => {
+  const obj = canvas.getActiveObject()
+  const width = obj.width
+  const height = obj.height
+  const scaleX = obj.scaleX
+  const scaleY = obj.scaleY
+  obj.set({
+    width: width * scaleX,
+    height: height * scaleY,
+    scaleX: 1,
+    scaleY: 1
+  })
+}
 
 function selectImage(image) {
   selectedImage.value = image
 }
 
-onMounted(() => {
-  if (selectedImage.value) {
-    drawImageOnCanvas(selectedImage.value)
-  }
-})
-
-function drawImageOnCanvas(image) {
-  const ctx = canvas.value.getContext('2d')
+async function drawImageOnCanvas(image) {
+  await nextTick()
+  const ctx = canvasRef.value.getContext('2d')
   const img = new Image()
   img.src = image.src
   img.onload = () => {
-    ctx.drawImage(img, 0, 0, canvas.value.width, canvas.value.height)
+    ctx.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height)
+    ctx.drawImage(img, 0, 0, canvasRef.value.width, canvasRef.value.height)
   }
 }
+
+onMounted(() => {
+  nextTick(() => {
+    canvas = new fabric.Canvas(canvasRef.value)
+    canvas.on('object:scaling', onObjectScaled)
+  })
+})
+
+watch(selectedImage, async (newImage) => {
+  if (newImage) {
+    await drawImageOnCanvas(newImage)
+  }
+})
 </script>
 
 <template>
@@ -51,11 +128,16 @@ function drawImageOnCanvas(image) {
     </div>
     <div v-if="selectedImage" class="annotation-tools bg-white">
       <div class="toolbar-container">
-        <button><IconBoundingBox /></button>
+        <button @click="addNewBox">
+          <IconBoundingBox />
+        </button>
+        <button @click="toTextFile">YOLO</button>
       </div>
       <div class="canvas-container">
-        <!-- <canvas ref="canvas" class="image-canvas"></canvas> -->
-        <img :src="selectedImage.src" :alt="selectedImage.alt" class="large-image" />
+        <canvas ref="canvasRef" class="image-canvas" width="500" height="300"></canvas>
+        <div id="labels">
+          yo
+        </div>
       </div>
     </div>
   </div>
@@ -77,7 +159,7 @@ function drawImageOnCanvas(image) {
 
 .image-container.single-row {
   flex-wrap: nowrap;
-  overflow-x: scroll;
+  overflow-x: auto;
 }
 
 .image-wrapper {
@@ -133,8 +215,7 @@ function drawImageOnCanvas(image) {
 }
 
 .image-canvas {
-  border-radius: 10px;
-  width: 300px;
-  height: 300px;
+  border: 1px solid #d8dbd8;
+  border-radius: 8px;
 }
 </style>
