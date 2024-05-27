@@ -53,7 +53,7 @@ const onCheckboxChange = (event) => {
 .custom-checkbox {
   display: flex;
   align-items: center;
-  margin: 5px 0;
+  margin-top: 5px ;
 }
 
 .custom-checkbox input[type='checkbox'] {
@@ -83,5 +83,8 @@ const onCheckboxChange = (event) => {
   margin-left: 8px;
   cursor: pointer;
   user-select: none;
+}
+label {
+  color: #7E7E7E;
 }
 </style>

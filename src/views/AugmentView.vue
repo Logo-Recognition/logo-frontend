@@ -17,19 +17,37 @@ for (const path in imageModules) {
 }
 
 const statusnow = ref('Rotate') // current action ('Rotate', 'Flip', 'Noise')
+const selectedImageSrc = ref(null)
+const imageWidth = ref(900)
+const imageHeight = ref(300)
+const originalImage = ref(null)
+const isImage = ref(false)
+
 const selectedRotation = ref(0)
 const selectedFlip = ref('none')
 const selectedNoiseLevel = ref(0)
 const selectedNoiseType = ref('pepper') // 'pepper' or 'chromatic'
-const selectedImageSrc = ref(null)
-const imageWidth = ref(700)
-const imageHeight = ref(300)
-const originalImage = ref(null)
-const isImage = ref(false)
 const selectedScale = ref(1) // default scale is 1 (no scaling)
 const selectedBrightness = ref(1) // default brightness is 1 (no change)
 const selectedSaturation = ref(1) // default saturation is 1 (no change)
 const selectedContrast = ref(1) // default contrast is 1 (no change)
+
+const selectedRotationAp = ref(0)
+const selectedFlipAp = ref('none')
+const selectedNoiseLevelAp = ref(0)
+// const selectedNoiseTypeAp = ref('pepper') // 'pepper' or 'chromatic'
+const selectedScaleAp = ref(1) // default scale is 1 (no scaling)
+const selectedBrightnessAp = ref(1) // default brightness is 1 (no change)
+const selectedSaturationAp = ref(1) // default saturation is 1 (no change)
+const selectedContrastAp = ref(1) // default contrast is 1 (no change)
+
+const showCollapseBoxRotation = ref(false)
+const showCollapseBoxFlip = ref(false)
+const showCollapseBoxNoise = ref(false)
+const showCollapseBoxScale = ref(false)
+const showCollapseBoxBrightness = ref(false)
+const showCollapseBoxSaturation = ref(false)
+const showCollapseBoxContrast = ref(false)
 
 const formatTooltip = (value) => {
   return value.toFixed(1)
@@ -189,8 +207,8 @@ const applyScaling = () => {
   const scaledWidth = imageWidth.value * selectedScale.value
   const scaledHeight = imageHeight.value * selectedScale.value
 
-  canvas.width = scaledWidth
-  canvas.height = scaledHeight
+  canvas.width = imageWidth.value
+  canvas.height = imageHeight.value
 
   ctx.drawImage(img, 0, 0, scaledWidth, scaledHeight)
 
@@ -290,6 +308,69 @@ watch(
 const getImageName = (path) => {
   return path.split('/').pop()
 }
+
+const Apply = () => {
+  switch (statusnow.value) {
+    case 'Rotate':
+      if (selectedRotation.value == 0) {
+        showCollapseBoxRotation.value = false
+      } else {
+        showCollapseBoxRotation.value = true
+      }
+      selectedRotationAp.value = selectedRotation.value
+      break
+    case 'Flip':
+      if (selectedFlip.value == 'none') {
+        showCollapseBoxFlip.value = false
+      } else {
+        showCollapseBoxFlip.value = true
+      }
+      selectedFlipAp.value = selectedFlip.value
+      break
+    case 'Noise':
+      if (selectedNoiseLevel.value == 0) {
+        showCollapseBoxNoise.value = false
+      } else {
+        showCollapseBoxNoise.value = true
+      }
+      selectedNoiseLevelAp.value = selectedNoiseLevel.value
+      break
+    case 'Scailing':
+      if (selectedScale.value == 1) {
+        showCollapseBoxScale.value = false
+      } else {
+        showCollapseBoxScale.value = true
+      }
+      selectedScaleAp.value = selectedScale.value
+      break
+    case 'Brightness':
+      if (selectedBrightness.value == 1) {
+        showCollapseBoxBrightness.value = false
+      } else {
+        showCollapseBoxBrightness.value = true
+      }
+      selectedBrightnessAp.value = selectedBrightness.value
+      break
+    case 'Saturation':
+      if (selectedSaturation.value == 1) {
+        showCollapseBoxSaturation.value = false
+      } else {
+        showCollapseBoxSaturation.value = true
+      }
+      selectedSaturationAp.value = selectedSaturation.value
+      break
+    case 'Contrast':
+      if (selectedContrast.value == 1) {
+        showCollapseBoxContrast.value = false
+      } else {
+        showCollapseBoxContrast.value = true
+      }
+      selectedContrastAp.value = selectedContrast.value
+      break
+    default:
+      break
+  }
+}
 </script>
 
 <template>
@@ -307,8 +388,24 @@ const getImageName = (path) => {
     </div>
     <div id="preview-body" class="flex justify-around">
       <div id="Left-Box">
-        <CollapseBox />
+        <h1 class="mb-5">Collapse</h1>
+        <CollapseBox v-if="showCollapseBoxRotation" title="Rotate" :value="selectedRotationAp" />
+        <CollapseBox v-if="showCollapseBoxFlip" title="Flip" :value="selectedFlipAp" />
+        <CollapseBox v-if="showCollapseBoxNoise" title="Noise" :value="selectedNoiseLevelAp" />
+        <CollapseBox v-if="showCollapseBoxScale" title="Scaling" :value="selectedScaleAp" />
+        <CollapseBox
+          v-if="showCollapseBoxBrightness"
+          title="Brightness"
+          :value="selectedBrightnessAp"
+        />
+        <CollapseBox
+          v-if="showCollapseBoxSaturation"
+          title="Saturation"
+          :value="selectedSaturationAp"
+        />
+        <CollapseBox v-if="showCollapseBoxContrast" title="Contrast" :value="selectedContrastAp" />
       </div>
+
       <div id="Right-Box" class="flex flex-col">
         <AugmentOptionBar @data-emitted="handleData" />
         <div v-if="statusnow === 'Rotate'" class="mr-10 ml-10">
@@ -418,9 +515,11 @@ const getImageName = (path) => {
             :format="formatTooltip"
           />
         </div>
-
         <div v-if="selectedImageSrc" class="flex place-content-center mt-8">
           <img :src="selectedImageSrc" alt="Selected Image" id="AugmentedImage" />
+        </div>
+        <div id="apply-button" class="flex justify-end mt-5">
+          <button class="apply" @click="Apply">Apply</button>
         </div>
       </div>
     </div>
@@ -499,7 +598,7 @@ const getImageName = (path) => {
   --slider-handle-radius: 9999px;
   --slider-handle-shadow: 0.5px 0.5px 2px 1px #7e7e7e;
   --slider-handle-shadow-active: 0.5px 0.5px 2px 1px rgba(0, 0, 0, 0.42);
-  --slider-handle-ring-width: 3px;
+  --slider-handle-ring-width: 2px;
   --slider-handle-ring-color: #7e7e7e;
 
   --slider-tooltip-bg: #031739;
@@ -552,5 +651,15 @@ const getImageName = (path) => {
   font-size: 14px;
   font-weight: 500;
   color: #020c1d;
+}
+.apply {
+  background-color: #7585ff;
+  width: 72px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center; /* Horizontally center the content */
+  align-items: center; /* Vertically center the content */
+  color: white;
 }
 </style>

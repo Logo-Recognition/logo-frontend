@@ -6,8 +6,8 @@
         <input
           type="checkbox"
           id="none"
-          value="None"
-          :checked="checkedName === 'None'"
+          value="none"
+          :checked="checkedName === 'none'"
           @change="onCheckboxChange($event)"
         />
         <label for="none">None</label>
@@ -41,7 +41,7 @@
 <script setup>
 import { ref, defineEmits } from 'vue'
 
-const checkedName = ref('None')
+const checkedName = ref('none')
 const emit = defineEmits(['update:checkedName'])
 
 const onCheckboxChange = (event) => {
@@ -58,13 +58,13 @@ const onCheckboxChange = (event) => {
 <style scoped>
 .flex {
   display: flex;
-  gap: 10px;
+  /* gap: 10px; */
 }
 
 .custom-checkbox {
   display: flex;
   align-items: center;
-  margin: 5px 0;
+  margin-top: 15px ;
 }
 
 .custom-checkbox input[type='checkbox'] {
@@ -95,5 +95,9 @@ const onCheckboxChange = (event) => {
   margin-left: 8px;
   cursor: pointer;
   user-select: none;
+}
+
+label {
+  color: #7E7E7E;
 }
 </style>
