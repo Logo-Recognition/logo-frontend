@@ -31,6 +31,10 @@ const selectedBrightness = ref(1) // default brightness is 1 (no change)
 const selectedSaturation = ref(1) // default saturation is 1 (no change)
 const selectedContrast = ref(1) // default contrast is 1 (no change)
 
+const formatTooltip = (value) => {
+  return value.toFixed(1)
+}
+
 const handleRotationUpdate = (value) => {
   console.log('Rotation value received from child:', value)
   selectedRotation.value = value
@@ -309,8 +313,8 @@ const getImageName = (path) => {
         <AugmentOptionBar @data-emitted="handleData" />
         <div v-if="statusnow === 'Rotate'" class="mr-10 ml-10">
           <div class="flex w-full justify-between mb-3 mt-3">
-            <p>0°</p>
-            <p>180°</p>
+            <p class="TextColor">0°</p>
+            <p class="TextColor">180°</p>
           </div>
           <Slider
             id="Slider"
@@ -327,19 +331,13 @@ const getImageName = (path) => {
           /> -->
         </div>
         <div v-if="statusnow === 'Flip'" class="mr-10 ml-10">
-          <FlipSelectBar @update:checkedName="updateFlipName"/>
-          
+          <FlipSelectBar @update:checkedName="updateFlipName" />
         </div>
         <div v-if="statusnow === 'Noise'" class="mr-10 ml-10">
-          <!-- <label for="noiseType">Noise Type:</label>
-          <select id="noiseType" v-model="selectedNoiseType" @change="updatePreviewImage">
-            <option value="pepper">Pepper Noise</option>
-            <option value="chromatic">Chromatic Noise</option>
-          </select> -->
-          <NoiseSelectBar @update:checkedName="updateNoiseName"/>
+          <NoiseSelectBar @update:checkedName="updateNoiseName" />
           <div class="flex w-full justify-between mb-3 mt-3">
-            <p>0%</p>
-            <p>10%</p>
+            <p class="TextColor">0%</p>
+            <p class="TextColor">10%</p>
           </div>
           <Slider
             id="Slider"
@@ -354,8 +352,8 @@ const getImageName = (path) => {
         </div>
         <div v-if="statusnow === 'Scailing'" class="mr-10 ml-10">
           <div class="flex w-full justify-between mb-3 mt-3">
-            <p>0.1</p>
-            <p>1</p>
+            <p class="TextColor">0.1</p>
+            <p class="TextColor">1</p>
           </div>
           <Slider
             id="Slider"
@@ -366,12 +364,13 @@ const getImageName = (path) => {
             :step="0.1"
             :tooltips="true"
             @slide="handleScaleUpdate"
+            :format="formatTooltip"
           />
         </div>
         <div v-if="statusnow === 'Brightness'" class="mr-10 ml-10">
           <div class="flex w-full justify-between mb-3 mt-3">
-            <p>0.1</p>
-            <p>2</p>
+            <p class="TextColor">0.1</p>
+            <p class="TextColor">2</p>
           </div>
           <Slider
             id="Slider"
@@ -382,12 +381,13 @@ const getImageName = (path) => {
             :step="0.1"
             :tooltips="true"
             @slide="handleBrightnessUpdate"
+            :format="formatTooltip"
           />
         </div>
         <div v-if="statusnow === 'Saturation'" class="mr-10 ml-10">
           <div class="flex w-full justify-between mb-3 mt-3">
-            <p>0.1</p>
-            <p>2</p>
+            <p class="TextColor">0.1</p>
+            <p class="TextColor">2</p>
           </div>
           <Slider
             id="Slider"
@@ -398,12 +398,13 @@ const getImageName = (path) => {
             :step="0.1"
             :tooltips="true"
             @slide="handleSaturationUpdate"
+            :format="formatTooltip"
           />
         </div>
         <div v-if="statusnow === 'Contrast'" class="mr-10 ml-10">
           <div class="flex w-full justify-between mb-3 mt-3">
-            <p>0.1</p>
-            <p>2</p>
+            <p class="TextColor">0.1</p>
+            <p class="TextColor">2</p>
           </div>
           <Slider
             id="Slider"
@@ -414,6 +415,7 @@ const getImageName = (path) => {
             :step="0.1"
             :tooltips="true"
             @slide="handleContrastUpdate"
+            :format="formatTooltip"
           />
         </div>
 
@@ -545,5 +547,10 @@ const getImageName = (path) => {
 .checked {
   background-color: #007bff;
   border-color: #007bff;
+}
+.TextColor {
+  font-size: 14px;
+  font-weight: 500;
+  color: #020c1d;
 }
 </style>
