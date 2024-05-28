@@ -17,7 +17,7 @@ const closeModal = () => {
 </script>
 
 <template>
-  <div class="app">
+  <div class="app bg-background">
     <SideBar @open-modal="openModal"/>
     <div class="content">
       <RouterView />

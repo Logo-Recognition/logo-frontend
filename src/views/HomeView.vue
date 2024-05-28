@@ -1,29 +1,6 @@
-
 <template>
-	<main id="Home-page">
-		<h1>Home</h1>
-		<div>
-			dsadsadwa
-		</div>
-		<div>
-			dsadsadwa
-		</div>
-		<div>
-			dsadsadwa
-		</div>
-		<div>
-			dsadsadwa
-		</div>
-		<div>
-			dsadsadwa
-		</div>
-		<div>
-			dsadsadwa
-		</div>
-	</main>
+  <main id="Home-page">
+    <h1>Home</h1>
+    <p>This is the home page</p>
+  </main>
 </template>
-<style scoped>
-div{
-	height: 120px;
-}
-</style>
