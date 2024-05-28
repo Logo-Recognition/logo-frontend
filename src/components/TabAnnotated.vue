@@ -1,5 +1,5 @@
 <script setup>
-const props = defineProps({
+const annotatedImages = defineProps({
   annotatedImages: {
     type: Array,
     required: true

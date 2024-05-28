@@ -3,7 +3,7 @@ import { ref, onMounted, watch, nextTick, defineProps } from 'vue'
 import IconBoundingBox from './icons/IconBoundingBox.vue'
 import { fabric } from 'fabric'
 
-const props = defineProps({
+const { unannotatedImages } = defineProps({
   unannotatedImages: {
     type: Array,
     required: true
@@ -13,6 +13,11 @@ const props = defineProps({
 const selectedImage = ref(null)
 const canvasRef = ref(null)
 let canvas = null
+const mouseCoordinates = ref({ x: 0, y: 0 })
+const isDrawing = ref(false)
+let x = 0
+let y = 0
+let line = null
 
 const toTextFile = async () => {
   const canvasWidth = canvas.width
@@ -52,16 +57,17 @@ const addNewBox = () => {
   const left = canvasWidth / 2 - 25
   const top = canvasHeight / 2 - 25
 
-  // test drawing box at canvas
   const rect = new fabric.Rect({
     top,
     left,
     width: 50,
     height: 50,
-    fill: '#f56',
-    borderColor: '#3845ff',
+    fill: 'rgba(255, 86, 86, 0.5)',
+    stroke: '#3845ff',
+    strokeWidth: 2,
     cornerSize: 15,
-    cornerStyle: 'circle'
+    cornerStyle: 'circle',
+    transparentCorners: false
   })
   canvas.add(rect)
   canvas.setActiveObject(rect)
@@ -79,6 +85,42 @@ const onObjectScaled = () => {
     scaleX: 1,
     scaleY: 1
   })
+  canvas.renderAll()
+}
+
+const showCoordinates = (event) => {
+  const pointer = canvas.getPointer(event.e)
+  mouseCoordinates.value = {
+    x: Math.round(pointer.x),
+    y: Math.round(pointer.y)
+  }
+}
+
+const beginDrawing = (event) => {
+  const pointer = canvas.getPointer(event.e)
+  x = pointer.x
+  y = pointer.y
+  isDrawing.value = true
+  line = new fabric.Line([x, y, x, y], {
+    stroke: 'black',
+    strokeWidth: 2
+  })
+  canvas.add(line)
+}
+
+const keepDrawing = (event) => {
+  if (!isDrawing.value) return
+  const pointer = canvas.getPointer(event.e)
+  line.set({ x2: pointer.x, y2: pointer.y })
+  canvas.renderAll()
+}
+
+const stopDrawing = (event) => {
+  if (!isDrawing.value) return
+  const pointer = canvas.getPointer(event.e)
+  line.set({ x2: pointer.x, y2: pointer.y })
+  isDrawing.value = false
+  canvas.renderAll()
 }
 
 function selectImage(image) {
@@ -119,6 +161,22 @@ onMounted(() => {
   nextTick(() => {
     canvas = new fabric.Canvas(canvasRef.value)
     canvas.on('object:scaling', onObjectScaled)
+    canvas.on('mouse:move', (event) => {
+      if (selectedImage.value) {
+        showCoordinates(event)
+        keepDrawing(event)
+      }
+    })
+    canvas.on('mouse:down', (event) => {
+      if (selectedImage.value) {
+        beginDrawing(event)
+      }
+    })
+    canvas.on('mouse:up', (event) => {
+      if (selectedImage.value) {
+        stopDrawing(event)
+      }
+    })
   })
 })
 
@@ -163,6 +221,7 @@ watch(selectedImage, async (newImage) => {
           </div>
         </div>
       </div>
+      <div class="mouse-coordinates">X: {{ mouseCoordinates.x }}, Y: {{ mouseCoordinates.y }}</div>
     </div>
   </div>
 </template>
@@ -210,12 +269,6 @@ watch(selectedImage, async (newImage) => {
   justify-content: center;
 }
 
-.large-image {
-  border-radius: 10px;
-  width: 300px;
-  height: 300px;
-}
-
 .annotation-tools {
   display: flex;
   flex-direction: column;
@@ -245,14 +298,13 @@ watch(selectedImage, async (newImage) => {
   border: 1px solid #d8dbd8;
   border-radius: 8px;
   padding: 8px;
-  width: 70%;
+  width: 100%;
   height: 300px;
   overflow-y: auto;
 }
 
 .image-canvas {
-  width: 100%;
-  height: 100%;
+  /* border: 1px solid #d8dbd8; */
   object-fit: contain;
 }
 
@@ -272,5 +324,13 @@ watch(selectedImage, async (newImage) => {
 .label-item {
   padding: 4px;
   border-bottom: 1px solid #d8dbd8;
+}
+
+.mouse-coordinates {
+  margin-top: 16px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  text-align: center;
 }
 </style>

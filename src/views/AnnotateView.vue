@@ -21,7 +21,7 @@ function getTabClass(tab) {
 async function fetchImages(tab) {
   try {
     const lowerCaseTab = tab.toLowerCase()
-    const response = await fetch(`${API_URL}/api/images/${lowerCaseTab}`, {
+    const response = await fetch(`${API_URL}/api/images`, {
       method: 'GET'
     })
     if (response.ok) {
