@@ -21,8 +21,9 @@ const fetchClasses = async () => {
     const data = await response.json();
     
 
-    if (data.success) {
-      classes.value = data.buckets;
+    if (response.ok) {
+      console.log("sdsdsd");
+      classes.value = data.classes;
     } else {
       error.value = 'An error occurred while fetching class data.';
     }
@@ -122,13 +123,14 @@ const togglePopup = () => {
       <hr />
       <div v-for="(item, index) in classes" :key="index">
         <div id="class-item" class="flex justify-between">
-          <label>{{ item.class_name }}</label>
+          <label>{{ item }}</label>
           <div id="delete-button">
-            <button class="delete" @click="removeClass(item.class_name)"><IconBin /></button>
+            <button class="delete" @click="removeClass(item)"><IconBin /></button>
           </div>
         </div>
       </div>
     </div>
+    <div>{{classes}}</div>
   </main>
   <Popup v-if="popupTriggers.buttonTrigger" :addClass="addClass" :togglePopup="togglePopup"> </Popup>
 </template>
