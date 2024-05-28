@@ -8,6 +8,7 @@ import IconScailing from '@/components/icons/IconScailing.vue'
 import IconBright from '@/components/icons/IconBright.vue'
 import IconSaturation from '@/components/icons/IconSaturation.vue'
 import IconContrast from '@/components/icons/IconContrast.vue'
+import IconClose from './icons/IconClose.vue'
 
 const props = defineProps({
   title: String,
@@ -47,17 +48,23 @@ const formattedValue = computed(() => {
     case 'Contrast':
       return `${props.value}x`
     case 'Flip':
-      return props.value === 'horizontal' ? 'Horizontal' : 'Vertical'
+      return props.value === 'Horizontal' ? 'Horizontal' : 'Vertical'
     case 'Scailing':
       return `${props.value}x`
     default:
       return props.value
   }
 })
+
+const emit = defineEmits(['close'])
+
+function closePopup() {
+  emit('close', props.title)
+}
 </script>
 
 <template>
-  <div id="Box" class="flex">
+  <div id="Box" class="flex relative">
     <div class="w-1/5">
       <component :is="iconComponent" />
     </div>
@@ -65,20 +72,21 @@ const formattedValue = computed(() => {
       <div id="text-title">{{ title }}</div>
       <div id="text">{{ formattedValue }}</div>
     </div>
+    <button class="popup-close" @click="closePopup"><IconClose class="icon-size" /></button>
   </div>
 </template>
 
 <style scoped>
 #Box {
+  position: relative;
   width: 100%;
-  height: 64px;
+  height: 72px;
   padding: 12px;
   border-radius: 8px;
   background: #eff1ff;
   margin-top: 10px;
 }
 #text-title {
- 
   font-size: 14px;
   font-weight: 500;
 }
@@ -87,5 +95,17 @@ const formattedValue = computed(() => {
   font-weight: 400;
   line-height: 20px;
   color: #7e7e7e;
+}
+.popup-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+.icon-size {
+  width: 15px;
+  height: 15px;
 }
 </style>

@@ -1,12 +1,10 @@
 <script setup>
 import CollapseBox from '@/components/CollapseBox.vue'
 import AugmentOptionBar from '@/components/AugmentOptionBar.vue'
-// import SlidingRotatebar from '@/components/SlidingRotatebar.vue'
 import FlipSelectBar from '@/components/FlipSelectBar.vue'
 import NoiseSelectBar from '@/components/NoiseSelectBar.vue'
 import { ref, watch } from 'vue'
 import Slider from '@vueform/slider'
-// Dynamically import all images from the 'components/images' directory
 const images = ref([])
 const imageModules = import.meta.glob('@/components/images/*.jpg')
 
@@ -35,7 +33,7 @@ const selectedContrast = ref(1) // default contrast is 1 (no change)
 const selectedRotationAp = ref(0)
 const selectedFlipAp = ref('none')
 const selectedNoiseLevelAp = ref(0)
-// const selectedNoiseTypeAp = ref('pepper') // 'pepper' or 'chromatic'
+const selectedNoiseTypeAp = ref('pepper') // 'pepper' or 'chromatic'
 const selectedScaleAp = ref(1) // default scale is 1 (no scaling)
 const selectedBrightnessAp = ref(1) // default brightness is 1 (no change)
 const selectedSaturationAp = ref(1) // default saturation is 1 (no change)
@@ -334,6 +332,7 @@ const Apply = () => {
         showCollapseBoxNoise.value = true
       }
       selectedNoiseLevelAp.value = selectedNoiseLevel.value
+      selectedNoiseTypeAp.value = selectedNoiseType.value
       break
     case 'Scailing':
       if (selectedScale.value == 1) {
@@ -371,6 +370,48 @@ const Apply = () => {
       break
   }
 }
+
+function handleClose(title) {
+  switch (title) {
+    case 'Rotate':
+      selectedRotationAp.value = 0
+      showCollapseBoxRotation.value = false
+      console.log('Rotate closed')
+      break
+    case 'Flip':
+      selectedFlip.value = 'none'
+      showCollapseBoxFlip.value = false
+      console.log('Flip closed')
+      break
+    case 'Noise':
+      selectedNoiseLevelAp.value = 0
+      selectedNoiseTypeAp.value = 'pepper'
+      showCollapseBoxNoise.value = false
+      console.log('Noise closed')
+      break
+    case 'Scailing':
+      selectedScaleAp.value = 1
+      showCollapseBoxScale.value = false
+      console.log('Scailing closed')
+      break
+    case 'Brightness':
+      selectedBrightnessAp.value = 1
+      showCollapseBoxBrightness.value = false
+      console.log('Brightness closed')
+      break
+    case 'Saturation':
+      selectedSaturationAp.value = 1
+      showCollapseBoxSaturation.value = false
+      console.log('Saturation closed')
+      break
+    case 'Contrast':
+      selectedContrastAp.value = 1
+      showCollapseBoxContrast.value = false
+      console.log('Contrast closed')
+      break
+    default:
+  }
+}
 </script>
 
 <template>
@@ -389,21 +430,49 @@ const Apply = () => {
     <div id="preview-body" class="flex justify-around">
       <div id="Left-Box">
         <h1 class="mb-5">Collapse</h1>
-        <CollapseBox v-if="showCollapseBoxRotation" title="Rotate" :value="selectedRotationAp" />
-        <CollapseBox v-if="showCollapseBoxFlip" title="Flip" :value="selectedFlipAp" />
-        <CollapseBox v-if="showCollapseBoxNoise" title="Noise" :value="selectedNoiseLevelAp" />
-        <CollapseBox v-if="showCollapseBoxScale" title="Scaling" :value="selectedScaleAp" />
+        <CollapseBox
+          v-if="showCollapseBoxRotation"
+          title="Rotate"
+          :value="selectedRotationAp"
+          @close="handleClose"
+        />
+        <CollapseBox
+          v-if="showCollapseBoxFlip"
+          title="Flip"
+          :value="selectedFlipAp"
+          @close="handleClose"
+        />
+        <CollapseBox
+          v-if="showCollapseBoxNoise"
+          title="Noise"
+          :value="selectedNoiseLevelAp"
+          :type="selectedNoiseTypeAp"
+          @close="handleClose"
+        />
+        <CollapseBox
+          v-if="showCollapseBoxScale"
+          title="Scailing"
+          :value="selectedScaleAp"
+          @close="handleClose"
+        />
         <CollapseBox
           v-if="showCollapseBoxBrightness"
           title="Brightness"
           :value="selectedBrightnessAp"
+          @close="handleClose"
         />
         <CollapseBox
           v-if="showCollapseBoxSaturation"
           title="Saturation"
           :value="selectedSaturationAp"
+          @close="handleClose"
         />
-        <CollapseBox v-if="showCollapseBoxContrast" title="Contrast" :value="selectedContrastAp" />
+        <CollapseBox
+          v-if="showCollapseBoxContrast"
+          title="Contrast"
+          :value="selectedContrastAp"
+          @close="handleClose"
+        />
       </div>
 
       <div id="Right-Box" class="flex flex-col">
@@ -422,10 +491,6 @@ const Apply = () => {
             :tooltips="true"
             @slide="handleRotationUpdate"
           />
-          <!-- <SlidingRotatebar
-            :initial-rotation="selectedRotation"
-            @update:selected-rotation="handleRotationUpdate"
-          /> -->
         </div>
         <div v-if="statusnow === 'Flip'" class="mr-10 ml-10">
           <FlipSelectBar @update:checkedName="updateFlipName" />
@@ -466,15 +531,15 @@ const Apply = () => {
         </div>
         <div v-if="statusnow === 'Brightness'" class="mr-10 ml-10">
           <div class="flex w-full justify-between mb-3 mt-3">
-            <p class="TextColor">0.1</p>
-            <p class="TextColor">2</p>
+            <p class="TextColor">0.5</p>
+            <p class="TextColor">1.5</p>
           </div>
           <Slider
             id="Slider"
             v-model="selectedBrightness"
             showTooltip="drag"
-            :min="0.1"
-            :max="2"
+            :min="0.5"
+            :max="1.5"
             :step="0.1"
             :tooltips="true"
             @slide="handleBrightnessUpdate"
@@ -490,7 +555,7 @@ const Apply = () => {
             id="Slider"
             v-model="selectedSaturation"
             showTooltip="drag"
-            :min="0.1"
+            :min="0"
             :max="2"
             :step="0.1"
             :tooltips="true"
