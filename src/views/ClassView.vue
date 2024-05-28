@@ -130,7 +130,6 @@ const togglePopup = () => {
         </div>
       </div>
     </div>
-    <div>{{classes}}</div>
   </main>
   <Popup v-if="popupTriggers.buttonTrigger" :addClass="addClass" :togglePopup="togglePopup"> </Popup>
 </template>
