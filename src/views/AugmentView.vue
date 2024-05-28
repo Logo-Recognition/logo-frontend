@@ -3,8 +3,40 @@ import CollapseBox from '@/components/CollapseBox.vue'
 import AugmentOptionBar from '@/components/AugmentOptionBar.vue'
 import FlipSelectBar from '@/components/FlipSelectBar.vue'
 import NoiseSelectBar from '@/components/NoiseSelectBar.vue'
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import Slider from '@vueform/slider'
+import { useParametersStore } from '@/stores/Augment.js'
+
+const store = useParametersStore()
+
+// // Accessing augmentation parameters
+const augmentationParam = computed(() => store.augmentationParam)
+
+// augmentationParam.rotate
+// augmentationParam.flipHorizontal
+// augmentationParam.flipVertical
+// augmentationParam.gaussianNoise
+// augmentationParam.pepperNoise
+// augmentationParam.scaling
+// augmentationParam.brightness
+// augmentationParam.saturation
+// augmentationParam.contrast
+
+// // Example of updating a parameter
+const updateRotate = (type, value) => {
+  store.updateAugmentationParam(type, value)
+}
+
+// updateRotate("rotate",)
+// updateRotate("flipHorizontal",)
+// updateRotate("flipVertical",)
+// updateRotate("gaussianNoise",)
+// updateRotate("pepperNoise",)
+// updateRotate("scaling",)
+// updateRotate("brightness",)
+// updateRotate("saturation",)
+// updateRotate("contrast",)
+
 const images = ref([])
 const imageModules = import.meta.glob('@/components/images/*.jpg')
 
@@ -30,7 +62,7 @@ const selectedBrightness = ref(1) // default brightness is 1 (no change)
 const selectedSaturation = ref(1) // default saturation is 1 (no change)
 const selectedContrast = ref(1) // default contrast is 1 (no change)
 
-const selectedRotationAp = ref(0)
+// const selectedRotationAp = ref(0)
 const selectedFlipAp = ref('none')
 const selectedNoiseLevelAp = ref(0)
 const selectedNoiseTypeAp = ref('pepper') // 'pepper' or 'chromatic'
@@ -315,7 +347,7 @@ const Apply = () => {
       } else {
         showCollapseBoxRotation.value = true
       }
-      selectedRotationAp.value = selectedRotation.value
+      updateRotate("rotate",selectedRotation.value)
       break
     case 'Flip':
       if (selectedFlip.value == 'none') {
@@ -374,7 +406,7 @@ const Apply = () => {
 function handleClose(title) {
   switch (title) {
     case 'Rotate':
-      selectedRotationAp.value = 0
+      updateRotate("rotate",0)
       showCollapseBoxRotation.value = false
       console.log('Rotate closed')
       break
@@ -433,7 +465,7 @@ function handleClose(title) {
         <CollapseBox
           v-if="showCollapseBoxRotation"
           title="Rotate"
-          :value="selectedRotationAp"
+          :value="augmentationParam.rotate"
           @close="handleClose"
         />
         <CollapseBox
