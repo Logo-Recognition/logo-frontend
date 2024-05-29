@@ -6,6 +6,7 @@ import IconBoundingBox from './icons/IconBoundingBox.vue'
 import IconTxtFile from './icons/IconTxtFile.vue'
 import IconZoomIn from './icons/IconZoomIn.vue'
 import IconZoomOut from './icons/IconZoomOut.vue'
+import BoxNameModal from './LabelModal.vue'
 
 const canvasRef = ref(null)
 let canvas = null
@@ -17,7 +18,6 @@ let isDrawing = false
 let startPoint = { x: 0, y: 0 }
 let currentBox = null
 const showModal = ref(false)
-const boxName = ref('')
 
 const toTextFile = async () => {
   const canvasWidth = canvas.width
@@ -90,9 +90,11 @@ const onMouseUp = () => {
   showModal.value = true // Show the modal after drawing the box
 }
 
-const hideModal = () => {
+const hideModal = (cancel = false) => {
+  if (cancel && currentBox) {
+    canvas.remove(currentBox)
+  }
   showModal.value = false
-  boxName.value = ''
   currentBox = null
 }
 
@@ -108,16 +110,9 @@ const showCoordinates = (event) => {
   canvas.renderAll()
 }
 
-const submitBoxName = () => {
+const handleModalSubmit = (name) => {
   if (currentBox) {
-    currentBox.set('name', boxName.value)
-  }
-  hideModal()
-}
-
-const cancelBoxDrawing = () => {
-  if (currentBox && currentBox.name === '') {
-    canvas.remove(currentBox)
+    currentBox.set('name', name)
   }
   hideModal()
 }
@@ -160,19 +155,7 @@ onMounted(() => {
     <canvas ref="canvasRef" width="500" height="500" />
     <div class="mouse-coordinates">X: {{ mouseCoordinates.x }}, Y: {{ mouseCoordinates.y }}</div>
 
-    <div class="modal" :class="{ 'is-active': showModal }">
-      <div class="modal-background" @click="hideModal"></div>
-      <div class="modal-content" @click.stop>
-        <div class="box">
-          <label class="label">Box Name:</label>
-          <input class="input" type="text" v-model="boxName" autofocus />
-        </div>
-        <div class="buttons">
-          <button class="button is-success" @click="submitBoxName">Submit</button>
-          <button class="button is-danger" @click="cancelBoxDrawing">Cancel</button>
-        </div>
-      </div>
-    </div>
+    <BoxNameModal v-if="showModal" @close="hideModal" @submit="handleModalSubmit" />
   </div>
 </template>
 
@@ -208,65 +191,5 @@ canvas {
   border: 1px solid #ccc;
   border-radius: 8px;
   text-align: center;
-}
-
-.modal {
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-}
-
-.modal.is-active {
-  display: flex;
-}
-
-.modal-content {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  width: 300px;
-  text-align: center;
-}
-
-.box {
-  margin-bottom: 20px;
-}
-
-.input {
-  width: 100%;
-  padding: 4px;
-  border: 1px solid grey;
-  border-radius: 4px;
-  outline: none;
-}
-
-.input:focus {
-  border-color: black;
-}
-
-.buttons {
-  display: flex;
-  justify-content: center;
-}
-
-.button.is-success {
-  background-color: #42b983;
-  color: white;
-  border-radius: 4px;
-  padding: 5px;
-}
-
-.button.is-danger {
-  background-color: #ff3860;
-  color: white;
-  border-radius: 4px;
-  padding: 5px;
 }
 </style>
