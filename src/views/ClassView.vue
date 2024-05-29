@@ -37,18 +37,6 @@ const fetchClasses = async () => {
 
 onMounted(fetchClasses);
 
-// const addClass = (classNames) => {
-//   const newClasses = classNames
-//     .split(',') // Split the input string by commas
-//     .map((name) => name.trim()) // Trim leading/trailing spaces from each class name
-//     .filter((name) => name !== '' && !classes.value.includes(name)) // Filter out empty strings and existing class names
-//     .map((name) => ({ content: name })); // Create objects with the 'content' property
-
-//   classes.value.push(...newClasses); // Add the new classes to the array
-// }
-// const removeClass = (classToRemove) => {
-//   classes.value = classes.value.filter((c) => c !== classToRemove)
-// }
 
 const removeClass = async (className) => {
   try {
@@ -61,8 +49,9 @@ const removeClass = async (className) => {
     })
     const data = await response.json()
 
-    if (data.success) {
+    if (response.ok) {
       // Fetch updated class list after successful addition
+      console.log("sdsdsd");
       await fetchClasses()
     } else {
       error.value = data.error
@@ -73,39 +62,39 @@ const removeClass = async (className) => {
   }
 }
 
-const addClass = (classNames) => {
-  const newClasses = classNames
-    .split(',') // Split the input string by commas
-    .map((name) => name.trim()) // Trim leading/trailing spaces from each class name
-    .filter((name) => name !== '') // Filter out empty strings and existing class names
+// const addClass = (classNames) => {
+//   const newClasses = classNames
+//     .split(',') // Split the input string by commas
+//     .map((name) => name.trim()) // Trim leading/trailing spaces from each class name
+//     .filter((name) => name !== '') // Filter out empty strings and existing class names
     
-    newClasses.forEach(className => PostClass(className));
-}
+//     newClasses.forEach(className => PostClass(className));
+// }
 
 
-const PostClass = async (newClassName) => {
-  try {
-    const response = await fetch(pathPublic, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ bucket_name: newClassName })
-    })
-    const data = await response.json()
+// const PostClass = async (newClassName) => {
+//   try {
+//     const response = await fetch(pathPublic, {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json'
+//       },
+//       body: JSON.stringify({ bucket_name: newClassName })
+//     })
+//     const data = await response.json()
 
-    if (data.success) {
-      // Fetch updated class list after successful addition
-      await fetchClasses()
-    } else {
-      error.value = data.error
-    }
-  } catch (err) {
-    error.value = 'An error occurred while adding the new class.'
-    console.error(err)
-  }
-}
-// AddClassPopup implement zone
+//     if (data.success) {
+//       // Fetch updated class list after successful addition
+//       await fetchClasses()
+//     } else {
+//       error.value = data.error
+//     }
+//   } catch (err) {
+//     error.value = 'An error occurred while adding the new class.'
+//     console.error(err)
+//   }
+// }
+// // AddClassPopup implement zone
 
 const togglePopup = () => {
   popupTriggers.value.buttonTrigger = !popupTriggers.value.buttonTrigger
@@ -130,8 +119,10 @@ const togglePopup = () => {
         </div>
       </div>
     </div>
+    {{ classes }}
   </main>
-  <Popup v-if="popupTriggers.buttonTrigger" :addClass="addClass" :togglePopup="togglePopup"> </Popup>
+  <Popup v-if="popupTriggers.buttonTrigger" :fetchClasses="fetchClasses" :togglePopup="togglePopup"> </Popup>
+  
 </template>
 
 <style scoped>
