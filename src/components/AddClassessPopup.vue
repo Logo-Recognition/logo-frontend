@@ -1,6 +1,7 @@
 <script setup>
 import IconClose from './icons/IconClose.vue'
 import { defineProps, ref } from 'vue'
+
 const pathPublic = 'http://192.168.2.44:5000/api/class'
 const props = defineProps({
   fetchClasses: Function,
@@ -9,7 +10,6 @@ const props = defineProps({
 
 const inputData = ref('')
 const isValid = ref(false)
-const error = ref(null)
 const errorMessage = ref('')
 
 const submitData = () => {
@@ -19,13 +19,17 @@ const submitData = () => {
   }
 }
 
-const addClass = (classNames) => {
+const addClass = async (classNames) => {
   const newClasses = classNames
-    .split(',') // Split the input string by commas
-    .map((name) => name.trim()) // Trim leading/trailing spaces from each class name
-    .filter((name) => name !== '') // Filter out empty strings and existing class names
+    .split(',')
+    .map(name => name.trim())
+    .filter(name => name !== '')
 
-  newClasses.forEach((ClassName) => PostClass(ClassName))
+  for (const className of newClasses) {
+    await PostClass(className)
+  }
+  
+
 }
 
 const PostClass = async (newClassName) => {
@@ -40,59 +44,58 @@ const PostClass = async (newClassName) => {
     const data = await response.json()
 
     if (data.success) {
-      // Fetch updated class list after successful addition
       props.fetchClasses(null)
     } else {
-      error.value = data.error
+      errorMessage.value = data.error || 'Failed to add the class.'
+      console.error(errorMessage.value)
     }
   } catch (err) {
-    error.value = 'An error occurred while adding the new class.'
+    errorMessage.value = 'An error occurred while adding the new class.'
     console.error(err)
   }
 }
-// AddClassPopup implement zone
 
-// Define the validation function
 const validateInput = () => {
   const inputValues = inputData.value
-    .split(',') // Split the input string by commas
-    .map((name) => name.trim()) // Trim leading/trailing spaces from each class name
-    .filter((name) => name !== '') // Filter out empty strings and existing class names
+    .split(',')
+    .map((name) => name.trim())
+    .filter((name) => name !== '')
 
   const inputPattern = /^[a-z0-9]+$/
   const isAnyValueTooShort = inputValues.some((value) => value.length < 3)
   const isAnyValueInvalid = inputValues.some((value) => !inputPattern.test(value))
 
-  if (isAnyValueTooShort && isAnyValueInvalid) {
-    errorMessage.value =
-      'Invalid input! Please enter values containing only lowercase letters or numbers with a length greater than 3.'
+  if (inputValues.length === 0) {
+    errorMessage.value = 'Please enter at least one class name.'
+  } else if (isAnyValueTooShort && isAnyValueInvalid) {
+    errorMessage.value = 'Invalid input! Please enter values containing only lowercase letters or numbers with a length greater than 3.'
   } else if (isAnyValueTooShort) {
     errorMessage.value = 'Invalid input! Please enter values with a length greater than 3.'
   } else if (isAnyValueInvalid) {
-    errorMessage.value =
-      'Invalid input! Please enter values containing only lowercase letters or numbers.'
+    errorMessage.value = 'Invalid input! Please enter values containing only lowercase letters or numbers.'
   } else {
     errorMessage.value = ''
   }
 
-  isValid.value = !isAnyValueTooShort && !isAnyValueInvalid
+  isValid.value = errorMessage.value === ''
 
   return isValid.value
 }
+
 const closePopup = () => {
-  // Close the popup
   props.togglePopup(null)
 }
 </script>
+
 <template>
   <div id="AddClassPopup">
     <div id="popup-inner" class="flex-col space-y-5">
-      <div id="title" class="flex flex justify-between">
+      <div id="title" class="flex justify-between">
         <p>Add New Classes</p>
         <button class="popup-close" @click="closePopup"><IconClose /></button>
       </div>
       <div id="inputclass-box" class="flex-col">
-        <p id="text-advice">Add a comma seperated list of class name</p>
+        <p id="text-advice">Add a comma separated list of class names</p>
         <input
           v-model="inputData"
           type="text"
@@ -100,7 +103,7 @@ const closePopup = () => {
           id="text-input"
           :class="{ 'valid-box': isValid, 'invalid-box': !isValid }"
         />
-        <p v-if="!isValid" class="error-message">
+        <p v-if="errorMessage" class="error-message">
           {{ errorMessage }}
         </p>
       </div>
@@ -109,13 +112,9 @@ const closePopup = () => {
         <button @click="closePopup" id="CloseButton">Cancel</button>
       </div>
     </div>
-    <div class="flex flex-col">
-      {{ isValid }}
-      {{ inputData }}
-      {{ inputData.length }}
-    </div>
   </div>
 </template>
+
 <style scoped>
 #AddClassPopup {
   position: fixed;
@@ -123,9 +122,8 @@ const closePopup = () => {
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 0;
+  z-index: 1000; /* Bring the popup to the front */
   background-color: rgba(0, 0, 0, 0.2);
-
   display: flex;
   align-items: center;
   justify-content: center;
@@ -134,9 +132,9 @@ const closePopup = () => {
   background-color: white;
   padding: 40px;
   width: 800px;
-  height: 255px;
   border-radius: 16px;
-  opacity: 0px;
+  opacity: 1;
+  transition: opacity 0.3s ease;
 }
 #title {
   font-weight: bold;
@@ -145,66 +143,56 @@ const closePopup = () => {
   font-size: 14px;
   font-weight: 500;
   color: #7e7e7e;
-  padding-left: 0px !important;
-  padding: 10px;
+  padding: 10px 0;
 }
 #text-input {
-  width: 707px;
+  width: 100%;
   height: 41px;
-  padding: 12px 18px 12px 18px;
-  gap: 8px;
+  padding: 12px 18px;
   border-radius: 8px;
-  border: 1px;
-  opacity: 0px;
   border: 1px solid #c8cdd0;
+  transition: border-color 0.3s ease;
 }
 #SaveButton {
   width: 144px;
   height: 32px;
-  padding: 8px 16px 8px 16px;
-  gap: 8px;
+  padding: 8px 16px;
   border-radius: 8px;
-  opacity: 0px;
   background: #48a393;
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: Inter;
+  font-family: Inter, sans-serif;
   font-size: 12px;
   font-weight: 600;
   line-height: 16px;
+  cursor: pointer;
 }
-
 #CloseButton {
   width: 72px;
   height: 32px;
-  padding: 8px 16px 8px 16px;
-  gap: 8px;
+  padding: 8px 16px;
   border-radius: 8px;
-  opacity: 0px;
   background: #fff1f1;
   border: 1px solid #e83550;
-  font-family: Inter;
+  font-family: Inter, sans-serif;
   font-size: 12px;
   font-weight: 600;
   line-height: 16px;
-  letter-spacing: -0.02em;
   color: #e83550;
   margin-left: 20px;
+  cursor: pointer;
 }
 .valid-box {
-  border: 2px solid green;
+  border-color: green;
 }
-
-/* Styles for invalid input */
 .invalid-box {
-  border: 2px solid red;
+  border-color: red;
 }
-
-/* Styles for error message */
 .error-message {
   color: red;
   font-size: 12px;
+  margin-top: 5px;
 }
 </style>
