@@ -87,7 +87,7 @@ const onMouseMove = (event) => {
 
 const onMouseUp = () => {
   isDrawing = false
-  showModal.value = true // Show the modal after drawing the box
+  showModal.value = true
 }
 
 const hideModal = (cancel = false) => {
@@ -116,6 +116,21 @@ const handleModalSubmit = (name) => {
   }
   hideModal()
 }
+
+const loadImage = (imageSrc) => {
+  fabric.Image.fromURL(imageSrc, (img) => {
+    canvas.clear()
+    img.set({
+      left: 0,
+      top: 0,
+      scaleX: canvas.width / img.width,
+      scaleY: canvas.height / img.height
+    })
+    canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas))
+  })
+}
+
+defineExpose({ loadImage })
 
 onMounted(() => {
   canvas = new fabric.Canvas(canvasRef.value, {

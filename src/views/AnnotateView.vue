@@ -1,8 +1,69 @@
+<script setup>
+import { ref, onMounted } from 'vue'
+import AnnotationCanvas from '@/components/AnnotationCanvas.vue'
+import { API_URL } from '@/config.js'
+
+const currentTab = ref('Unannotated')
+const unannotatedImages = ref([])
+const annotatedImages = ref([])
+
+const annotationCanvas = ref(null)
+
+function getTabClass(tab) {
+  const isActive = currentTab.value === tab
+  return [
+    'my-2 block px-7 pb-3.5 pt-4 text-s font-medium leading-tight',
+    isActive
+      ? 'text-primary border-b-2 border-primary'
+      : 'text-grey-text border-b-2 border-grey-border hover:border-dark hover:text-dark hover:border-dark'
+  ].join(' ')
+}
+
+async function fetchImages(tab) {
+  try {
+    const endpoint = tab.toLowerCase() === 'unannotated' ? 'images' : 'annotated-images'
+    const response = await fetch(`${API_URL}/api/${endpoint}`, {
+      method: 'GET'
+    })
+    if (response.ok) {
+      const imageUrls = await response.json()
+      const images = imageUrls.map((url, index) => ({
+        id: `image-${index}`,
+        src: url,
+        alt: `Image ${index + 1}`
+      }))
+      if (tab.toLowerCase() === 'unannotated') {
+        unannotatedImages.value = images
+      } else if (tab.toLowerCase() === 'annotated') {
+        annotatedImages.value = images
+      }
+    } else {
+      console.error('Error fetching images')
+    }
+  } catch (error) {
+    console.error('Error:', error)
+  }
+}
+
+function switchTab(tab) {
+  currentTab.value = tab
+  fetchImages(tab)
+}
+
+function loadImageToCanvas(imageSrc) {
+  annotationCanvas.value.loadImage(imageSrc)
+}
+
+onMounted(() => {
+  fetchImages('Unannotated')
+})
+</script>
+
 <template>
   <div class="annotate-container">
     <h1 class="page-title text-lg text-dark font-bold">Annotate</h1>
     <div class="annotation-section">
-      <AnnotationCanvas class="canvas-container" />
+      <AnnotationCanvas ref="annotationCanvas" class="canvas-container" />
       <div class="labels-container bg-white">
         <h2>Labels</h2>
         <div v-for="object in canvas?.getObjects()" :key="object.id" class="label-item">
@@ -59,7 +120,12 @@
           role="tabpanel"
         >
           <div class="image-grid">
-            <div v-for="image in unannotatedImages" :key="image.id" class="image-item">
+            <div
+              v-for="image in unannotatedImages"
+              :key="image.id"
+              class="image-item"
+              @click="loadImageToCanvas(image.src)"
+            >
               <img :src="image.src" :alt="image.alt" class="image" />
             </div>
           </div>
@@ -71,7 +137,12 @@
           role="tabpanel"
         >
           <div class="image-grid">
-            <div v-for="image in annotatedImages" :key="image.id" class="image-item">
+            <div
+              v-for="image in annotatedImages"
+              :key="image.id"
+              class="image-item"
+              @click="loadImageToCanvas(image.src)"
+            >
               <img :src="image.src" :alt="image.alt" class="image" />
             </div>
           </div>
@@ -80,61 +151,6 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { ref, onMounted } from 'vue'
-import AnnotationCanvas from '@/components/AnnotationCanvas.vue'
-import { API_URL } from '@/config.js'
-
-const currentTab = ref('Unannotated')
-const unannotatedImages = ref([])
-const annotatedImages = ref([])
-
-function getTabClass(tab) {
-  const isActive = currentTab.value === tab
-  return [
-    'my-2 block px-7 pb-3.5 pt-4 text-s font-medium leading-tight',
-    isActive
-      ? 'text-primary border-b-2 border-primary'
-      : 'text-grey-text border-b-2 border-grey-border hover:border-dark hover:text-dark hover:border-dark'
-  ].join(' ')
-}
-
-async function fetchImages(tab) {
-  try {
-    const endpoint = tab.toLowerCase() === 'unannotated' ? 'images' : 'annotated-images'
-    const response = await fetch(`${API_URL}/api/${endpoint}`, {
-      method: 'GET'
-    })
-    if (response.ok) {
-      const imageUrls = await response.json()
-      const images = imageUrls.map((url, index) => ({
-        id: `image-${index}`,
-        src: url,
-        alt: `Image ${index + 1}`
-      }))
-      if (tab.toLowerCase() === 'unannotated') {
-        unannotatedImages.value = images
-      } else if (tab.toLowerCase() === 'annotated') {
-        annotatedImages.value = images
-      }
-    } else {
-      console.error('Error fetching images')
-    }
-  } catch (error) {
-    console.error('Error:', error)
-  }
-}
-
-function switchTab(tab) {
-  currentTab.value = tab
-  fetchImages(tab)
-}
-
-onMounted(() => {
-  fetchImages('Unannotated')
-})
-</script>
 
 <style scoped>
 .annotate-container {
@@ -190,6 +206,7 @@ onMounted(() => {
   height: 100px;
   width: calc(50% - 16px);
   max-width: none;
+  cursor: pointer;
 }
 
 .image {
