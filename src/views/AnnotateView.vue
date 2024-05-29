@@ -1,62 +1,3 @@
-<script setup>
-import { ref, onMounted } from 'vue'
-import TabUnannotated from '@/components/TabUnannotated.vue'
-import TabAnnotated from '@/components/TabAnnotated.vue'
-import AnnotationCanvas from '@/components/AnnotationCanvas.vue'
-// eslint-disable-next-line no-unused-vars
-import LabelModal from '@/components/LabelModal.vue'
-import { API_URL } from '@/config.js'
-
-const currentTab = ref('Unannotated')
-const unannotatedImages = ref([])
-const annotatedImages = ref([])
-
-function getTabClass(tab) {
-  const isActive = currentTab.value === tab
-  return [
-    'my-2 block px-7 pb-3.5 pt-4 text-s font-medium leading-tight',
-    isActive
-      ? 'text-primary border-b-2 border-primary'
-      : 'text-grey-text border-b-2 border-grey-border hover:border-dark hover:text-dark hover:border-dark'
-  ].join(' ')
-}
-
-async function fetchImages(tab) {
-  try {
-    const lowerCaseTab = tab.toLowerCase()
-    const response = await fetch(`${API_URL}/api/images`, {
-      method: 'GET'
-    })
-    if (response.ok) {
-      const imageUrls = await response.json()
-      const images = imageUrls.map((url, index) => ({
-        id: `image-${index}`,
-        src: url,
-        alt: `Image ${index + 1}`
-      }))
-      if (lowerCaseTab === 'unannotated') {
-        unannotatedImages.value = images
-      } else if (lowerCaseTab === 'annotated') {
-        annotatedImages.value = images
-      }
-    } else {
-      console.error('Error fetching images')
-    }
-  } catch (error) {
-    console.error('Error:', error)
-  }
-}
-
-function switchTab(tab) {
-  currentTab.value = tab
-  fetchImages(tab)
-}
-
-onMounted(() => {
-  fetchImages('Unannotated')
-})
-</script>
-
 <template>
   <div class="annotate-container">
     <h1 class="page-title text-lg text-dark font-bold">Annotate</h1>
@@ -85,8 +26,9 @@ onMounted(() => {
                   'bg-primary text-light': currentTab === 'Unannotated',
                   'outline-badge border-grey-text': currentTab !== 'Unannotated'
                 }"
-                >{{ unannotatedImages.length }}</span
               >
+                {{ unannotatedImages.length }}
+              </span>
             </a>
           </li>
           <li role="presentation">
@@ -104,8 +46,9 @@ onMounted(() => {
                   'bg-primary text-light': currentTab === 'Annotated',
                   'outline-badge border-grey-text': currentTab !== 'Annotated'
                 }"
-                >{{ annotatedImages.length }}</span
               >
+                {{ annotatedImages.length }}
+              </span>
             </a>
           </li>
         </ul>
@@ -115,7 +58,11 @@ onMounted(() => {
           id="tabs-unannotated"
           role="tabpanel"
         >
-          <TabUnannotated :unannotatedImages="unannotatedImages" />
+          <div class="image-grid">
+            <div v-for="image in unannotatedImages" :key="image.id" class="image-item">
+              <img :src="image.src" :alt="image.alt" class="image" />
+            </div>
+          </div>
         </div>
         <div
           v-else-if="currentTab === 'Annotated'"
@@ -123,16 +70,79 @@ onMounted(() => {
           id="tabs-annotated"
           role="tabpanel"
         >
-          <TabAnnotated :annotatedImages="annotatedImages" />
+          <div class="image-grid">
+            <div v-for="image in annotatedImages" :key="image.id" class="image-item">
+              <img :src="image.src" :alt="image.alt" class="image" />
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </template>
 
+<script setup>
+import { ref, onMounted } from 'vue'
+import AnnotationCanvas from '@/components/AnnotationCanvas.vue'
+import { API_URL } from '@/config.js'
+
+const currentTab = ref('Unannotated')
+const unannotatedImages = ref([])
+const annotatedImages = ref([])
+
+function getTabClass(tab) {
+  const isActive = currentTab.value === tab
+  return [
+    'my-2 block px-7 pb-3.5 pt-4 text-s font-medium leading-tight',
+    isActive
+      ? 'text-primary border-b-2 border-primary'
+      : 'text-grey-text border-b-2 border-grey-border hover:border-dark hover:text-dark hover:border-dark'
+  ].join(' ')
+}
+
+async function fetchImages(tab) {
+  try {
+    const endpoint = tab.toLowerCase() === 'unannotated' ? 'images' : 'annotated-images'
+    const response = await fetch(`${API_URL}/api/${endpoint}`, {
+      method: 'GET'
+    })
+    if (response.ok) {
+      const imageUrls = await response.json()
+      const images = imageUrls.map((url, index) => ({
+        id: `image-${index}`,
+        src: url,
+        alt: `Image ${index + 1}`
+      }))
+      if (tab.toLowerCase() === 'unannotated') {
+        unannotatedImages.value = images
+      } else if (tab.toLowerCase() === 'annotated') {
+        annotatedImages.value = images
+      }
+    } else {
+      console.error('Error fetching images')
+    }
+  } catch (error) {
+    console.error('Error:', error)
+  }
+}
+
+function switchTab(tab) {
+  currentTab.value = tab
+  fetchImages(tab)
+}
+
+onMounted(() => {
+  fetchImages('Unannotated')
+})
+</script>
+
 <style scoped>
 .annotate-container {
   padding: 32px 60px 40px 40px;
+}
+
+.page-title {
+  margin-bottom: 16px;
 }
 
 .annotation-section {
@@ -140,10 +150,6 @@ onMounted(() => {
   grid-template-columns: 2fr 1fr;
   grid-template-rows: auto 1fr;
   gap: 32px 24px;
-}
-
-.page-title {
-  margin-bottom: 16px;
 }
 
 .canvas-container {
@@ -167,11 +173,41 @@ onMounted(() => {
 .images-container {
   grid-column: 2 / 3;
   grid-row: 2 / 3;
+  display: flex;
+  flex-direction: column;
+}
+
+.image-grid {
+  display: flex;
+  flex-wrap: wrap;
+  max-height: 60%;
   overflow-y: auto;
+}
+
+.image-item {
+  margin-right: 16px;
+  margin-bottom: 16px;
+  height: 100px;
+  width: calc(50% - 16px);
+  max-width: none;
+}
+
+.image {
+  object-fit: cover;
+  border-radius: 8px;
+  transition: transform 0.2s;
+  width: 100%;
+  height: 100%;
+}
+
+.image:hover {
+  transform: scale(1.05);
 }
 
 .tab-content {
   transition: opacity 0.3s ease-in-out;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .badge {
