@@ -411,7 +411,7 @@ function handleClose(title) {
       console.log('Rotate closed')
       break
     case 'Flip':
-      selectedFlip.value = 'none'
+      selectedFlipAp.value = 'none'
       showCollapseBoxFlip.value = false
       console.log('Flip closed')
       break
