@@ -66,10 +66,10 @@ const selectedContrast = ref(1) // default contrast is 1 (no change)
 const selectedFlipAp = ref('none')
 const selectedNoiseLevelAp = ref(0)
 const selectedNoiseTypeAp = ref('pepper') // 'pepper' or 'chromatic'
-const selectedScaleAp = ref(1) // default scale is 1 (no scaling)
-const selectedBrightnessAp = ref(1) // default brightness is 1 (no change)
-const selectedSaturationAp = ref(1) // default saturation is 1 (no change)
-const selectedContrastAp = ref(1) // default contrast is 1 (no change)
+// const selectedScaleAp = ref(1) // default scale is 1 (no scaling)
+// const selectedBrightnessAp = ref(1) // default brightness is 1 (no change)
+// const selectedSaturationAp = ref(1) // default saturation is 1 (no change)
+// const selectedContrastAp = ref(1) // default contrast is 1 (no change)
 
 const showCollapseBoxRotation = ref(false)
 const showCollapseBoxFlip = ref(false)
@@ -347,7 +347,7 @@ const Apply = () => {
       } else {
         showCollapseBoxRotation.value = true
       }
-      updateRotate("rotate",selectedRotation.value)
+      updateRotate('rotate', selectedRotation.value)
       break
     case 'Flip':
       if (selectedFlip.value == 'none') {
@@ -356,6 +356,16 @@ const Apply = () => {
         showCollapseBoxFlip.value = true
       }
       selectedFlipAp.value = selectedFlip.value
+      if (selectedFlipAp.value == 'none') {
+        updateRotate('flipHorizontal', false)
+        updateRotate('flipVertical', false)
+      } else if (selectedFlipAp.value == 'Horizontal') {
+        updateRotate('flipHorizontal', true)
+        updateRotate('flipVertical', false)
+      } else {
+        updateRotate('flipHorizontal', false)
+        updateRotate('flipVertical', true)
+      }
       break
     case 'Noise':
       if (selectedNoiseLevel.value == 0) {
@@ -365,6 +375,16 @@ const Apply = () => {
       }
       selectedNoiseLevelAp.value = selectedNoiseLevel.value
       selectedNoiseTypeAp.value = selectedNoiseType.value
+
+      if (selectedNoiseTypeAp.value == 'pepper') {
+        //'pepper' or 'chromatic'
+        updateRotate('gaussianNoise', selectedNoiseLevel.value)
+        updateRotate('pepperNoise', 0)
+      } else {
+        updateRotate('gaussianNoise', 0)
+        updateRotate('pepperNoise', selectedNoiseLevel.value)
+      }
+
       break
     case 'Scailing':
       if (selectedScale.value == 1) {
@@ -372,7 +392,7 @@ const Apply = () => {
       } else {
         showCollapseBoxScale.value = true
       }
-      selectedScaleAp.value = selectedScale.value
+      updateRotate('scaling', selectedScale.value)
       break
     case 'Brightness':
       if (selectedBrightness.value == 1) {
@@ -380,7 +400,7 @@ const Apply = () => {
       } else {
         showCollapseBoxBrightness.value = true
       }
-      selectedBrightnessAp.value = selectedBrightness.value
+      updateRotate('brightness', selectedBrightness.value)
       break
     case 'Saturation':
       if (selectedSaturation.value == 1) {
@@ -388,7 +408,7 @@ const Apply = () => {
       } else {
         showCollapseBoxSaturation.value = true
       }
-      selectedSaturationAp.value = selectedSaturation.value
+      updateRotate('saturation', selectedSaturation.value)
       break
     case 'Contrast':
       if (selectedContrast.value == 1) {
@@ -396,7 +416,7 @@ const Apply = () => {
       } else {
         showCollapseBoxContrast.value = true
       }
-      selectedContrastAp.value = selectedContrast.value
+      updateRotate('contrast', selectedContrast.value)
       break
     default:
       break
@@ -406,7 +426,7 @@ const Apply = () => {
 function handleClose(title) {
   switch (title) {
     case 'Rotate':
-      updateRotate("rotate",0)
+      updateRotate('rotate', 0)
       showCollapseBoxRotation.value = false
       console.log('Rotate closed')
       break
@@ -422,22 +442,22 @@ function handleClose(title) {
       console.log('Noise closed')
       break
     case 'Scailing':
-      selectedScaleAp.value = 1
+      updateRotate('scaling', 1)
       showCollapseBoxScale.value = false
       console.log('Scailing closed')
       break
     case 'Brightness':
-      selectedBrightnessAp.value = 1
+      updateRotate('brightness', 1)
       showCollapseBoxBrightness.value = false
       console.log('Brightness closed')
       break
     case 'Saturation':
-      selectedSaturationAp.value = 1
+      updateRotate('saturation', 1)
       showCollapseBoxSaturation.value = false
       console.log('Saturation closed')
       break
     case 'Contrast':
-      selectedContrastAp.value = 1
+      updateRotate('contrast', 1)
       showCollapseBoxContrast.value = false
       console.log('Contrast closed')
       break
@@ -484,25 +504,25 @@ function handleClose(title) {
         <CollapseBox
           v-if="showCollapseBoxScale"
           title="Scailing"
-          :value="selectedScaleAp"
+          :value="augmentationParam.scaling"
           @close="handleClose"
         />
         <CollapseBox
           v-if="showCollapseBoxBrightness"
           title="Brightness"
-          :value="selectedBrightnessAp"
+          :value="augmentationParam.brightness"
           @close="handleClose"
         />
         <CollapseBox
           v-if="showCollapseBoxSaturation"
           title="Saturation"
-          :value="selectedSaturationAp"
+          :value="augmentationParam.saturation"
           @close="handleClose"
         />
         <CollapseBox
           v-if="showCollapseBoxContrast"
           title="Contrast"
-          :value="selectedContrastAp"
+          :value="augmentationParam.contrast"
           @close="handleClose"
         />
       </div>
