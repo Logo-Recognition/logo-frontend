@@ -225,21 +225,51 @@ onMounted(() => {
       <button class="button is-primary" @click="submitAndRefreshLabels">save</button>
     </h1>
     <div class="annotation-section">
-      <div class="toolbar-container">
-        <button @click="onPointer"><IconCursorPointer /></button>
-        <button @click="onDrawing"><IconBoundingBox /></button>
-        <button @click="toTextFile"><IconTxtFile /></button>
-        <button @click="onZoomIn"><IconZoomIn /></button>
-        <button @click="onZoomOut"><IconZoomOut /></button>
+      <div class="canvas-container bg-white">
+        <div class="toolbar-container">
+          <div class="tooltip">
+            <button class="action-button pointer" @click="onPointer">
+              <IconCursorPointer />
+            </button>
+            <span class="tooltip-text">Pointer</span>
+          </div>
+          <div class="tooltip">
+            <button class="action-button drawing" @click="onDrawing">
+              <IconBoundingBox />
+            </button>
+            <span class="tooltip-text">Drawing</span>
+          </div>
+          <div class="tooltip">
+            <button class="action-button yolo-format" @click="toTextFile">
+              <IconTxtFile />
+            </button>
+            <span class="tooltip-text">Save YOLO format</span>
+          </div>
+          <div class="tooltip">
+            <button class="action-button zoom-in" @click="onZoomIn">
+              <IconZoomIn />
+            </button>
+            <span class="tooltip-text">Zoom In</span>
+          </div>
+          <div class="tooltip">
+            <button class="action-button zoom-out" @click="onZoomOut">
+              <IconZoomOut />
+            </button>
+            <span class="tooltip-text">Zoom Out</span>
+          </div>
+        </div>
+        <canvas ref="canvasRef" class="canvas-wrapper" width="500" height="500"></canvas>
+        <div class="mouse-coordinates">
+          X: {{ mouseCoordinates.x }}, Y: {{ mouseCoordinates.y }}
+        </div>
       </div>
-      <canvas ref="canvasRef" class="canvas-container" width="500" height="500"></canvas>
       <div class="labels-container bg-white">
         <h2>Labels</h2>
         <div v-if="selectedClass" class="label-item">Selected Class: {{ selectedClass }}</div>
       </div>
 
-      <div class="mouse-coordinates">X: {{ mouseCoordinates.x }}, Y: {{ mouseCoordinates.y }}</div>
       <BoxNameModal v-if="showModal" @close="hideModal" @submit="handleModalSubmit" />
+
       <div class="images-container">
         <ul class="mb-5 text-sm flex list-none flex-row flex-wrap border-b-0 ps-0" role="tablist">
           <li role="presentation">
@@ -341,6 +371,7 @@ onMounted(() => {
 .toolbar-container {
   display: flex;
   justify-content: flex-start;
+  gap: 0.5rem;
   padding: 10px 12px;
   border: 1px solid #ccc;
   border-radius: 10px;
@@ -348,12 +379,49 @@ onMounted(() => {
   margin-bottom: 16px;
 }
 
+.action-button {
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  width: 120px;
+  background-color: #2d3748;
+  color: #fff;
+  text-align: center;
+  border-radius: 0.25rem;
+  padding: 0.5rem;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -60px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
 .canvas-container {
   grid-column: 1 / 2;
   grid-row: 1 / 3;
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.canvas-wrapper {
   background: ghostwhite;
   border: 1px solid gainsboro;
-  border-radius: 8px;
   width: 100%;
 }
 
