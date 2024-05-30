@@ -1,15 +1,14 @@
-// src/stores/useParametersStore.js
 import { defineStore } from 'pinia'
 
 export const useParametersStore = defineStore('parameters', {
   state: () => ({
     augmentationParam: {
-      rotate: 50,
-      flipHorizontal: true,
-      flipVertical: true,
-      gaussianNoise: 5,
-      pepperNoise: 5,
-      scaling: 120,
+      rotate: 0,
+      flipHorizontal: false,
+      flipVertical: false,
+      gaussianNoise: 0,
+      pepperNoise: 0,
+      scaling: 1,
       brightness: 1,
       saturation: 1,
       contrast: 1,
@@ -20,6 +19,16 @@ export const useParametersStore = defineStore('parameters', {
       validSize: 0.1,
     },
   }),
+  persist: {
+    enabled: true,
+    strategies: [
+      {
+        key: 'parameters',
+        storage: localStorage,
+        paths: ['augmentationParam', 'trainTestSplitParam'],
+      },
+    ],
+  },
   actions: {
     updateAugmentationParam(param, value) {
       this.augmentationParam[param] = value

@@ -3,7 +3,7 @@ import CollapseBox from '@/components/CollapseBox.vue'
 import AugmentOptionBar from '@/components/AugmentOptionBar.vue'
 import FlipSelectBar from '@/components/FlipSelectBar.vue'
 import NoiseSelectBar from '@/components/NoiseSelectBar.vue'
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, onMounted } from 'vue'
 import Slider from '@vueform/slider'
 import { useParametersStore } from '@/stores/Augment.js'
 
@@ -433,12 +433,17 @@ function handleClose(title) {
     case 'Flip':
       selectedFlipAp.value = 'none'
       showCollapseBoxFlip.value = false
+      updateRotate('flipHorizontal', false)
+        updateRotate('flipVertical', false)
       console.log('Flip closed')
+
       break
     case 'Noise':
       selectedNoiseLevelAp.value = 0
       selectedNoiseTypeAp.value = 'pepper'
       showCollapseBoxNoise.value = false
+      updateRotate('gaussianNoise', 0)
+      updateRotate('pepperNoise', 0)
       console.log('Noise closed')
       break
     case 'Scailing':
@@ -464,6 +469,27 @@ function handleClose(title) {
     default:
   }
 }
+
+onMounted(() => {
+  showCollapseBoxRotation.value = augmentationParam.value.rotate !== 0
+  showCollapseBoxFlip.value =
+    augmentationParam.value.flipHorizontal || augmentationParam.value.flipVertical
+  showCollapseBoxNoise.value =
+    augmentationParam.value.gaussianNoise !== 0 || augmentationParam.value.pepperNoise !== 0
+  showCollapseBoxScale.value = augmentationParam.value.scaling !== 1
+  showCollapseBoxBrightness.value = augmentationParam.value.brightness !== 1
+  showCollapseBoxSaturation.value = augmentationParam.value.saturation !== 1
+  showCollapseBoxContrast.value = augmentationParam.value.contrast !== 1
+})
+// augmentationParam.rotate
+// augmentationParam.flipHorizontal
+// augmentationParam.flipVertical
+// augmentationParam.gaussianNoise
+// augmentationParam.pepperNoise
+// augmentationParam.scaling
+// augmentationParam.brightness
+// augmentationParam.saturation
+// augmentationParam.contrast
 </script>
 
 <template>
