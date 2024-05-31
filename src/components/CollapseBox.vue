@@ -56,6 +56,15 @@ const formattedValue = computed(() => {
   }
 })
 
+const formattedTitle = computed(() => {
+  switch (props.title) {
+    case 'Noise':
+      return `${props.title}/${props.type}`
+    default:
+      return props.title
+  }
+})
+
 const emit = defineEmits(['close'])
 
 function closePopup() {
@@ -69,7 +78,7 @@ function closePopup() {
       <component :is="iconComponent" />
     </div>
     <div class="flex flex-col w-2/5 ml-5">
-      <div id="text-title">{{ title }}</div>
+      <div id="text-title">{{ formattedTitle }}</div>
       <div id="text">{{ formattedValue }}</div>
     </div>
     <button class="popup-close" @click="closePopup"><IconClose class="icon-size" /></button>
