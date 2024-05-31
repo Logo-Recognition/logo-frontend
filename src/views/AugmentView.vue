@@ -36,15 +36,35 @@ const updateRotate = (type, value) => {
 // updateRotate("brightness",)
 // updateRotate("saturation",)
 // updateRotate("contrast",)
-
+const pathImage = "http://192.168.2.44:5000/api/annotated-images"
 const images = ref([])
-const imageModules = import.meta.glob('@/components/images/*.jpg')
 
-for (const path in imageModules) {
-  imageModules[path]().then((mod) => {
-    images.value.push(mod.default)
-  })
-}
+// for (const path in imageModules) {
+//   imageModules[path]().then((mod) => {
+//     images.value.push(mod.default)
+//   })
+// }
+
+const fetchClasses = async () => {
+  try {
+    const response = await fetch(pathImage);
+    const data = await response.json();
+    
+    if (response.ok) {
+      // Extracting image URLs from the fetched data
+      images.value = data.map(item => item['image']);
+      handleImageClick(images.value[0])
+    } else {
+      console.log("error to get")
+    }
+  } catch (err) {
+    
+    console.error(err);
+  } finally {
+    console.log("error to get")
+  }
+};
+
 
 const statusnow = ref('Rotate') // current action ('Rotate', 'Flip', 'Noise')
 const selectedImageSrc = ref(null)
@@ -121,6 +141,7 @@ const handleData = (data) => {
 const handleImageClick = (src) => {
   selectedImageSrc.value = src
   originalImage.value = new Image()
+  originalImage.value.crossOrigin = "Anonymous"
   originalImage.value.src = src
   originalImage.value.onload = () => {
     isImage.value = true
@@ -132,16 +153,19 @@ const applyRotation = () => {
   const canvas = document.createElement('canvas')
   const ctx = canvas.getContext('2d')
   const img = originalImage.value
+  
 
   canvas.width = imageWidth.value
   canvas.height = imageHeight.value
-
+  ctx.save()
   ctx.translate(canvas.width / 2, canvas.height / 2)
   ctx.rotate((selectedRotation.value * Math.PI) / 180)
   ctx.drawImage(img, -canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height)
-
+  ctx.restore
   return canvas.toDataURL('image/jpeg')
 }
+
+
 
 const applyFlip = () => {
   const canvas = document.createElement('canvas')
@@ -471,6 +495,7 @@ function handleClose(title) {
 }
 
 onMounted(() => {
+  fetchClasses()
   showCollapseBoxRotation.value = augmentationParam.value.rotate !== 0
   showCollapseBoxFlip.value =
     augmentationParam.value.flipHorizontal || augmentationParam.value.flipVertical
@@ -663,6 +688,7 @@ onMounted(() => {
         </div>
         <div id="apply-button" class="flex justify-end mt-5">
           <button class="apply" @click="Apply">Apply</button>
+          
         </div>
       </div>
     </div>
@@ -671,7 +697,7 @@ onMounted(() => {
 <style src="@vueform/slider/themes/default.css"></style>
 <style scoped>
 #main {
-  width: 83%;
+  width: 100%;
   background-color: #f0f0f0;
   padding: 10px;
 }
