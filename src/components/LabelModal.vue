@@ -1,40 +1,41 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { API_URL } from '@/config.js'
+import { ref, defineEmits, onMounted } from 'vue'
 import axios from 'axios'
+import { API_URL } from '@/config.js'
 
-const emit = defineEmits(['close', 'submit'])
-const boxName = ref('')
 const classList = ref([])
-const selectedClass = ref(null)
+const selectedClass = ref('')
+const emit = defineEmits(['close', 'submit', 'classSelected'])
 
 const fetchClassList = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/class`, { method: 'GET' })
-    classList.value = response.data
+    const response = await axios.get(`${API_URL}/api/class`)
+    classList.value = response.data.classes
   } catch (error) {
     console.error('Error fetching class list:', error)
   }
 }
 
-const submitBoxName = () => {
+const selectClass = (className) => {
+  if (!selectedClass.value) {
+    selectedClass.value = className
+    console.log('Selected Class:', selectedClass.value)
+  }
+}
+
+const handleSubmit = () => {
   if (selectedClass.value) {
-    emit('submit', { boxName: boxName.value, className: selectedClass.value })
-    boxName.value = ''
-    selectedClass.value = null
+    emit('classSelected', selectedClass.value)
+    emit('submit', selectedClass.value)
+    console.log('Selected Class:', selectedClass.value)
   } else {
-    alert('Please select a class for the box.')
+    console.log('Please select a class first.')
   }
 }
 
 const cancelBoxDrawing = () => {
-  boxName.value = ''
-  selectedClass.value = null
-  emit('close', true)
-}
-
-const selectClass = (className) => {
-  selectedClass.value = className
+  selectedClass.value = ''
+  emit('close')
 }
 
 onMounted(() => {
@@ -44,22 +45,32 @@ onMounted(() => {
 
 <template>
   <div class="modal" @click.self="cancelBoxDrawing">
-    <div class="modal-content" @click.stop>
-      <div class="class-list">
-        <label class="label">Select Class:</label>
-        <div
-          class="class-item"
-          v-for="classItem in classList"
-          :key="classItem.id"
-          @click="selectClass(classItem.name)"
-          :class="{ selected: selectedClass.value === classItem.name }"
-        >
-          {{ classItem.name }}
+    <div class="modal-wrapper bg-white">
+      <div class="modal-container">
+        <div class="modal-header bg-primary text-white">Label Image</div>
+        <div class="modal-body">
+          <ul>
+            <li v-for="(classItem, index) in classList" :key="index">
+              <button
+                class="class-item"
+                :class="{ selected: classItem === selectedClass }"
+                @click="selectClass(classItem)"
+              >
+                {{ classItem }}
+              </button>
+            </li>
+          </ul>
         </div>
-      </div>
-      <div class="buttons">
-        <button class="button is-success" @click="submitBoxName">Submit</button>
-        <button class="button is-danger" @click="cancelBoxDrawing">Cancel</button>
+        <div class="selected-class" v-if="selectedClass">{{ selectedClass }}</div>
+        <div class="modal-footer">
+          <button
+            class="button is-success bg-secondary text-white hover:bg-primary"
+            @click="handleSubmit"
+          >
+            Submit
+          </button>
+          <button class="button is-danger" @click="cancelBoxDrawing">Cancel</button>
+        </div>
       </div>
     </div>
   </div>
@@ -68,7 +79,6 @@ onMounted(() => {
 <style scoped>
 .modal {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   position: fixed;
@@ -79,64 +89,95 @@ onMounted(() => {
   background-color: rgba(0, 0, 0, 0.5);
 }
 
-.modal-content {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  width: 300px;
-  text-align: center;
+.modal-wrapper {
+  border-radius: 10px;
 }
 
-.box {
-  margin-bottom: 20px;
+.modal-container {
+  border-radius: 10px;
+  width: 400px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  text-align: start;
 }
 
-.input {
+.modal-header {
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  padding: 12px 20px;
+}
+
+.modal-body {
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  padding: 12px 20px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  padding: 16px;
+}
+
+.button {
+  flex: 1;
+  margin: 0 5px;
+  padding: 10px;
   width: 100%;
-  padding: 4px;
-  border: 1px solid grey;
-  border-radius: 4px;
-  outline: none;
-}
-
-.input:focus {
-  border-color: black;
+  font-size: 1em;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
 }
 
 .class-list {
   margin-bottom: 20px;
 }
 
+.class-list ul {
+  padding: 0;
+}
+
 .class-item {
-  padding: 8px;
-  border: 1px solid grey;
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
   border-radius: 4px;
+  background-color: #f9f9f9;
   cursor: pointer;
-  margin-top: 4px;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
+}
+
+.class-item:hover {
+  background-color: #eee;
 }
 
 .class-item.selected {
-  background-color: #42b983;
-  color: white;
-}
-
-.buttons {
-  display: flex;
-  justify-content: center;
+  border-radius: 8px;
 }
 
 .button.is-success {
-  background-color: #42b983;
-  color: white;
-  border-radius: 4px;
-  padding: 5px;
-  margin-right: 5px;
+  border-radius: 8px;
+}
+
+.button.is-success:hover {
+  background-color: #6b7bf4;
 }
 
 .button.is-danger {
   background-color: #ff3860;
+  border-radius: 8px;
   color: white;
-  border-radius: 4px;
-  padding: 5px;
+}
+
+.button.is-danger:hover {
+  background-color: #e02847;
 }
 </style>
