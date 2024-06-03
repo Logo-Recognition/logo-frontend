@@ -24,6 +24,7 @@ const currentTab = ref('Unannotated')
 const unannotatedImages = ref([])
 const annotatedImages = ref([])
 const selectedClass = ref(null)
+const selectedClasses = ref([])
 
 const submitAndRefreshLabels = () => {
   if (currentBox) {
@@ -108,6 +109,16 @@ const onMouseUp = () => {
   }
 }
 
+const addSelectedClass = (className) => {
+  if (!selectedClasses.value.includes(className)) {
+    selectedClasses.value.push(className)
+    console.log('Selected Classes:', selectedClasses.value)
+  } else {
+    console.log(`${className} has already been selected.`)
+    console.log('Selected Classes:', selectedClasses.value)
+  }
+}
+
 const hideModal = (cancel = false) => {
   if (cancel && currentBox) {
     canvas.remove(currentBox)
@@ -119,6 +130,10 @@ const hideModal = (cancel = false) => {
 const handleModalSubmit = (name) => {
   if (currentBox) {
     currentBox.set('name', name)
+
+    if (!selectedClasses.value.includes(name)) {
+      selectedClasses.value.push(name)
+    }
   }
   hideModal()
 }
@@ -222,7 +237,6 @@ onMounted(() => {
   <div class="annotate-container">
     <h1 class="page-title text-lg text-dark font-bold flex items-center justify-between">
       Annotate
-      <button class="button is-primary" @click="submitAndRefreshLabels">save</button>
     </h1>
     <div class="annotation-section">
       <div class="canvas-container bg-white">
@@ -259,16 +273,29 @@ onMounted(() => {
           </div>
         </div>
         <canvas ref="canvasRef" class="canvas-wrapper" width="500" height="500"></canvas>
-        <div class="mouse-coordinates">
-          X: {{ mouseCoordinates.x }}, Y: {{ mouseCoordinates.y }}
+        <div class="xxxx">
+          <div class="mouse-coordinates">
+            X: {{ mouseCoordinates.x }}, Y: {{ mouseCoordinates.y }}
+          </div>
+          <div class="submit-button bg-secondary text-white">
+            <button class="button is-primary" @click="submitAndRefreshLabels">save</button>
+          </div>
         </div>
       </div>
       <div class="labels-container bg-white">
         <h2>Labels</h2>
-        <div v-if="selectedClass" class="label-item">Selected Class: {{ selectedClass }}</div>
+        <div v-for="selectedClass in selectedClasses" :key="selectedClass" class="label-item">
+          Selected Class: {{ selectedClass }}
+        </div>
       </div>
 
-      <BoxNameModal v-if="showModal" @close="hideModal" @submit="handleModalSubmit" />
+      <BoxNameModal
+        v-if="showModal"
+        @close="hideModal"
+        @submit="handleModalSubmit"
+        @classSelected="addSelectedClass"
+        :selectedClasses="selectedClasses"
+      />
 
       <div class="images-container">
         <ul class="mb-5 text-sm flex list-none flex-row flex-wrap border-b-0 ps-0" role="tablist">
@@ -372,7 +399,7 @@ onMounted(() => {
   display: flex;
   justify-content: flex-start;
   gap: 0.5rem;
-  padding: 10px 12px;
+  padding: 5px 12px;
   border: 1px solid #ccc;
   border-radius: 10px;
   width: 100%;
@@ -423,6 +450,13 @@ onMounted(() => {
   background: ghostwhite;
   border: 1px solid gainsboro;
   width: 100%;
+}
+
+.submit-button {
+  text-align: center;
+  border-radius: 8px;
+  padding: 8px 16px;
+  min-width: 72px;
 }
 
 .labels-container {
@@ -496,5 +530,11 @@ onMounted(() => {
   border: 1px solid #ccc;
   border-radius: 8px;
   text-align: center;
+}
+
+.xxxx {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 </style>
