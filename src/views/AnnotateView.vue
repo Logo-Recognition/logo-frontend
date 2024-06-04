@@ -10,6 +10,7 @@ import BoxNameModal from '@/components/LabelModal.vue'
 import { API_URL } from '@/config.js'
 
 const canvasRef = ref(null)
+const labelsContainerRef = ref(null)
 let canvas = null
 
 const mode = ref('pointer')
@@ -64,20 +65,34 @@ const toTextFile = async () => {
   URL.revokeObjectURL(blobURL)
 }
 
-const drawNewBox = (startPoint, endPoint) => {
+const drawNewBox = (startPoint, endPoint, label = null) => {
   const canvasWidth = canvas.width
   const canvasHeight = canvas.height
 
-  const left = startPoint.x
-  const top = startPoint.y
-  const width = endPoint.x - startPoint.x
-  const height = endPoint.y - startPoint.y
+  let left, top, width, height
+  let centerX, centerY, normalizedWidth, normalizedHeight
 
-  const classId = 0
-  const centerX = (left + width / 2) / canvasWidth
-  const centerY = (top + height / 2) / canvasHeight
-  const normalizedWidth = width / canvasWidth
-  const normalizedHeight = height / canvasHeight
+  if (label) {
+    const [cx, cy, w, h] = label.bbox.split(' ')
+    left = (cx - w / 2) * canvasWidth
+    top = (cy - h / 2) * canvasHeight
+    width = w * canvasWidth
+    height = h * canvasHeight
+    centerX = cx
+    centerY = cy
+    normalizedWidth = w
+    normalizedHeight = h
+  } else {
+    left = startPoint.x
+    top = startPoint.y
+    width = endPoint.x - startPoint.x
+    height = endPoint.y - startPoint.y
+
+    centerX = (left + width / 2) / canvasWidth
+    centerY = (top + height / 2) / canvasHeight
+    normalizedWidth = width / canvasWidth
+    normalizedHeight = height / canvasHeight
+  }
 
   const rect = new fabric.Rect({
     left,
@@ -91,8 +106,8 @@ const drawNewBox = (startPoint, endPoint) => {
     cornerColor: '#f00',
     selectable: true,
     hasControls: true,
-    name: '',
-    classId,
+    name: label ? label.class_name : '',
+    classId: 0,
     centerX,
     centerY,
     normalizedWidth,
@@ -101,6 +116,39 @@ const drawNewBox = (startPoint, endPoint) => {
   canvas.add(rect)
   canvas.setActiveObject(rect)
   currentBox = rect
+
+  if (labelsContainerRef.value) {
+    const labelElement = document.createElement('div')
+    labelElement.className = 'label-item'
+    labelElement.textContent = `YOLO Format: ${rect.classId} ${rect.centerX.toFixed(6)} ${rect.centerY.toFixed(6)} ${rect.normalizedWidth.toFixed(6)} ${rect.normalizedHeight.toFixed(6)} ${rect.name}`
+    labelsContainerRef.value.appendChild(labelElement)
+  }
+}
+
+const loadImageToCanvas = (imageSrc, imageName, labels) => {
+  fabric.Image.fromURL(imageSrc, (img) => {
+    canvas.clear()
+    img.set({
+      left: 0,
+      top: 0,
+      scaleX: canvas.width / img.width,
+      scaleY: canvas.height / img.height
+    })
+    canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas))
+
+    canvas.getObjects().forEach((obj) => {
+      if (obj.type === 'rect') {
+        canvas.remove(obj)
+      }
+    })
+
+    if (labels && Array.isArray(labels)) {
+      labels.forEach((label) => {
+        drawNewBox(null, null, label)
+      })
+    }
+  })
+  selectedImageName.value = imageName
 }
 
 const onMouseDown = (event) => {
@@ -201,19 +249,6 @@ const showCoordinates = (event) => {
   canvas.renderAll()
 }
 
-const loadImage = (imageSrc) => {
-  fabric.Image.fromURL(imageSrc, (img) => {
-    canvas.clear()
-    img.set({
-      left: 0,
-      top: 0,
-      scaleX: canvas.width / img.width,
-      scaleY: canvas.height / img.height
-    })
-    canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas))
-  })
-}
-
 const getTabClass = (tab) => {
   const isActive = currentTab.value === tab
   return [
@@ -256,6 +291,7 @@ const fetchImages = async (tab) => {
           }
         })
         annotatedImages.value = images
+        console.log(annotatedImages.value)
       }
     } else {
       console.error('Error fetching images')
@@ -268,38 +304,6 @@ const fetchImages = async (tab) => {
 const switchTab = (tab) => {
   currentTab.value = tab
   fetchImages(tab)
-}
-
-const loadImageToCanvas = (imageSrc, imageName, labels) => {
-  loadImage(imageSrc)
-  selectedImageName.value = imageName
-
-  if (labels && Array.isArray(labels)) {
-    labels.forEach((label) => {
-      if (label.bbox) {
-        const [centerX, centerY, width, height] = label.bbox.split(' ') // Split the bbox string
-        const left = (centerX - width / 2) * canvas.width
-        const top = (centerY - height / 2) * canvas.width
-        const rectWidth = width * canvas.width
-        const rectHeight = height * canvas.width
-
-        const rect = new fabric.Rect({
-          left,
-          top,
-          width: rectWidth,
-          height: rectHeight,
-          fill: 'rgba(255, 0, 0, 0.2)',
-          stroke: '#f00',
-          strokeWidth: 2,
-          cornerSize: 10,
-          cornerColor: '#f00',
-          selectable: false,
-          name: label.class_name
-        })
-        canvas.add(rect)
-      }
-    })
-  }
 }
 
 const saveAnnotations = async () => {
@@ -415,17 +419,20 @@ onMounted(() => {
           </div>
         </div>
         <canvas ref="canvasRef" class="canvas-wrapper" width="500" height="500"></canvas>
-        <div class="coordinate-container">
-          <div class="mouse-coordinates">
-            X: {{ mouseCoordinates.x }}, Y: {{ mouseCoordinates.y }}
-          </div>
-        </div>
       </div>
-      <div class="labels-container bg-white">
+      <div class="labels-container bg-white" ref="labelsContainer">
         <h2>Labels</h2>
         <div v-if="canvas">
           <div v-for="obj in canvas.getObjects()" :key="obj.id" class="label-item">
-            <span v-if="obj.type === 'rect'">
+            <span
+              v-if="
+                obj.type === 'rect' &&
+                typeof obj.centerX === 'number' &&
+                typeof obj.centerY === 'number' &&
+                typeof obj.normalizedWidth === 'number' &&
+                typeof obj.normalizedHeight === 'number'
+              "
+            >
               YOLO Format: {{ obj.classId }} {{ obj.centerX.toFixed(6) }}
               {{ obj.centerY.toFixed(6) }} {{ obj.normalizedWidth.toFixed(6) }}
               {{ obj.normalizedHeight.toFixed(6) }} {{ obj.name || '' }}
@@ -650,7 +657,7 @@ onMounted(() => {
 .image-grid {
   display: flex;
   flex-wrap: wrap;
-  max-height: 60%;
+  max-height: 90%;
   overflow-y: auto;
 }
 

@@ -17,10 +17,8 @@ const fetchClassList = async () => {
 }
 
 const selectClass = (className) => {
-  if (!selectedClass.value) {
-    selectedClass.value = className
-    console.log('Selected Class:', selectedClass.value)
-  }
+  selectedClass.value = className
+  console.log('Selected Class:', selectedClass.value)
 }
 
 const handleSubmit = () => {
