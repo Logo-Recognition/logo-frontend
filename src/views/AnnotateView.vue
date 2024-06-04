@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { fabric } from 'fabric'
 import IconCursorPointer from '@/components/icons/IconCursorPointer.vue'
 import IconBoundingBox from '@/components/icons/IconBoundingBox.vue'
@@ -65,6 +65,33 @@ const toTextFile = async () => {
   URL.revokeObjectURL(blobURL)
 }
 
+const visibleObjects = computed(() => {
+  const allObjects = [...canvas.getObjects(), ...submittedBoxes.value]
+  const filteredObjects = allObjects.filter(
+    (obj, index, self) =>
+      !isProxy(obj) &&
+      self.findIndex(
+        (o) =>
+          o &&
+          o.type === 'rect' &&
+          o.centerX === obj.centerX &&
+          o.centerY === obj.centerY &&
+          o.normalizedWidth === obj.normalizedWidth &&
+          o.normalizedHeight === obj.normalizedHeight &&
+          o.imageName === selectedImageName.value
+      ) === index
+  )
+  return filteredObjects
+})
+
+function isProxy(obj) {
+  return isObject(obj) && isObject(obj.__v_isProxy)
+}
+
+function isObject(val) {
+  return val !== null && typeof val === 'object'
+}
+
 const drawNewBox = (startPoint, endPoint, label = null) => {
   const canvasWidth = canvas.width
   const canvasHeight = canvas.height
@@ -74,14 +101,15 @@ const drawNewBox = (startPoint, endPoint, label = null) => {
 
   if (label) {
     const [cx, cy, w, h] = label.bbox.split(' ')
-    left = (cx - w / 2) * canvasWidth
-    top = (cy - h / 2) * canvasHeight
-    width = w * canvasWidth
-    height = h * canvasHeight
-    centerX = cx
-    centerY = cy
-    normalizedWidth = w
-    normalizedHeight = h
+    centerX = parseFloat(cx)
+    centerY = parseFloat(cy)
+    normalizedWidth = parseFloat(w)
+    normalizedHeight = parseFloat(h)
+
+    left = (centerX - normalizedWidth / 2) * canvasWidth
+    top = (centerY - normalizedHeight / 2) * canvasHeight
+    width = normalizedWidth * canvasWidth
+    height = normalizedHeight * canvasHeight
   } else {
     left = startPoint.x
     top = startPoint.y
@@ -106,6 +134,7 @@ const drawNewBox = (startPoint, endPoint, label = null) => {
     cornerColor: '#f00',
     selectable: true,
     hasControls: true,
+    imageName: selectedImageName.value,
     name: label ? label.class_name : '',
     classId: 0,
     centerX,
@@ -123,6 +152,8 @@ const drawNewBox = (startPoint, endPoint, label = null) => {
     labelElement.textContent = `YOLO Format: ${rect.classId} ${rect.centerX.toFixed(6)} ${rect.centerY.toFixed(6)} ${rect.normalizedWidth.toFixed(6)} ${rect.normalizedHeight.toFixed(6)} ${rect.name}`
     labelsContainerRef.value.appendChild(labelElement)
   }
+
+  return rect
 }
 
 const loadImageToCanvas = (imageSrc, imageName, labels) => {
@@ -137,14 +168,16 @@ const loadImageToCanvas = (imageSrc, imageName, labels) => {
     canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas))
 
     canvas.getObjects().forEach((obj) => {
-      if (obj.type === 'rect') {
+      if (obj.type !== 'rect') {
         canvas.remove(obj)
       }
     })
 
     if (labels && Array.isArray(labels)) {
       labels.forEach((label) => {
-        drawNewBox(null, null, label)
+        const box = drawNewBox(null, null, label)
+        box.imageName = imageName
+        submittedBoxes.value.push(box)
       })
     }
   })
@@ -232,6 +265,7 @@ const handleModalSubmit = (name) => {
     }
 
     submittedBoxes.value.push(currentBox)
+    console.log('submittedBoxes:', submittedBoxes.value)
   }
   showModal.value = false
   currentBox = null
@@ -294,10 +328,10 @@ const fetchImages = async (tab) => {
         console.log(annotatedImages.value)
       }
     } else {
-      console.error('Error fetching images')
+      console.error('Error fetching images:', response.status)
     }
   } catch (error) {
-    console.error('Error:', error)
+    console.error('Error fetching images:', error)
   }
 }
 
@@ -315,7 +349,13 @@ const saveAnnotations = async () => {
     }
 
     objects.forEach((obj) => {
-      if (obj.type === 'rect') {
+      if (
+        obj.type === 'rect' &&
+        typeof obj.centerX === 'number' &&
+        typeof obj.centerY === 'number' &&
+        typeof obj.normalizedWidth === 'number' &&
+        typeof obj.normalizedHeight === 'number'
+      ) {
         annotatedData.label.push({
           class_name: obj.name,
           bbox: `${obj.centerX.toFixed(6)} ${obj.centerY.toFixed(6)} ${obj.normalizedWidth.toFixed(6)} ${obj.normalizedHeight.toFixed(6)}`
@@ -323,7 +363,8 @@ const saveAnnotations = async () => {
       }
     })
 
-    console.log(annotatedData)
+    console.log('annotatedData:', annotatedData)
+
     const response = await fetch(`${API_URL}/api/annotated-images`, {
       method: 'POST',
       headers: {
@@ -423,16 +464,8 @@ onMounted(() => {
       <div class="labels-container bg-white" ref="labelsContainer">
         <h2>Labels</h2>
         <div v-if="canvas">
-          <div v-for="obj in canvas.getObjects()" :key="obj.id" class="label-item">
-            <span
-              v-if="
-                obj.type === 'rect' &&
-                typeof obj.centerX === 'number' &&
-                typeof obj.centerY === 'number' &&
-                typeof obj.normalizedWidth === 'number' &&
-                typeof obj.normalizedHeight === 'number'
-              "
-            >
+          <div v-for="obj in visibleObjects" :key="obj.id" class="label-item">
+            <span>
               YOLO Format: {{ obj.classId }} {{ obj.centerX.toFixed(6) }}
               {{ obj.centerY.toFixed(6) }} {{ obj.normalizedWidth.toFixed(6) }}
               {{ obj.normalizedHeight.toFixed(6) }} {{ obj.name || '' }}
