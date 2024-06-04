@@ -4,12 +4,15 @@ import IconTrainTestSplit from '@/components/icons/IconTrainTestSplit.vue';
 import { ref,onMounted } from 'vue';
 import {API_URL} from '@/config.js'
 import Slider from '@vueform/slider';
+import Toggle from '@vueform/toggle';
 
 const range = ref([100, 100]);
 const sliderGradient = ref(`linear-gradient(to right, #EDB95E ${range.value[0]}%, #CA2222 ${range.value[1]}%)`);
 const train_test_value = ref([range.value[0],100 - range.value[1],range.value[1] - range.value[0]])
-const images = ref([]);
-const classes = ref([]);
+const images = ref(0);
+const classes = ref(0);
+const isAugment = ref(false);
+
 const onDrag = (value) => {
     const startColor = '#EDB95E';
     const endColor = '#CA2222';
@@ -19,12 +22,23 @@ const onDrag = (value) => {
     train_test_value.value =  [value[0],value[1] - value[0],100 - value[1]]
 };
 
+const onDownload = () => {
+  if(isAugment.value){
+
+  }
+
+
+}
+
 onMounted(async () => {
   try {
     const response = await fetch(`${API_URL}/api/dataset`);
-    const responseData = await response.json();
-    classes.value = responseData["total_buckets"];
-    images.value = responseData["total_images"];
+    if(response.ok){
+      const responseData = await response.json();
+      classes.value = responseData["total_classes"];
+      images.value = responseData["total_images"];
+      console.log(classes.value)
+    }
   } catch (error) {
     console.error('Error fetching data:', error);
   }
@@ -60,7 +74,7 @@ onMounted(async () => {
                 </div>
                 <span class="text-sm text-black font-medium">{{ Math.round(images*train_test_value[0]/100) }} Images</span>
             </div>
-            <div id="train" class="flex flex-col h-24 p-4 rounded-2xl border border-information justify-between w-full mx-6">
+            <div id="valid" class="flex flex-col h-24 p-4 rounded-2xl border border-information justify-between w-full mx-6">
                 <div class="flex flex-row justify-between">
                     <span class="text-sm text-dark-grey font-medium">VALID SET</span>
                     <div class="flex flex-col justify-center items-center rounded-lg bg-information px-4 py-1">
@@ -68,7 +82,8 @@ onMounted(async () => {
                     </div>
                 </div>
                 <span class="text-sm text-black font-medium">{{ Math.round(images*train_test_value[1]/100) }} Images</span>
-            </div><div id="train" class="flex flex-col h-24 p-4 rounded-2xl border border-error justify-between w-full">
+            </div>
+            <div id="test" class="flex flex-col h-24 p-4 rounded-2xl border border-error justify-between w-full">
                 <div class="flex flex-row justify-between">
                     <span class="text-sm text-dark-grey font-medium">TEST SET</span>
                     <div class="flex flex-col justify-center items-center rounded-lg bg-error px-4 py-1">
@@ -80,13 +95,26 @@ onMounted(async () => {
         </div>
         <Slider v-model="range" class="slider" @slide="onDrag" :tooltips="false"/>
     </div>
+    <div id="augment" class="flex flex-row bg-white rounded-3xl px-8 py-6 mt-6">
+      <div class="flex flex-row justify-between items-center h-8 w-full">
+        <div class="flex flex-row justify-start items-center">
+          <IconSourceImage />
+          <span class="text-base font-medium text-sub-primary pl-3">Augmentation options</span>
+          <div class="tooltip">
+            <img class="px-1" src="@/assets/images/tooltip.svg" alt="tooltipImg">
+            <span class="tooltiptext">Create new training examples for model to learn from by generating augmented versions of each image in your training set.</span>
+          </div>
+        </div>
+        <Toggle class="toggle-bt" v-model="isAugment"></Toggle>
+      </div>
+    </div>
     <div id="action" class="flex flex-row bg-white rounded-3xl px-8 py-6 mt-6">
         <button class="rounded-lg bg-secondary font-medium text-xs text-white px-4 py-2 w-32 shadow">Create</button>
         <button class="rounded-lg border border-dark-grey font-medium text-xs text-dark-grey px-4 py-2 w-16 ml-4 shadow">Reset</button>
     </div>
-  </main>a
+  </main>
 </template>
-
+<style src="@vueform/toggle/themes/default.css"></style>
 <style src="@vueform/slider/themes/default.css"></style>
 <style scoped>
 #train-test-split .slider ::v-deep(.slider-base) {
@@ -95,5 +123,39 @@ onMounted(async () => {
 .slider{
     --slider-connect-bg: #4A90E2;
     --slider-handle-ring-color: #4A90E2;
+}
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 450px;
+  background-color: #EFF1FF;
+  color: #ABADAB;
+  border:  1px #ABADAB solid;
+  text-align: start;
+  border-radius: 8px;
+  padding: 10px 12px;
+  position: absolute;
+  font-weight: 400;
+  font-size: 14px;
+  z-index: 1;
+  top: 50%;
+  left: 105%; 
+  transform: translateY(-10%);
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+
+.toggle-bt{
+  --toggle-width: 32px;
+  --toggle-height: 18px;
+  --toggle-bg-on: #459E19;
+  --toggle-border-on: #459E19;
+
 }
 </style>
