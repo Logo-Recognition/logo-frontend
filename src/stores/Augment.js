@@ -4,10 +4,10 @@ export const useParametersStore = defineStore('parameters', {
   state: () => ({
     augmentationParam: {
       rotate: 0,
-      flipHorizontal: false,
-      flipVertical: false,
-      gaussianNoise: 0,
-      pepperNoise: 0,
+      flip_horizontal: false,
+      flip_verical: false,
+      gaussian_noise: 0,
+      pepper_noise: 0,
       scaling: 1,
       brightness: 1,
       saturation: 1,

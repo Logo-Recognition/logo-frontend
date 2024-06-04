@@ -69,6 +69,7 @@ const emit = defineEmits(['close'])
 
 function closePopup() {
   emit('close', props.title)
+  emit('type' , props.type)
 }
 </script>
 

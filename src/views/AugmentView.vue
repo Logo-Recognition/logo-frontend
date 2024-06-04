@@ -12,31 +12,12 @@ const store = useParametersStore()
 // // Accessing augmentation parameters
 const augmentationParam = computed(() => store.augmentationParam)
 
-// augmentationParam.rotate
-// augmentationParam.flipHorizontal
-// augmentationParam.flipVertical
-// augmentationParam.gaussianNoise
-// augmentationParam.pepperNoise
-// augmentationParam.scaling
-// augmentationParam.brightness
-// augmentationParam.saturation
-// augmentationParam.contrast
-
 // // Example of updating a parameter
 const updateRotate = (type, value) => {
   store.updateAugmentationParam(type, value)
 }
 
-// updateRotate("rotate",)
-// updateRotate("flipHorizontal",)
-// updateRotate("flipVertical",)
-// updateRotate("gaussianNoise",)
-// updateRotate("pepperNoise",)
-// updateRotate("scaling",)
-// updateRotate("brightness",)
-// updateRotate("saturation",)
-// updateRotate("contrast",)
-const pathImage = "http://192.168.2.44:5000/api/annotated-images"
+const pathImage = 'http://192.168.2.44:5000/api/annotated-images'
 const images = ref([])
 
 // for (const path in imageModules) {
@@ -47,24 +28,22 @@ const images = ref([])
 
 const fetchClasses = async () => {
   try {
-    const response = await fetch(pathImage);
-    const data = await response.json();
-    
+    const response = await fetch(pathImage)
+    const data = await response.json()
+
     if (response.ok) {
       // Extracting image URLs from the fetched data
-      images.value = data.map(item => item['image']);
+      images.value = data.map((item) => item['image'])
       handleImageClick(images.value[0])
     } else {
-      console.log("error to get")
+      console.log('error to get')
     }
   } catch (err) {
-    
-    console.error(err);
+    console.error(err)
   } finally {
-    console.log("error to get")
+    console.log('error to get')
   }
-};
-
+}
 
 const statusnow = ref('Rotate') // current action ('Rotate', 'Flip', 'Noise')
 const selectedImageSrc = ref(null)
@@ -86,10 +65,6 @@ const selectedContrast = ref(1) // default contrast is 1 (no change)
 const selectedFlipAp = ref('none')
 const selectedNoiseLevelAp = ref(0)
 const selectedNoiseTypeAp = ref('pepper') // 'pepper' or 'chromatic'
-// const selectedScaleAp = ref(1) // default scale is 1 (no scaling)
-// const selectedBrightnessAp = ref(1) // default brightness is 1 (no change)
-// const selectedSaturationAp = ref(1) // default saturation is 1 (no change)
-// const selectedContrastAp = ref(1) // default contrast is 1 (no change)
 
 const showCollapseBoxRotation = ref(false)
 const showCollapseBoxFlip = ref(false)
@@ -141,7 +116,7 @@ const handleData = (data) => {
 const handleImageClick = (src) => {
   selectedImageSrc.value = src
   originalImage.value = new Image()
-  originalImage.value.crossOrigin = "Anonymous"
+  originalImage.value.crossOrigin = 'Anonymous'
   originalImage.value.src = src
   originalImage.value.onload = () => {
     isImage.value = true
@@ -153,7 +128,6 @@ const applyRotation = () => {
   const canvas = document.createElement('canvas')
   const ctx = canvas.getContext('2d')
   const img = originalImage.value
-  
 
   canvas.width = imageWidth.value
   canvas.height = imageHeight.value
@@ -164,8 +138,6 @@ const applyRotation = () => {
   ctx.restore
   return canvas.toDataURL('image/jpeg')
 }
-
-
 
 const applyFlip = () => {
   const canvas = document.createElement('canvas')
@@ -264,7 +236,11 @@ const applyScaling = () => {
   canvas.width = imageWidth.value
   canvas.height = imageHeight.value
 
-  ctx.drawImage(img, 0, 0, scaledWidth, scaledHeight)
+  if (selectedScale.value < 1) {
+    ctx.drawImage(img, 0, 0, scaledWidth, scaledHeight)
+  } else {
+    ctx.drawImage(img, 0, 0, imageWidth.value, imageHeight.value)
+  }
 
   return canvas.toDataURL('image/jpeg')
 }
@@ -381,14 +357,14 @@ const Apply = () => {
       }
       selectedFlipAp.value = selectedFlip.value
       if (selectedFlipAp.value == 'none') {
-        updateRotate('flipHorizontal', false)
-        updateRotate('flipVertical', false)
+        updateRotate('flip_horizontal', false)
+        updateRotate('flip_verical', false)
       } else if (selectedFlipAp.value == 'Horizontal') {
-        updateRotate('flipHorizontal', true)
-        updateRotate('flipVertical', false)
+        updateRotate('flip_horizontal', true)
+        updateRotate('flip_verical', false)
       } else {
-        updateRotate('flipHorizontal', false)
-        updateRotate('flipVertical', true)
+        updateRotate('flip_horizontal', false)
+        updateRotate('flip_verical', true)
       }
       break
     case 'Noise':
@@ -402,11 +378,11 @@ const Apply = () => {
 
       if (selectedNoiseTypeAp.value == 'pepper') {
         //'pepper' or 'chromatic'
-        updateRotate('gaussianNoise', selectedNoiseLevel.value)
-        updateRotate('pepperNoise', 0)
+        updateRotate('pepper_noise', selectedNoiseLevel.value)
+        // updateRotate('pepper_noise', 0)
       } else {
-        updateRotate('gaussianNoise', 0)
-        updateRotate('pepperNoise', selectedNoiseLevel.value)
+        // updateRotate('gaussian_noise', 0)
+        updateRotate('gaussian_noise', selectedNoiseLevel.value)
       }
 
       break
@@ -447,7 +423,7 @@ const Apply = () => {
   }
 }
 
-function handleClose(title) {
+function handleClose(title, type) {
   switch (title) {
     case 'Rotate':
       updateRotate('rotate', 0)
@@ -457,17 +433,22 @@ function handleClose(title) {
     case 'Flip':
       selectedFlipAp.value = 'none'
       showCollapseBoxFlip.value = false
-      updateRotate('flipHorizontal', false)
-        updateRotate('flipVertical', false)
+      updateRotate('flip_horizontal', false)
+      updateRotate('flip_verical', false)
       console.log('Flip closed')
 
       break
     case 'Noise':
+      if (type == 'pepper') {
+        updateRotate('pepper_noise', 0)
+      } else {
+        updateRotate('gaussian_noise', 0)
+      }
       selectedNoiseLevelAp.value = 0
       selectedNoiseTypeAp.value = 'pepper'
       showCollapseBoxNoise.value = false
-      updateRotate('gaussianNoise', 0)
-      updateRotate('pepperNoise', 0)
+      // updateRotate('gaussian_noise', 0)
+      // updateRotate('pepper_noise', 0)
       console.log('Noise closed')
       break
     case 'Scailing':
@@ -498,23 +479,14 @@ onMounted(() => {
   fetchClasses()
   showCollapseBoxRotation.value = augmentationParam.value.rotate !== 0
   showCollapseBoxFlip.value =
-    augmentationParam.value.flipHorizontal || augmentationParam.value.flipVertical
+    augmentationParam.value.flip_horizontal || augmentationParam.value.flip_verical
   showCollapseBoxNoise.value =
-    augmentationParam.value.gaussianNoise !== 0 || augmentationParam.value.pepperNoise !== 0
+    augmentationParam.value.gaussian_noise !== 0 || augmentationParam.value.pepper_noise !== 0
   showCollapseBoxScale.value = augmentationParam.value.scaling !== 1
   showCollapseBoxBrightness.value = augmentationParam.value.brightness !== 1
   showCollapseBoxSaturation.value = augmentationParam.value.saturation !== 1
   showCollapseBoxContrast.value = augmentationParam.value.contrast !== 1
 })
-// augmentationParam.rotate
-// augmentationParam.flipHorizontal
-// augmentationParam.flipVertical
-// augmentationParam.gaussianNoise
-// augmentationParam.pepperNoise
-// augmentationParam.scaling
-// augmentationParam.brightness
-// augmentationParam.saturation
-// augmentationParam.contrast
 </script>
 
 <template>
@@ -546,10 +518,17 @@ onMounted(() => {
           @close="handleClose"
         />
         <CollapseBox
-          v-if="showCollapseBoxNoise"
+          v-if="augmentationParam.pepper_noise != 0"
           title="Noise"
-          :value="selectedNoiseLevelAp"
-          :type="selectedNoiseTypeAp"
+          :value="augmentationParam.pepper_noise"
+          type="pepper"
+          @close="handleClose"
+        />
+        <CollapseBox
+          v-if="augmentationParam.gaussian_noise != 0"
+          title="Noise"
+          :value="augmentationParam.gaussian_noise"
+          type="chromatic"
           @close="handleClose"
         />
         <CollapseBox
@@ -618,14 +597,14 @@ onMounted(() => {
         <div v-if="statusnow === 'Scailing'" class="mr-10 ml-10">
           <div class="flex w-full justify-between mb-3 mt-3">
             <p class="TextColor">0.1</p>
-            <p class="TextColor">1</p>
+            <p class="TextColor">2</p>
           </div>
           <Slider
             id="Slider"
             v-model="selectedScale"
             showTooltip="drag"
             :min="0.1"
-            :max="1"
+            :max="2"
             :step="0.1"
             :tooltips="true"
             @slide="handleScaleUpdate"
@@ -686,9 +665,14 @@ onMounted(() => {
         <div v-if="selectedImageSrc" class="flex place-content-center mt-8">
           <img :src="selectedImageSrc" alt="Selected Image" id="AugmentedImage" />
         </div>
-        <div id="apply-button" class="flex justify-end mt-5">
+        <div id="apply-button" class="flex mt-5">
+          <div class="w-1/2">
+            <p v-if="statusnow === 'Scailing'" class="text-red-700 text-xs">
+              A live preview is not available for > 1x
+            </p>
+          </div>
+          <div class="w-1/2"></div>
           <button class="apply" @click="Apply">Apply</button>
-          
         </div>
       </div>
     </div>
