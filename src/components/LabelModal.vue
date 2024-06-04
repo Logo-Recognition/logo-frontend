@@ -67,7 +67,7 @@ onMounted(() => {
             class="button is-success bg-secondary text-white hover:bg-primary"
             @click="handleSubmit"
           >
-            Submit
+            Save
           </button>
           <button class="button is-danger" @click="cancelBoxDrawing">Cancel</button>
         </div>

@@ -229,19 +229,32 @@ const fetchImages = async (tab) => {
     const endpoint = tab.toLowerCase() === 'unannotated' ? 'images' : 'annotated-images'
     const response = await fetch(`${API_URL}/api/${endpoint}`)
     if (response.ok) {
-      const imageUrls = await response.json()
-      const images = imageUrls.map((url, index) => {
-        const imageName = url.split('/').pop().split('?')[0]
-        return {
-          id: `image-${index}`,
-          src: url,
-          alt: `Image ${index + 1}`,
-          name: imageName
-        }
-      })
+      let images = []
+
       if (tab.toLowerCase() === 'unannotated') {
+        const imageUrls = await response.json()
+        images = imageUrls.map((url, index) => {
+          const imageName = url.split('/').pop().split('?')[0]
+          return {
+            id: `image-${index}`,
+            src: url,
+            alt: `Image ${index + 1}`,
+            name: imageName
+          }
+        })
         unannotatedImages.value = images
       } else if (tab.toLowerCase() === 'annotated') {
+        const imageData = await response.json()
+        images = imageData.map((data, index) => {
+          const imageName = data.image.split('/').pop().split('?')[0]
+          return {
+            id: `image-${index}`,
+            src: data.image,
+            alt: `Image ${index + 1}`,
+            name: imageName,
+            labels: data.label
+          }
+        })
         annotatedImages.value = images
       }
     } else {
@@ -251,14 +264,42 @@ const fetchImages = async (tab) => {
     console.error('Error:', error)
   }
 }
+
 const switchTab = (tab) => {
   currentTab.value = tab
   fetchImages(tab)
 }
 
-const loadImageToCanvas = (imageSrc, imageName) => {
+const loadImageToCanvas = (imageSrc, imageName, labels) => {
   loadImage(imageSrc)
   selectedImageName.value = imageName
+
+  if (labels && Array.isArray(labels)) {
+    labels.forEach((label) => {
+      if (label.bbox) {
+        const [centerX, centerY, width, height] = label.bbox.split(' ') // Split the bbox string
+        const left = (centerX - width / 2) * canvas.width
+        const top = (centerY - height / 2) * canvas.width
+        const rectWidth = width * canvas.width
+        const rectHeight = height * canvas.width
+
+        const rect = new fabric.Rect({
+          left,
+          top,
+          width: rectWidth,
+          height: rectHeight,
+          fill: 'rgba(255, 0, 0, 0.2)',
+          stroke: '#f00',
+          strokeWidth: 2,
+          cornerSize: 10,
+          cornerColor: '#f00',
+          selectable: false,
+          name: label.class_name
+        })
+        canvas.add(rect)
+      }
+    })
+  }
 }
 
 const saveAnnotations = async () => {
@@ -374,7 +415,7 @@ onMounted(() => {
           </div>
         </div>
         <canvas ref="canvasRef" class="canvas-wrapper" width="500" height="500"></canvas>
-        <div class="xxxx">
+        <div class="coordinate-container">
           <div class="mouse-coordinates">
             X: {{ mouseCoordinates.x }}, Y: {{ mouseCoordinates.y }}
           </div>
@@ -382,9 +423,6 @@ onMounted(() => {
       </div>
       <div class="labels-container bg-white">
         <h2>Labels</h2>
-        <div v-for="selectedClass in selectedClasses" :key="selectedClass" class="label-item">
-          Selected Class: {{ selectedClass }}
-        </div>
         <div v-if="canvas">
           <div v-for="obj in canvas.getObjects()" :key="obj.id" class="label-item">
             <span v-if="obj.type === 'rect'">
@@ -395,7 +433,7 @@ onMounted(() => {
           </div>
         </div>
         <div class="submit-button bg-secondary text-white">
-          <button class="button is-primary" @click="saveAnnotations">Save</button>
+          <button class="button is-primary" @click="saveAnnotations">Apply</button>
         </div>
       </div>
 
@@ -479,7 +517,7 @@ onMounted(() => {
               v-for="image in annotatedImages"
               :key="image.id"
               class="image-item"
-              @click="loadImageToCanvas(image.src, image.name)"
+              @click="loadImageToCanvas(image.src, image.name, image.labels)"
             >
               <img :src="image.src" :alt="image.alt" class="image" />
             </div>
@@ -568,6 +606,20 @@ onMounted(() => {
   width: 100%;
 }
 
+.mouse-coordinates {
+  margin-top: 16px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.coordinate-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .submit-button {
   text-align: center;
   border-radius: 8px;
@@ -638,19 +690,5 @@ onMounted(() => {
 
 .outline-badge {
   border: 1px solid;
-}
-
-.mouse-coordinates {
-  margin-top: 16px;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  text-align: center;
-}
-
-.xxxx {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 }
 </style>
