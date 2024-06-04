@@ -14,10 +14,11 @@ export const useParametersStore = defineStore('parameters', {
       contrast: 1,
     },
     trainTestSplitParam: {
-      trainSize: 0.7,
-      testSize: 0.2,
-      validSize: 0.1,
+      trainSize: 70,
+      validSize: 10,
+      testSize: 20,
     },
+    isAugment: false,
   }),
   persist: {
     enabled: true,
@@ -25,7 +26,7 @@ export const useParametersStore = defineStore('parameters', {
       {
         key: 'parameters',
         storage: localStorage,
-        paths: ['augmentationParam', 'trainTestSplitParam'],
+        paths: ['augmentationParam', 'trainTestSplitParam','isAugment'],
       },
     ],
   },
@@ -35,6 +36,9 @@ export const useParametersStore = defineStore('parameters', {
     },
     updateTrainTestSplitParam(param, value) {
       this.trainTestSplitParam[param] = value
+    },
+    updateIsAugmentParam(value) {
+      this.isAugment = value
     },
   },
 })
