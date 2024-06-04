@@ -12,12 +12,18 @@ import { API_URL } from '@/config.js'
 const canvasRef = ref(null)
 let canvas = null
 
+const mode = ref('pointer')
+let isDragging = false
+let isResizing = false
+
 const mouseCoordinates = ref({ x: 0, y: 0 })
 let verticalLine, horizontalLine
 
 let isDrawing = false
 let startPoint = { x: 0, y: 0 }
 let currentBox = null
+const submittedBoxes = ref([])
+
 const showModal = ref(false)
 
 const currentTab = ref('Unannotated')
@@ -98,25 +104,56 @@ const drawNewBox = (startPoint, endPoint) => {
 }
 
 const onMouseDown = (event) => {
-  isDrawing = true
-  startPoint = canvas.getPointer(event.e)
+  if (mode.value === 'drawing') {
+    isDrawing = true
+    startPoint = canvas.getPointer(event.e)
+    if (currentBox) {
+      canvas.remove(currentBox)
+    }
+  } else if (mode.value === 'pointer') {
+    const target = canvas.findTarget(event.e)
+    if (target) {
+      canvas.setActiveObject(target)
+      const objectTransformHandlers = target.getTransformHandles()
+      const handlePointer =
+        event.e.offsetX &&
+        event.e.offsetY &&
+        objectTransformHandlers &&
+        objectTransformHandlers.findIndex((objectTransformHandler) =>
+          objectTransformHandler.containsPoint(new fabric.Point(event.e.offsetX, event.e.offsetY))
+        ) > -1
+
+      isDragging = !handlePointer
+      isResizing = handlePointer
+
+      canvas.renderAll()
+    }
+  }
 }
 
 const onMouseMove = (event) => {
-  if (!isDrawing) return
-  const currentPoint = canvas.getPointer(event.e)
-  if (currentBox) {
-    canvas.remove(currentBox)
+  if (mode.value === 'drawing' && isDrawing) {
+    const currentPoint = canvas.getPointer(event.e)
+    if (currentBox) {
+      canvas.remove(currentBox)
+    }
+    drawNewBox(startPoint, currentPoint)
+  } else if (mode.value === 'pointer' && (isDragging || isResizing)) {
+    canvas.renderAll()
   }
-  drawNewBox(startPoint, currentPoint)
 }
 
 const onMouseUp = () => {
-  isDrawing = false
-  if (currentBox) {
-    showModal.value = true
-  } else {
-    console.error('No currentBox set')
+  if (mode.value === 'drawing') {
+    isDrawing = false
+    if (currentBox) {
+      showModal.value = true
+    } else {
+      console.error('No currentBox set')
+    }
+  } else if (mode.value === 'pointer') {
+    isDragging = false
+    isResizing = false
   }
 }
 
@@ -130,12 +167,12 @@ const addSelectedClass = (className) => {
   }
 }
 
-const hideModal = (cancel = false) => {
-  if (cancel && currentBox) {
+const discardCurrentBox = () => {
+  if (currentBox) {
     canvas.remove(currentBox)
+    currentBox = null
   }
   showModal.value = false
-  currentBox = null
 }
 
 const handleModalSubmit = (name) => {
@@ -145,8 +182,11 @@ const handleModalSubmit = (name) => {
     if (!selectedClasses.value.includes(name)) {
       selectedClasses.value.push(name)
     }
+
+    submittedBoxes.value.push(currentBox)
   }
-  hideModal()
+  showModal.value = false
+  currentBox = null
 }
 
 const showCoordinates = (event) => {
@@ -262,6 +302,8 @@ onMounted(() => {
     isDrawingMode: false
   })
 
+  submittedBoxes.value.forEach((box) => canvas.add(box))
+
   verticalLine = new fabric.Line([0, 0, 0, canvas.getHeight()], {
     stroke: 'red',
     selectable: false,
@@ -293,13 +335,21 @@ onMounted(() => {
       <div class="canvas-container bg-white">
         <div class="toolbar-container">
           <div class="tooltip">
-            <button class="action-button pointer" @click="onPointer">
+            <button
+              class="action-button pointer"
+              :class="{ active: mode === 'pointer' }"
+              @click="mode = 'pointer'"
+            >
               <IconCursorPointer />
             </button>
             <span class="tooltip-text">Pointer</span>
           </div>
           <div class="tooltip">
-            <button class="action-button drawing" @click="onDrawing">
+            <button
+              class="action-button drawing"
+              :class="{ active: mode === 'drawing' }"
+              @click="mode = 'drawing'"
+            >
               <IconBoundingBox />
             </button>
             <span class="tooltip-text">Drawing</span>
@@ -351,7 +401,7 @@ onMounted(() => {
 
       <BoxNameModal
         v-if="showModal"
-        @close="hideModal"
+        @close="discardCurrentBox"
         @submit="handleModalSubmit"
         @classSelected="addSelectedClass"
         :selectedClasses="selectedClasses"
@@ -471,6 +521,11 @@ onMounted(() => {
   border: none;
   padding: 0.5rem;
   cursor: pointer;
+  color: #ccc;
+}
+
+.action-button.active {
+  color: #333;
 }
 
 .tooltip {
