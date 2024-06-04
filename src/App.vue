@@ -17,9 +17,11 @@ const closeModal = () => {
 </script>
 
 <template>
-  <div class="app">
+  <div class="app bg-background">
     <SideBar @open-modal="openModal"/>
-    <RouterView />
+    <div class="content">
+      <RouterView />
+    </div>
     <ModalUploadImage 
       :is-open="showModal"
       @close="closeModal"
@@ -28,8 +30,13 @@ const closeModal = () => {
 </template>
 
 <style scoped>
-.app{
+.app {
   display: flex;
-  flex-direction: row;
+  height: 100vh;
+  overflow: hidden;
+}
+.content {
+  flex-grow: 1;
+  overflow: auto;
 }
 </style>

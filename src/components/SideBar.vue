@@ -6,6 +6,7 @@ import IconAugment from './icons/IconAugment.vue';
 import IconDataset from './icons/IconDataset.vue';
 import IconModelRun from './icons/IconModelRun.vue';
 import IconLogout from './icons/IconLogout.vue';
+import IconOCR from './icons/IconOCR.vue';
 const emit = defineEmits(['openModal'])
 
 const openModal = () => {
@@ -24,7 +25,7 @@ const openModal = () => {
             <div id="menu" class="flex flex-col items-center p-6">
                 <button @click="openModal" id="upload-img-button" >
                     <IconUploadImage />
-                    <span id="upload-img-text" class="p-1 text-neutral-white text-xs">Upload Image</span>
+                    <span id="upload-img-text" class="p-1 text-white text-xs">Upload Image</span>
                 </button>
                 <div id="logo-management" class="w-full flex flex-col justify-start">
                     <span class="menu-title">LOGO MANAGEMENT</span>
@@ -50,6 +51,13 @@ const openModal = () => {
                     <router-link to='/model' class="button">
                         <IconModelRun/>
                         <span class="text">Run</span>
+                    </router-link>
+                </div>
+                <div id="text-convert" class="w-full flex flex-col justify-start pt-6">
+                    <span class="menu-title">TEXT CONVERT</span>
+                    <router-link to='/text-convert' class="button">
+                        <IconOCR/>
+                        <span class="text">OCR</span>
                     </router-link>
                 </div>
             </div>

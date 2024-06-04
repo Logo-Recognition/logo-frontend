@@ -2,6 +2,7 @@ import ClassView from '@/views/ClassView.vue'
 import AugmentView from '@/views/AugmentView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import AboutView from '@/views/AboutView.vue'
+import AnnotateView from '@/views/AnnotateView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,8 +21,12 @@ const router = createRouter({
       path: '/model', // New path
       name: 'model', // Name for the route
       component: AboutView // Component to render
+    },
+    {
+      path: '/annotate',
+      name: 'annotate',
+      component: AnnotateView
     }
-
   ]
 })
 

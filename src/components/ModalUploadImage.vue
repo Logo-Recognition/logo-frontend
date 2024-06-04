@@ -94,7 +94,7 @@ const removeImage = (index) => {
     <div v-if="props.isOpen" class="modal">
         <div class="modal-content">
             <span class="close" @click="closeModal">&times;</span>
-            <h2 class="text-xl font-semibold text-neutral-black pb-6">Upload Image</h2>
+            <h2 class="text-xl font-semibold text-black pb-6">Upload Image</h2>
             <div class="upload-content">
               <div class="drop-area">
                 <input class="file" type="file" multiple @change="onFileChange" accept="image/*" >

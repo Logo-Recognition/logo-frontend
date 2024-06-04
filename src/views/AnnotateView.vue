@@ -6,7 +6,7 @@
         <a
           :class="getTabClass('Unannotated')"
           @click="currentTab = 'Unannotated'"
-          role="tab"                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+          role="tab"
           aria-controls="tabs-unannotated"
           aria-selected="currentTab === 'Unannotated'"
         >
