@@ -58,10 +58,10 @@ onMounted(() => {
               >
                 {{ classItem }}
               </button>
+              <div class="divider" v-if="index !== classList.length - 1"></div>
             </li>
           </ul>
         </div>
-        <div class="selected-class" v-if="selectedClass">{{ selectedClass }}</div>
         <div class="modal-footer">
           <button
             class="button is-success bg-secondary text-white hover:bg-primary"
@@ -146,9 +146,7 @@ onMounted(() => {
   display: block;
   width: 100%;
   padding: 10px;
-  margin: 5px 0;
   border-radius: 4px;
-  background-color: #f9f9f9;
   cursor: pointer;
   transition:
     background-color 0.3s,
@@ -160,7 +158,12 @@ onMounted(() => {
 }
 
 .class-item.selected {
-  border-radius: 8px;
+  background-color: #eff1ff;
+  color: black;
+}
+
+.divider {
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .button.is-success {
@@ -172,12 +175,14 @@ onMounted(() => {
 }
 
 .button.is-danger {
-  background-color: #ff3860;
+  background-color: transparent;
   border-radius: 8px;
-  color: white;
+  border: 1px solid grey;
+  color: grey;
 }
 
 .button.is-danger:hover {
-  background-color: #e02847;
+  background-color: rgba(0, 0, 0, 0.1);
+  color: grey;
 }
 </style>
