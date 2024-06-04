@@ -1,27 +1,27 @@
 <script setup>
 import Popup from '@/components/AddClassessPopup.vue'
-import IconPlus from './icon/IconPlus.vue'
-import IconBin from './icon/IconBin.vue'
+import IconPlus from '@/components/icons/IconPlus.vue'
+import IconBin from '@/components/icons/IconBin.vue'
 
 import { ref } from 'vue'
 const classes = ref([])
 const input_content = ref('')
-// const addClass = () => {
-//   if (input_content.value.trim() === '') {
-//     return
-//   }
-//   classes.value.push({
-//     content: input_content.value
-//   })
-//   input_content.value = ''
-// }
+const popupTriggers = ref({
+  buttonTrigger: false
+})
+const addClass = (classNames) => {
+  const newClasses = classNames
+    .split(',') // Split the input string by commas
+    .map((name) => name.trim()) // Trim leading/trailing spaces from each class name
+    .filter((name) => name !== '' && !classes.value.includes(name)) // Filter out empty strings and existing class names
+    .map((name) => ({ content: name })) // Create objects with the 'content' property
+
+  classes.value.push(...newClasses) // Add the new classes to the array
+}
 const removeClass = (classToRemove) => {
   classes.value = classes.value.filter((c) => c !== classToRemove)
 }
 // AddClassPopup implement zone
-const popupTriggers = ref({
-  buttonTrigger: false
-})
 
 const togglePopup = () => {
   popupTriggers.value.buttonTrigger = !popupTriggers.value.buttonTrigger
@@ -33,11 +33,16 @@ const togglePopup = () => {
     <div id="title">Classes</div>
     <div id="class-box" class="flex-col justify-self-center">
       <form id="form" @submit.prevent="togglePopup" class="flex justify-between">
-        <input id="input-box" type="text" placeholder="Class Name" v-model="input_content" />
+        <input
+          id="input-box"
+          type="text"
+          placeholder="Class Name"
+          v-model="input_content"
+          disabled
+        />
         <button type="submit" id="add-button" class="flex"><IconPlus /> &nbsp; Add Classes</button>
       </form>
       <hr />
-      {{ popupTriggers }}
       <div v-for="(item, index) in classes" :key="index">
         <div id="class-item" class="flex justify-between">
           <label>{{ item.content }}</label>
@@ -48,19 +53,18 @@ const togglePopup = () => {
       </div>
     </div>
   </main>
-  <Popup v-if="popupTriggers.buttonTrigger" :togglePopup="togglePopup">
-
+  <Popup v-if="popupTriggers.buttonTrigger" :addClass="addClass" :togglePopup="togglePopup">
   </Popup>
 </template>
 
 <style scoped>
 #class-box {
-  width: 1200px; /* Adjust the width percentage as needed */
+  width: 92%;
   min-height: 381px;
-  height: auto; /* Adjust the height as needed */
+  height: auto;
   border-radius: 16px;
-  padding: 20px;
   background-color: #fefefe;
+  padding: 20px;
   margin: 30px;
 }
 #Class-page {
@@ -68,10 +72,7 @@ const togglePopup = () => {
   background-color: #f0f0f0;
   padding: 10px;
 }
-#input-box {
-  outline: none;
-  width: 600px;
-}
+
 #title {
   font-size: 18px;
   margin: 30px;
