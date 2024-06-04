@@ -423,7 +423,8 @@ const Apply = () => {
   }
 }
 
-function handleClose(title, type) {
+function handleClose({title, type}) {
+   console.log(`Close event received with title: ${title} and type: ${type}`);
   switch (title) {
     case 'Rotate':
       updateRotate('rotate', 0)
@@ -439,7 +440,7 @@ function handleClose(title, type) {
 
       break
     case 'Noise':
-      if (type == 'pepper') {
+      if (type === "pepper") {
         updateRotate('pepper_noise', 0)
       } else {
         updateRotate('gaussian_noise', 0)

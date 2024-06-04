@@ -68,8 +68,7 @@ const formattedTitle = computed(() => {
 const emit = defineEmits(['close'])
 
 function closePopup() {
-  emit('close', props.title)
-  emit('type' , props.type)
+  emit('close', { title: props.title, type: props.type })
 }
 </script>
 
