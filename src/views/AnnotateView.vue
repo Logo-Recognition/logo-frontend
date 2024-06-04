@@ -23,16 +23,8 @@ const showModal = ref(false)
 const currentTab = ref('Unannotated')
 const unannotatedImages = ref([])
 const annotatedImages = ref([])
-const selectedClass = ref(null)
 const selectedClasses = ref([])
-
-const submitAndRefreshLabels = () => {
-  if (currentBox) {
-    selectedClass.value = currentBox.name
-  } else {
-    console.error('currentBox is null')
-  }
-}
+const selectedImageName = ref('')
 
 const toTextFile = async () => {
   const canvasWidth = canvas.width
@@ -67,11 +59,25 @@ const toTextFile = async () => {
 }
 
 const drawNewBox = (startPoint, endPoint) => {
+  const canvasWidth = canvas.width
+  const canvasHeight = canvas.height
+
+  const left = startPoint.x
+  const top = startPoint.y
+  const width = endPoint.x - startPoint.x
+  const height = endPoint.y - startPoint.y
+
+  const classId = 0
+  const centerX = (left + width / 2) / canvasWidth
+  const centerY = (top + height / 2) / canvasHeight
+  const normalizedWidth = width / canvasWidth
+  const normalizedHeight = height / canvasHeight
+
   const rect = new fabric.Rect({
-    left: startPoint.x,
-    top: startPoint.y,
-    width: endPoint.x - startPoint.x,
-    height: endPoint.y - startPoint.y,
+    left,
+    top,
+    width,
+    height,
     fill: 'rgba(255, 0, 0, 0.2)',
     stroke: '#f00',
     strokeWidth: 2,
@@ -79,7 +85,12 @@ const drawNewBox = (startPoint, endPoint) => {
     cornerColor: '#f00',
     selectable: true,
     hasControls: true,
-    name: ''
+    name: '',
+    classId,
+    centerX,
+    centerY,
+    normalizedWidth,
+    normalizedHeight
   })
   canvas.add(rect)
   canvas.setActiveObject(rect)
@@ -179,11 +190,15 @@ const fetchImages = async (tab) => {
     const response = await fetch(`${API_URL}/api/${endpoint}`)
     if (response.ok) {
       const imageUrls = await response.json()
-      const images = imageUrls.map((url, index) => ({
-        id: `image-${index}`,
-        src: url,
-        alt: `Image ${index + 1}`
-      }))
+      const images = imageUrls.map((url, index) => {
+        const imageName = url.split('/').pop().split('?')[0]
+        return {
+          id: `image-${index}`,
+          src: url,
+          alt: `Image ${index + 1}`,
+          name: imageName
+        }
+      })
       if (tab.toLowerCase() === 'unannotated') {
         unannotatedImages.value = images
       } else if (tab.toLowerCase() === 'annotated') {
@@ -196,14 +211,50 @@ const fetchImages = async (tab) => {
     console.error('Error:', error)
   }
 }
-
 const switchTab = (tab) => {
   currentTab.value = tab
   fetchImages(tab)
 }
 
-const loadImageToCanvas = (imageSrc) => {
+const loadImageToCanvas = (imageSrc, imageName) => {
   loadImage(imageSrc)
+  selectedImageName.value = imageName
+}
+
+const saveAnnotations = async () => {
+  try {
+    const objects = canvas.getObjects()
+    const annotatedData = {
+      image_name: selectedImageName.value,
+      label: []
+    }
+
+    objects.forEach((obj) => {
+      if (obj.type === 'rect') {
+        annotatedData.label.push({
+          class_name: obj.name,
+          bbox: `${obj.centerX.toFixed(6)} ${obj.centerY.toFixed(6)} ${obj.normalizedWidth.toFixed(6)} ${obj.normalizedHeight.toFixed(6)}`
+        })
+      }
+    })
+
+    console.log(annotatedData)
+    const response = await fetch(`${API_URL}/api/annotated-images`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(annotatedData)
+    })
+
+    if (response.ok) {
+      console.log('Annotations saved successfully')
+    } else {
+      console.error('Error saving annotations:', response.status)
+    }
+  } catch (error) {
+    console.error('Error saving annotations:', error)
+  }
 }
 
 onMounted(() => {
@@ -277,15 +328,24 @@ onMounted(() => {
           <div class="mouse-coordinates">
             X: {{ mouseCoordinates.x }}, Y: {{ mouseCoordinates.y }}
           </div>
-          <div class="submit-button bg-secondary text-white">
-            <button class="button is-primary" @click="submitAndRefreshLabels">save</button>
-          </div>
         </div>
       </div>
       <div class="labels-container bg-white">
         <h2>Labels</h2>
         <div v-for="selectedClass in selectedClasses" :key="selectedClass" class="label-item">
           Selected Class: {{ selectedClass }}
+        </div>
+        <div v-if="canvas">
+          <div v-for="obj in canvas.getObjects()" :key="obj.id" class="label-item">
+            <span v-if="obj.type === 'rect'">
+              YOLO Format: {{ obj.classId }} {{ obj.centerX.toFixed(6) }}
+              {{ obj.centerY.toFixed(6) }} {{ obj.normalizedWidth.toFixed(6) }}
+              {{ obj.normalizedHeight.toFixed(6) }} {{ obj.name || '' }}
+            </span>
+          </div>
+        </div>
+        <div class="submit-button bg-secondary text-white">
+          <button class="button is-primary" @click="saveAnnotations">Save</button>
         </div>
       </div>
 
@@ -295,6 +355,7 @@ onMounted(() => {
         @submit="handleModalSubmit"
         @classSelected="addSelectedClass"
         :selectedClasses="selectedClasses"
+        :currentBox="currentBox"
       />
 
       <div class="images-container">
@@ -351,7 +412,7 @@ onMounted(() => {
               v-for="image in unannotatedImages"
               :key="image.id"
               class="image-item"
-              @click="loadImageToCanvas(image.src)"
+              @click="loadImageToCanvas(image.src, image.name)"
             >
               <img :src="image.src" :alt="image.alt" class="image" />
             </div>
@@ -368,7 +429,7 @@ onMounted(() => {
               v-for="image in annotatedImages"
               :key="image.id"
               class="image-item"
-              @click="loadImageToCanvas(image.src)"
+              @click="loadImageToCanvas(image.src, image.name)"
             >
               <img :src="image.src" :alt="image.alt" class="image" />
             </div>
