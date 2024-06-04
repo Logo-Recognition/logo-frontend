@@ -5,13 +5,31 @@ import { ref,onMounted } from 'vue';
 import {API_URL} from '@/config.js'
 import Slider from '@vueform/slider';
 import Toggle from '@vueform/toggle';
+import { useParametersStore } from '@/stores/Augment.js'
+import { toast } from 'vue3-toastify';
 
-const range = ref([100, 100]);
+const augmentParameterStore = useParametersStore()
+const range = ref([augmentParameterStore.trainTestSplitParam.trainSize, augmentParameterStore.trainTestSplitParam.trainSize+augmentParameterStore.trainTestSplitParam.validSize]);
 const sliderGradient = ref(`linear-gradient(to right, #EDB95E ${range.value[0]}%, #CA2222 ${range.value[1]}%)`);
 const train_test_value = ref([range.value[0],100 - range.value[1],range.value[1] - range.value[0]])
 const images = ref(0);
 const classes = ref(0);
-const isAugment = ref(false);
+
+function updateTrainSize(value) {
+  augmentParameterStore.updateTrainTestSplitParam('trainSize', value)
+}
+
+function updateValidSize(value) {
+  augmentParameterStore.updateTrainTestSplitParam('validSize', value)
+}
+
+function updateTestSize(value) {
+  augmentParameterStore.updateTrainTestSplitParam('testSize', value)
+}
+
+function updateIsAugment(value) {
+  augmentParameterStore.updateIsAugmentParam(value)
+}
 
 const onDrag = (value) => {
     const startColor = '#EDB95E';
@@ -20,14 +38,67 @@ const onDrag = (value) => {
     const end = value[1];
     sliderGradient.value = `linear-gradient(to right, ${startColor} ${start}%, ${endColor} ${end}%)`;
     train_test_value.value =  [value[0],value[1] - value[0],100 - value[1]]
+    updateTrainSize(train_test_value.value[0])
+    updateValidSize(train_test_value.value[1])
+    updateTestSize(train_test_value.value[2])
 };
 
-const onDownload = () => {
-  if(isAugment.value){
+const onDownload = async () => {
+  try {
+    if(augmentParameterStore.trainTestSplitParam.trainSize == 0){
+      toast.error("Train set size cannot be zero.")
+      return
+    }
+    const  requestBody = JSON.stringify({ augmentation_param : augmentParameterStore.isAugment? {
+          rotate : augmentParameterStore.augmentationParam.rotate,
+          flip_horizontal : augmentParameterStore.augmentationParam.flip_horizontal,
+          flip_verical: augmentParameterStore.augmentationParam.flip_verical,
+          gaussian_noise: augmentParameterStore.augmentationParam.gaussian_noise,
+          pepper_noise: augmentParameterStore.augmentationParam.pepper_noise,
+          scaling: augmentParameterStore.augmentationParam.scaling,
+          brightness: augmentParameterStore.augmentationParam.brightness,
+          saturation: augmentParameterStore.augmentationParam.saturation,
+          contrast: augmentParameterStore.augmentationParam.contrast,
+        } : {
+          rotate: 0,
+          flip_horizontal: false,
+          flip_verical: false,
+          gaussian_noise: 0,
+          pepper_noise: 0,
+          scaling: 1,
+          brightness: 1,
+          saturation: 1,
+          contrast: 1,
+        },
+        train_test_split_param : {
+          train_size: augmentParameterStore.trainTestSplitParam.trainSize / 100,
+          test_size:  augmentParameterStore.trainTestSplitParam.testSize / 100,
+          valid_size:  augmentParameterStore.trainTestSplitParam.validSize / 100,
+        }
+      })
+    console.log(augmentParameterStore.trainTestSplitParam.validSize)
+    const request = new Request(`${API_URL}/api/dataset/download`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: requestBody,
+    });
 
+    const response = await fetch(request);
+
+    const blob = await response.blob();
+    const zipFilename = 'dataset.zip'; 
+    const url = window.URL.createObjectURL(new Blob([blob]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', zipFilename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } catch (err) {
+    console.error('Error downloading ZIP file:', err);
   }
-
-
 }
 
 onMounted(async () => {
@@ -69,28 +140,28 @@ onMounted(async () => {
                 <div class="flex flex-row justify-between">
                     <span class="text-sm text-dark-grey font-medium">TRAIN SET</span>
                     <div class="flex flex-col justify-center items-center rounded-lg bg-warning px-4 py-1">
-                        <span class="text-sm text-white font-bold">{{train_test_value[0]}} %</span>
+                        <span class="text-sm text-white font-bold">{{augmentParameterStore.trainTestSplitParam.trainSize}} %</span>
                     </div>
                 </div>
-                <span class="text-sm text-black font-medium">{{ Math.round(images*train_test_value[0]/100) }} Images</span>
+                <span class="text-sm text-black font-medium">{{ Math.round(images*augmentParameterStore.trainTestSplitParam.trainSize/100) }} Images</span>
             </div>
             <div id="valid" class="flex flex-col h-24 p-4 rounded-2xl border border-information justify-between w-full mx-6">
                 <div class="flex flex-row justify-between">
                     <span class="text-sm text-dark-grey font-medium">VALID SET</span>
                     <div class="flex flex-col justify-center items-center rounded-lg bg-information px-4 py-1">
-                        <span class="text-sm text-white font-bold">{{train_test_value[1]}} %</span>
+                        <span class="text-sm text-white font-bold">{{augmentParameterStore.trainTestSplitParam.validSize}} %</span>
                     </div>
                 </div>
-                <span class="text-sm text-black font-medium">{{ Math.round(images*train_test_value[1]/100) }} Images</span>
+                <span class="text-sm text-black font-medium">{{ Math.round(images*augmentParameterStore.trainTestSplitParam.validSize/100) }} Images</span>
             </div>
             <div id="test" class="flex flex-col h-24 p-4 rounded-2xl border border-error justify-between w-full">
                 <div class="flex flex-row justify-between">
                     <span class="text-sm text-dark-grey font-medium">TEST SET</span>
                     <div class="flex flex-col justify-center items-center rounded-lg bg-error px-4 py-1">
-                        <span class="text-sm text-white font-bold">{{train_test_value[2]}} %</span>
+                        <span class="text-sm text-white font-bold">{{augmentParameterStore.trainTestSplitParam.testSize}} %</span>
                     </div>
                 </div>
-                <span class="text-sm text-black font-medium">{{ Math.round(images*train_test_value[2]/100) }} Images</span>
+                <span class="text-sm text-black font-medium">{{ Math.round(images*augmentParameterStore.trainTestSplitParam.testSize/100) }} Images</span>
             </div>
         </div>
         <Slider v-model="range" class="slider" @slide="onDrag" :tooltips="false"/>
@@ -105,11 +176,11 @@ onMounted(async () => {
             <span class="tooltiptext">Create new training examples for model to learn from by generating augmented versions of each image in your training set.</span>
           </div>
         </div>
-        <Toggle class="toggle-bt" v-model="isAugment"></Toggle>
+        <Toggle class="toggle-bt" v-model="augmentParameterStore.isAugment" :change="updateIsAugment"></Toggle>
       </div>
     </div>
     <div id="action" class="flex flex-row bg-white rounded-3xl px-8 py-6 mt-6">
-        <button class="rounded-lg bg-secondary font-medium text-xs text-white px-4 py-2 w-32 shadow">Create</button>
+        <button class="rounded-lg bg-secondary font-medium text-xs text-white px-4 py-2 w-32 shadow" @click="onDownload">Create</button>
         <button class="rounded-lg border border-dark-grey font-medium text-xs text-dark-grey px-4 py-2 w-16 ml-4 shadow">Reset</button>
     </div>
   </main>
