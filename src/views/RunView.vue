@@ -3,31 +3,24 @@ import { ref } from 'vue'
 
 // Initialize the selected model with a default value
 const model = ref('RT-DETR')
+// Initialize a reactive state for the dropdown visibility
+const isDropdownOpen = ref(false)
+
+// Function to toggle the dropdown visibility
+function toggleDropdown() {
+  isDropdownOpen.value = !isDropdownOpen.value
+}
+
+// Function to select a model and close the dropdown
+function selectModel(selectedModel) {
+  model.value = selectedModel
+  isDropdownOpen.value = false
+}
 
 // Close the dropdown if the user clicks outside of it
 function closeDropdown(event) {
-  if (!event.target.matches('.dropbtn')) {
-    const dropdowns = document.getElementsByClassName('dropdown-content')
-    for (let i = 0; i < dropdowns.length; i++) {
-      const openDropdown = dropdowns[i]
-      if (openDropdown.style.display === 'block') {
-        openDropdown.style.display = 'none'
-      }
-    }
-  }
-}
-
-// Function to select a model
-function selectModel(selectedModel) {
-  model.value = selectedModel
-
-  // Close the dropdown menu after selecting
-  const dropdowns = document.getElementsByClassName('dropdown-content')
-  for (let i = 0; i < dropdowns.length; i++) {
-    const openDropdown = dropdowns[i]
-    if (openDropdown.style.display === 'block') {
-      openDropdown.style.display = 'none'
-    }
+  if (!event.target.closest('.dropdown')) {
+    isDropdownOpen.value = false
   }
 }
 
@@ -37,14 +30,14 @@ window.addEventListener('click', closeDropdown)
 
 <template>
   <main id="" class="flex-col">
-    <div>
+    <div id="title">
       <H1>Classes</H1>
     </div>
     <div class="flex-col" id="class-box">
       <H2 class="font-bold mb-5">Select Model</H2>
       <div class="dropdown">
-        <button class="dropbtn" id="selectedModel">{{ model }}</button>
-        <div class="dropdown-content">
+        <button class="dropbtn" id="selectedModel" @click="toggleDropdown">{{ model }}</button>
+        <div class="dropdown-content" :class="{ show: isDropdownOpen }">
           <a href="#" @click.prevent="selectModel('RT-DETR')">RT-DETR</a>
           <a href="#" @click.prevent="selectModel('Option 2')">Option 2</a>
           <a href="#" @click.prevent="selectModel('Option 3')">Option 3</a>
@@ -63,6 +56,13 @@ window.addEventListener('click', closeDropdown)
   padding: 20px;
   margin: 30px;
 }
+#title {
+  font-size: 18px;
+  font-weight: 500;
+  gap: 0px;
+  opacity: 0px;
+  margin: 30px;
+}
 .dropbtn {
   width: 1000px;
   height: 58px;
@@ -72,7 +72,6 @@ window.addEventListener('click', closeDropdown)
   opacity: 0px;
   background: #eff1ff;
 }
-
 /* Dropdown Content (Hidden by Default) */
 .dropdown-content {
   display: none;
@@ -83,7 +82,10 @@ window.addEventListener('click', closeDropdown)
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 1;
 }
-
+/* Show the dropdown menu when isDropdownOpen is true */
+.dropdown-content.show {
+  display: block;
+}
 /* Links inside the dropdown */
 .dropdown-content a {
   color: black;
@@ -91,20 +93,8 @@ window.addEventListener('click', closeDropdown)
   text-decoration: none;
   display: block;
 }
-
 /* Change color of dropdown links on hover */
 .dropdown-content a:hover {
   background-color: #f1f1f1;
-  
-}
-
-/* Show the dropdown menu on hover */
-.dropdown:hover .dropdown-content {
-  display: block;
-}
-
-/* Change the background color of the dropdown button when the dropdown content is shown */
-.dropdown:hover .dropbtn {
-  
 }
 </style>
