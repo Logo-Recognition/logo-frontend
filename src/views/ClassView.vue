@@ -3,25 +3,64 @@ import Popup from '@/components/AddClassessPopup.vue'
 import IconPlus from '@/components/icons/IconPlus.vue'
 import IconBin from '@/components/icons/IconBin.vue'
 
-import { ref } from 'vue'
+import { ref, onMounted  } from 'vue'
 const classes = ref([])
 const input_content = ref('')
 const popupTriggers = ref({
   buttonTrigger: false
 })
-const addClass = (classNames) => {
-  const newClasses = classNames
-    .split(',') // Split the input string by commas
-    .map((name) => name.trim()) // Trim leading/trailing spaces from each class name
-    .filter((name) => name !== '' && !classes.value.includes(name)) // Filter out empty strings and existing class names
-    .map((name) => ({ content: name })) // Create objects with the 'content' property
+const pathPublic = "http://192.168.2.44:5000/api/class"
+// const pathPublic = "http://127.0.0.1:5000/api/class"
 
-  classes.value.push(...newClasses) // Add the new classes to the array
+const isLoading = ref(true)
+const error = ref(null)
+
+const fetchClasses = async () => {
+  try {
+    const response = await fetch(pathPublic);
+    const data = await response.json();
+    
+
+    if (response.ok) {
+      classes.value = data.classes;
+    } else {
+      error.value = 'An error occurred while fetching class data.';
+    }
+  } catch (err) {
+    error.value = 'An error occurred while fetching class data.';
+    console.error(err);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+onMounted(fetchClasses);
+
+
+const removeClass = async (className) => {
+  try {
+    const response = await fetch(pathPublic, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ bucket_name: className })
+    })
+    const data = await response.json()
+
+    if (response.ok) {
+      // Fetch updated class list after successful addition
+      console.log("sdsdsd");
+      await fetchClasses()
+    } else {
+      error.value = data.error
+    }
+  } catch (err) {
+    error.value = 'An error occurred while adding the new class.'
+    console.error(err)
+  }
 }
-const removeClass = (classToRemove) => {
-  classes.value = classes.value.filter((c) => c !== classToRemove)
-}
-// AddClassPopup implement zone
+
 
 const togglePopup = () => {
   popupTriggers.value.buttonTrigger = !popupTriggers.value.buttonTrigger
@@ -45,7 +84,7 @@ const togglePopup = () => {
       <hr />
       <div v-for="(item, index) in classes" :key="index">
         <div id="class-item" class="flex justify-between">
-          <label>{{ item.content }}</label>
+          <label>{{ item }}</label>
           <div id="delete-button">
             <button class="delete" @click="removeClass(item)"><IconBin /></button>
           </div>
@@ -53,13 +92,13 @@ const togglePopup = () => {
       </div>
     </div>
   </main>
-  <Popup v-if="popupTriggers.buttonTrigger" :addClass="addClass" :togglePopup="togglePopup">
-  </Popup>
+  <Popup v-if="popupTriggers.buttonTrigger" :fetchClasses="fetchClasses" :togglePopup="togglePopup"> </Popup>
+  
 </template>
 
 <style scoped>
 #class-box {
-  width: 92%;
+  width: 95%; /* Adjust the width percentage as needed */
   min-height: 381px;
   height: auto;
   border-radius: 16px;
