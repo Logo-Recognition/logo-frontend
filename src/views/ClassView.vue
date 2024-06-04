@@ -3,13 +3,13 @@ import Popup from '@/components/AddClassessPopup.vue'
 import IconPlus from '@/components/icons/IconPlus.vue'
 import IconBin from '@/components/icons/IconBin.vue'
 
-import { ref, onMounted  } from 'vue'
+import { ref, onMounted } from 'vue'
 const classes = ref([])
 const input_content = ref('')
 const popupTriggers = ref({
   buttonTrigger: false
 })
-const pathPublic = "http://192.168.2.44:5000/api/class"
+const pathPublic = 'http://192.168.2.44:5000/api/class'
 // const pathPublic = "http://127.0.0.1:5000/api/class"
 
 const isLoading = ref(true)
@@ -17,25 +17,23 @@ const error = ref(null)
 
 const fetchClasses = async () => {
   try {
-    const response = await fetch(pathPublic);
-    const data = await response.json();
-    
+    const response = await fetch(pathPublic)
+    const data = await response.json()
 
     if (response.ok) {
-      classes.value = data.classes;
+      classes.value = data.classes
     } else {
-      error.value = 'An error occurred while fetching class data.';
+      error.value = 'An error occurred while fetching class data.'
     }
   } catch (err) {
-    error.value = 'An error occurred while fetching class data.';
-    console.error(err);
+    error.value = 'An error occurred while fetching class data.'
+    console.error(err)
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
-};
+}
 
-onMounted(fetchClasses);
-
+onMounted(fetchClasses)
 
 const removeClass = async (className) => {
   try {
@@ -50,7 +48,7 @@ const removeClass = async (className) => {
 
     if (response.ok) {
       // Fetch updated class list after successful addition
-      console.log("sdsdsd");
+      console.log('sdsdsd')
       await fetchClasses()
     } else {
       error.value = data.error
@@ -60,7 +58,6 @@ const removeClass = async (className) => {
     console.error(err)
   }
 }
-
 
 const togglePopup = () => {
   popupTriggers.value.buttonTrigger = !popupTriggers.value.buttonTrigger
@@ -92,11 +89,17 @@ const togglePopup = () => {
       </div>
     </div>
   </main>
-  <Popup v-if="popupTriggers.buttonTrigger" :fetchClasses="fetchClasses" :togglePopup="togglePopup"> </Popup>
-  
+  <Popup v-if="popupTriggers.buttonTrigger" :fetchClasses="fetchClasses" :togglePopup="togglePopup">
+  </Popup>
 </template>
 
 <style scoped>
+#Class-page {
+  width: 100%;
+  height: 100%;
+  background-color: #f0f0f0;
+  padding: 10px;
+}
 #class-box {
   width: 95%; /* Adjust the width percentage as needed */
   min-height: 381px;
@@ -105,11 +108,6 @@ const togglePopup = () => {
   background-color: #fefefe;
   padding: 20px;
   margin: 30px;
-}
-#Class-page {
-  width: 100%;
-  background-color: #f0f0f0;
-  padding: 10px;
 }
 
 #title {
