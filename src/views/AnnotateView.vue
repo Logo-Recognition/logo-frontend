@@ -151,6 +151,9 @@ const loadImageToCanvas = (imageSrc, imageName, labels) => {
       }
     })
 
+    canvas.remove(verticalLine)
+    canvas.remove(horizontalLine)
+
     const boxesForImage = []
 
     if (labels && Array.isArray(labels)) {
@@ -164,6 +167,9 @@ const loadImageToCanvas = (imageSrc, imageName, labels) => {
 
     canvas.renderAll()
     submittedBoxes.value.push(...boxesForImage)
+
+    canvas.add(verticalLine, horizontalLine)
+    canvas.renderAll()
   })
   selectedImageName.value = imageName
 }
