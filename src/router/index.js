@@ -1,6 +1,7 @@
+import DatasetView from '@/views/DatasetView.vue'
+import { createRouter, createWebHistory } from 'vue-router'
 import ClassView from '@/views/ClassView.vue'
 import AugmentView from '@/views/AugmentView.vue'
-import { createRouter, createWebHistory } from 'vue-router'
 import AboutView from '@/views/AboutView.vue'
 import AnnotateView from '@/views/AnnotateView.vue'
 
@@ -21,6 +22,11 @@ const router = createRouter({
       path: '/model', // New path
       name: 'model', // Name for the route
       component: AboutView // Component to render
+    },
+    {
+      path: '/dataset',
+      name: 'dataset',
+      component: DatasetView
     },
     {
       path: '/annotate',
