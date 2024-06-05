@@ -466,9 +466,7 @@ onMounted(() => {
         <div v-if="canvas">
           <div v-for="obj in visibleObjects" :key="obj.id" class="label-item">
             <span>
-              YOLO Format: {{ obj.classId }} {{ obj.centerX.toFixed(6) }}
-              {{ obj.centerY.toFixed(6) }} {{ obj.normalizedWidth.toFixed(6) }}
-              {{ obj.normalizedHeight.toFixed(6) }} {{ obj.name || '' }}
+              {{ obj.name || '' }}
             </span>
           </div>
         </div>
