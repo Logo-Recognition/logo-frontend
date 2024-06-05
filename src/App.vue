@@ -19,9 +19,9 @@ const closeModal = () => {
     <SideBar @open-modal="openModal" />
     <div class="content-container">
       <div class="content">
-      <RouterView />
+        <RouterView />
       </div>
-    <ModalUploadImage :is-open="showModal" @close="closeModal" />
+      <ModalUploadImage :is-open="showModal" @close="closeModal" />
     </div>
   </div>
 </template>
@@ -35,9 +35,7 @@ const closeModal = () => {
 }
 
 .content-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  position: relative;
+  flex-grow: 1;
+  overflow: auto;
 }
 </style>
