@@ -1,7 +1,7 @@
 <script setup>
 import IconSourceImage from '@/components/icons/IconSourceImage.vue';
 import IconTrainTestSplit from '@/components/icons/IconTrainTestSplit.vue';
-import { ref,onMounted } from 'vue';
+import { ref,onMounted,watch } from 'vue';
 import {API_URL} from '@/config.js'
 import Slider from '@vueform/slider';
 import Toggle from '@vueform/toggle';
@@ -14,6 +14,16 @@ const sliderGradient = ref(`linear-gradient(to right, #EDB95E ${range.value[0]}%
 const train_test_value = ref([range.value[0],100 - range.value[1],range.value[1] - range.value[0]])
 const images = ref(0);
 const classes = ref(0);
+
+watch(
+  () => augmentParameterStore.trainTestSplitParam,
+  (newValue) => {
+    range.value = [newValue.trainSize, newValue.trainSize + newValue.validSize];
+    sliderGradient.value = `linear-gradient(to right, #EDB95E ${range.value[0]}%, #CA2222 ${range.value[1]}%)`
+    train_test_value.value = [range.value[0],100 - range.value[1],range.value[1] - range.value[0]]
+  },
+  { deep: true }
+);
 
 function updateTrainSize(value) {
   augmentParameterStore.updateTrainTestSplitParam('trainSize', value)
@@ -101,6 +111,13 @@ const onDownload = async () => {
   }
 }
 
+const onReset = () => {
+  updateTrainSize(100)
+  updateValidSize(0)
+  updateTestSize(0)
+  updateIsAugment(false)
+}
+
 onMounted(async () => {
   try {
     const response = await fetch(`${API_URL}/api/dataset`);
@@ -181,7 +198,7 @@ onMounted(async () => {
     </div>
     <div id="action" class="flex flex-row bg-white rounded-3xl px-8 py-6 mt-6">
         <button class="rounded-lg bg-secondary font-medium text-xs text-white px-4 py-2 w-32 shadow" @click="onDownload">Create</button>
-        <button class="rounded-lg border border-dark-grey font-medium text-xs text-dark-grey px-4 py-2 w-16 ml-4 shadow">Reset</button>
+        <button class="rounded-lg border border-dark-grey font-medium text-xs text-dark-grey px-4 py-2 w-16 ml-4 shadow " @click="onReset">Reset</button>
     </div>
   </main>
 </template>
