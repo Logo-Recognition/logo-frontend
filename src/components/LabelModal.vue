@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineEmits, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { toast } from 'vue3-toastify'
 import axios from 'axios'
 import { API_URL } from '@/config.js'
