@@ -67,7 +67,7 @@ const sendImagesToServer = async () => {
     const formData = new FormData()
     images.forEach((file) => formData.append('files[]', file))
 
-    const response = await fetch(`${API_URL}/api/image/unannotated`, {
+    const response = await fetch(`${API_URL}/api/images`, {
       method: 'POST',
       body: formData
     })
@@ -99,7 +99,7 @@ const removeImage = (index) => {
           <input class="file" type="file" multiple @change="onFileChange" accept="image/*" />
           <img alt="Upload image" class="m-5" src="@/assets/images/upload-btn.svg" width="90" />
           <span class="text-primary font-normal text-sm"
-            >Click<span class="text-sub-primary"> hear </span>to upload or drop image</span
+            ><span class="text-secondary">Click hear </span>to upload or drop image</span
           >
         </div>
         <div v-if="previewImages.length > 0" class="preview-container">
@@ -207,7 +207,7 @@ const removeImage = (index) => {
   width: 144px;
   height: 32px;
   border-radius: 8px;
-  background-color: #48a393;
+  background-color: #7585FF;
   color: #fefefe;
   font-size: 12px;
   font-weight: 600;
@@ -218,9 +218,9 @@ const removeImage = (index) => {
   width: 72px;
   height: 32px;
   border-radius: 8px;
-  border: 1px solid #e83550;
-  color: #e83550;
-  background-color: #fff1f1;
+  border: 1px solid #7E7E7E;
+  color: #7E7E7E;
+  background-color: #FEFEFE;
   font-size: 12px;
   font-weight: 600;
 }
