@@ -1,15 +1,14 @@
 <script setup>
 import { ref } from 'vue'
-import { toast } from 'vue3-toastify';
-import PreviewImage from './PreviewImage.vue';
-import {API_URL} from '@/config.js'
+import { toast } from 'vue3-toastify'
+import PreviewImage from './PreviewImage.vue'
+import { API_URL } from '@/config.js'
 const props = defineProps({
   isOpen: {
     type: Boolean,
     required: true
   }
 })
-
 
 const emit = defineEmits(['close'])
 
@@ -22,68 +21,68 @@ const closeModal = () => {
 
 const onUploadedSuccess = () => {
   toast.success('Images uploaded successfully!', {
-    autoClose: 3000,
-  });
+    autoClose: 3000
+  })
   emit('close')
   previewImages.value = []
-};
+}
 
 const onUploadedFail = () => {
   toast.error('Failed to upload images.', {
-    autoClose: 3000,
-  });
-};
+    autoClose: 3000
+  })
+}
 
 const onFileChange = (event) => {
   const files = event.target.files
   for (var index = 0; index < files.length; index++) {
-      var reader = new FileReader();
-      reader.onload = function(event) {
-        const imageUrl = event.target.result;
-        previewImages.value.push(imageUrl);
-      }
-      reader.readAsDataURL(files[index]);
+    var reader = new FileReader()
+    reader.onload = function (event) {
+      const imageUrl = event.target.result
+      previewImages.value.push(imageUrl)
+    }
+    reader.readAsDataURL(files[index])
   }
 }
 
 const sendImagesToServer = async () => {
   try {
-    const images = previewImages.value.map(imageUrl => {
-      const byteString = atob(imageUrl.split(',')[1]);
-      const mimeString = imageUrl.split(',')[0].split(':')[1].split(';')[0];
-      const ab = new ArrayBuffer(byteString.length);
-      const ia = new Uint8Array(ab);
+    const images = previewImages.value.map((imageUrl) => {
+      const byteString = atob(imageUrl.split(',')[1])
+      const mimeString = imageUrl.split(',')[0].split(':')[1].split(';')[0]
+      const ab = new ArrayBuffer(byteString.length)
+      const ia = new Uint8Array(ab)
 
       for (let i = 0; i < byteString.length; i++) {
-        ia[i] = byteString.charCodeAt(i);
+        ia[i] = byteString.charCodeAt(i)
       }
 
-      const blob = new Blob([ab], { type: mimeString });
-      const file = new File([blob], `image-${Date.now()}.${mimeString.split('/')[1]}`, { type: mimeString });
-      return file;
-    });
+      const blob = new Blob([ab], { type: mimeString })
+      const file = new File([blob], `image-${Date.now()}.${mimeString.split('/')[1]}`, {
+        type: mimeString
+      })
+      return file
+    })
 
-    const formData = new FormData();
-    images.forEach(file => formData.append('files[]', file));
+    const formData = new FormData()
+    images.forEach((file) => formData.append('files[]', file))
 
     const response = await fetch(`${API_URL}/api/image/unannotated`, {
       method: 'POST',
       body: formData
-    });
+    })
 
     if (response.ok) {
-      console.log('Images uploaded successfully');
-      onUploadedSuccess();
+      console.log('Images uploaded successfully')
+      onUploadedSuccess()
     } else {
-      console.error('Error uploading images');
+      console.error('Error uploading images')
       onUploadedFail()
     }
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error:', error)
   }
 }
-
-
 
 const removeImage = (index) => {
   previewImages.value.splice(index, 1)
@@ -91,32 +90,34 @@ const removeImage = (index) => {
 </script>
 
 <template>
-    <div v-if="props.isOpen" class="modal">
-        <div class="modal-content">
-            <span class="close" @click="closeModal">&times;</span>
-            <h2 class="text-xl font-semibold text-black pb-6">Upload Image</h2>
-            <div class="upload-content">
-              <div class="drop-area">
-                <input class="file" type="file" multiple @change="onFileChange" accept="image/*" >
-                <img alt="Upload image" class="m-5" src="@/assets/images/upload-btn.svg" width="90"/>
-                <span class="text-primary font-normal text-sm">Click<span class="text-sub-primary"> hear </span>to upload or drop image</span>
-              </div>
-              <div v-if="previewImages.length > 0" class="preview-container">
-                <div v-if="previewImages" class="preview-area">
-                    <div v-for="(image, index) in previewImages" :key="index" class="preview-items">
-                        <PreviewImage :src="image" @img-removed="removeImage(index)"></PreviewImage>
-                    </div>
-                </div>
-              </div>
-            </div>
-            <div class="flex flex-row pt-5">
-              <button class="save-button" @click="sendImagesToServer">Save</button>
-              <button class="cancel-button" @click="closeModal">Cancel</button>
-            </div>
+  <div v-if="props.isOpen" class="modal">
+    <div class="modal-content">
+      <span class="close" @click="closeModal">&times;</span>
+      <h2 class="text-xl font-semibold text-black pb-6">Upload Image</h2>
+      <div class="upload-content">
+        <div class="drop-area">
+          <input class="file" type="file" multiple @change="onFileChange" accept="image/*" />
+          <img alt="Upload image" class="m-5" src="@/assets/images/upload-btn.svg" width="90" />
+          <span class="text-primary font-normal text-sm"
+            >Click<span class="text-sub-primary"> hear </span>to upload or drop image</span
+          >
         </div>
+        <div v-if="previewImages.length > 0" class="preview-container">
+          <div v-if="previewImages" class="preview-area">
+            <div v-for="(image, index) in previewImages" :key="index" class="preview-items">
+              <PreviewImage :src="image" @img-removed="removeImage(index)"></PreviewImage>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-row pt-5">
+        <button class="save-button" @click="sendImagesToServer">Save</button>
+        <button class="cancel-button" @click="closeModal">Cancel</button>
+      </div>
     </div>
+  </div>
 </template>
-  
+
 <style>
 .modal {
   display: flex;
@@ -153,32 +154,31 @@ const removeImage = (index) => {
   cursor: pointer;
 }
 
-.upload-content{
+.upload-content {
   display: flex;
   flex-direction: column;
   background-color: white;
-  box-shadow: 0px 1px 5px 0px #64748B1F;
+  box-shadow: 0px 1px 5px 0px #64748b1f;
   border-radius: 8px;
-
 }
 
-.drop-area{
+.drop-area {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   height: 200px;
   border-radius: 8.66px;
-  border: 1px dashed #9E9E9E;
+  border: 1px dashed #9e9e9e;
   margin: 24px;
   position: relative;
 }
 
-.drop-area:hover{
-  border: 1px dashed #0D4F72;
+.drop-area:hover {
+  border: 1px dashed #0d4f72;
 }
 
-.file{
+.file {
   opacity: 0;
   width: 100%;
   height: 200px;
@@ -193,36 +193,35 @@ const removeImage = (index) => {
   margin-bottom: 24px;
 }
 
-.preview-area{
+.preview-area {
   display: inline-flex;
 }
 
-.preview-items{
+.preview-items {
   width: 150px;
   height: 100px;
   margin-right: 16px;
 }
 
-.save-button{
+.save-button {
   width: 144px;
   height: 32px;
   border-radius: 8px;
-  background-color: #48A393;
-  color: #FEFEFE;
+  background-color: #48a393;
+  color: #fefefe;
   font-size: 12px;
   font-weight: 600;
   margin-right: 16px;
 }
 
-.cancel-button{
+.cancel-button {
   width: 72px;
   height: 32px;
   border-radius: 8px;
-  border: 1px solid #E83550;
-  color: #E83550;
-  background-color: #FFF1F1;
+  border: 1px solid #e83550;
+  color: #e83550;
+  background-color: #fff1f1;
   font-size: 12px;
   font-weight: 600;
 }
-  
 </style>
