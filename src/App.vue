@@ -18,8 +18,10 @@ const closeModal = () => {
   <div class="app bg-grey-background">
     <SideBar @open-modal="openModal" />
     <div class="content-container">
+      <div class="content">
       <RouterView />
-      <ModalUploadImage :is-open="showModal" @close="closeModal" />
+      </div>
+    <ModalUploadImage :is-open="showModal" @close="closeModal" />
     </div>
   </div>
 </template>
