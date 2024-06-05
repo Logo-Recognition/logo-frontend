@@ -35,12 +35,12 @@ window.addEventListener('click', closeDropdown)
     </div>
     <div class="flex-col" id="class-box">
       <H2 class="font-bold mb-5">Select Model</H2>
-      <div class="dropdown">
+      <div class="dropdown justify-center">
         <button class="dropbtn" id="selectedModel" @click="toggleDropdown">{{ model }}</button>
         <div class="dropdown-content" :class="{ show: isDropdownOpen }">
           <a href="#" @click.prevent="selectModel('RT-DETR')">RT-DETR</a>
-          <a href="#" @click.prevent="selectModel('Option 2')">Option 2</a>
-          <a href="#" @click.prevent="selectModel('Option 3')">Option 3</a>
+          <a href="#" @click.prevent="selectModel('YOLO V8')">YOLO V8</a>
+          <a href="#" @click.prevent="selectModel('YOLO V9')">YOLO V9</a>
         </div>
       </div>
     </div>
@@ -64,23 +64,25 @@ window.addEventListener('click', closeDropdown)
   margin: 30px;
 }
 .dropbtn {
-  width: 1000px;
+  width: 100%;
   height: 58px;
   padding: 16px;
   gap: 0px;
   border-radius: 8px;
   opacity: 0px;
   background: #eff1ff;
+  text-align: start;
 }
 /* Dropdown Content (Hidden by Default) */
 .dropdown-content {
   display: none;
-  width: 1000px;
+  width: 100%;
   position: absolute;
   background-color: #f9f9f9;
   min-width: 160px;
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 1;
+  top: 100%; /* Position the dropdown below the button */
 }
 /* Show the dropdown menu when isDropdownOpen is true */
 .dropdown-content.show {
@@ -92,9 +94,16 @@ window.addEventListener('click', closeDropdown)
   padding: 12px 16px;
   text-decoration: none;
   display: block;
+  text-align: center; /* Center the text within the links */
 }
 /* Change color of dropdown links on hover */
 .dropdown-content a:hover {
   background-color: #f1f1f1;
+}
+.dropdown{
+  position: relative;
+  display: flex;
+  justify-content: center; /* Center the button horizontally */
+  width: 100%; /* Ensure the container spans full width */
 }
 </style>
