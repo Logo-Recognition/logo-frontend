@@ -1,8 +1,8 @@
 <script setup>
 import { RouterView } from 'vue-router'
-import { ref } from 'vue';
+import { ref } from 'vue'
 import SideBar from '@/components/SideBar.vue'
-import ModalUploadImage from './components/ModalUploadImage.vue';
+import ModalUploadImage from './components/ModalUploadImage.vue'
 const showModal = ref(false)
 
 const openModal = () => {
@@ -12,30 +12,29 @@ const openModal = () => {
 const closeModal = () => {
   showModal.value = false
 }
-
-
 </script>
 
 <template>
-  <div class="app bg-background">
-    <SideBar @open-modal="openModal"/>
-    <div class="content">
-      <RouterView />
+  <div class="app bg-grey-background">
+    <SideBar @open-modal="openModal" />
+    <div class="content-container">
+      <div class="content">
+        <RouterView />
+      </div>
+      <ModalUploadImage :is-open="showModal" @close="closeModal" />
     </div>
-    <ModalUploadImage 
-      :is-open="showModal"
-      @close="closeModal"
-    />
   </div>
 </template>
 
 <style scoped>
 .app {
   display: flex;
+  flex-direction: row;
   height: 100vh;
   overflow: hidden;
 }
-.content {
+
+.content-container {
   flex-grow: 1;
   overflow: auto;
 }
