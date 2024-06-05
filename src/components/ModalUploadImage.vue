@@ -67,7 +67,7 @@ const sendImagesToServer = async () => {
     const formData = new FormData()
     images.forEach((file) => formData.append('files[]', file))
 
-    const response = await fetch(`${API_URL}/api/image/unannotated`, {
+    const response = await fetch(`${API_URL}/api/images`, {
       method: 'POST',
       body: formData
     })
