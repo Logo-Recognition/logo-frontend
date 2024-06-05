@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { fabric } from 'fabric'
+import { toast } from 'vue3-toastify'
 import IconCursorPointer from '@/components/icons/IconCursorPointer.vue'
 import IconBoundingBox from '@/components/icons/IconBoundingBox.vue'
 import IconTxtFile from '@/components/icons/IconTxtFile.vue'
@@ -166,7 +167,6 @@ const loadImageToCanvas = (imageSrc, imageName, labels) => {
       scaleY: canvas.height / img.height
     })
     canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas))
-
     canvas.getObjects().forEach((obj) => {
       if (obj.type !== 'rect') {
         canvas.remove(obj)
@@ -374,6 +374,9 @@ const saveAnnotations = async () => {
     })
 
     if (response.ok) {
+      toast.success('Annotations saved successfully!', {
+        autoClose: 3000
+      })
       console.log('Annotations saved successfully')
     } else {
       console.error('Error saving annotations:', response.status)

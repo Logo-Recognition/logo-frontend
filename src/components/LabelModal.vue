@@ -1,5 +1,6 @@
 <script setup>
 import { ref, defineEmits, onMounted } from 'vue'
+import { toast } from 'vue3-toastify'
 import axios from 'axios'
 import { API_URL } from '@/config.js'
 
@@ -23,10 +24,16 @@ const selectClass = (className) => {
 
 const handleSubmit = () => {
   if (selectedClass.value) {
+    toast.success('Class added successfully!', {
+      autoClose: 3000
+    })
     emit('classSelected', selectedClass.value)
     emit('submit', selectedClass.value)
     console.log('Selected Class:', selectedClass.value)
   } else {
+    toast.warning('Please select a class first', {
+      autoClose: 3000
+    })
     console.log('Please select a class first.')
   }
 }
