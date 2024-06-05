@@ -75,10 +75,10 @@ const visibleObjects = computed(() => {
         (o) =>
           o &&
           o.type === 'rect' &&
-          o.centerX === obj.centerX &&
-          o.centerY === obj.centerY &&
-          o.normalizedWidth === obj.normalizedWidth &&
-          o.normalizedHeight === obj.normalizedHeight &&
+          o.x1 === obj.x1 &&
+          o.y1 === obj.y1 &&
+          o.x2 === obj.x2 &&
+          o.y2 === obj.y2 &&
           o.imageName === selectedImageName.value
       ) === index
   )
@@ -93,35 +93,11 @@ function isObject(val) {
   return val !== null && typeof val === 'object'
 }
 
-const drawNewBox = (startPoint, endPoint, label = null) => {
-  const canvasWidth = canvas.width
-  const canvasHeight = canvas.height
-
-  let left, top, width, height
-  let centerX, centerY, normalizedWidth, normalizedHeight
-
-  if (label) {
-    const [cx, cy, w, h] = label.bbox.split(' ')
-    centerX = parseFloat(cx)
-    centerY = parseFloat(cy)
-    normalizedWidth = parseFloat(w)
-    normalizedHeight = parseFloat(h)
-
-    left = (centerX - normalizedWidth / 2) * canvasWidth
-    top = (centerY - normalizedHeight / 2) * canvasHeight
-    width = normalizedWidth * canvasWidth
-    height = normalizedHeight * canvasHeight
-  } else {
-    left = startPoint.x
-    top = startPoint.y
-    width = endPoint.x - startPoint.x
-    height = endPoint.y - startPoint.y
-
-    centerX = (left + width / 2) / canvasWidth
-    centerY = (top + height / 2) / canvasHeight
-    normalizedWidth = width / canvasWidth
-    normalizedHeight = height / canvasHeight
-  }
+const drawNewBox = (x1, y1, x2, y2, label = null) => {
+  const left = x1
+  const top = y1
+  const width = x2 - x1
+  const height = y2 - y1
 
   const rect = new fabric.Rect({
     left,
@@ -138,10 +114,10 @@ const drawNewBox = (startPoint, endPoint, label = null) => {
     imageName: selectedImageName.value,
     name: label ? label.class_name : '',
     classId: 0,
-    centerX,
-    centerY,
-    normalizedWidth,
-    normalizedHeight
+    x1,
+    y1,
+    x2,
+    y2
   })
   canvas.add(rect)
   canvas.setActiveObject(rect)
@@ -150,7 +126,7 @@ const drawNewBox = (startPoint, endPoint, label = null) => {
   if (labelsContainerRef.value) {
     const labelElement = document.createElement('div')
     labelElement.className = 'label-item'
-    labelElement.textContent = `YOLO Format: ${rect.classId} ${rect.centerX.toFixed(6)} ${rect.centerY.toFixed(6)} ${rect.normalizedWidth.toFixed(6)} ${rect.normalizedHeight.toFixed(6)} ${rect.name}`
+    labelElement.textContent = `Coordinates: (${x1}, ${y1}), (${x2}, ${y2}) - ${rect.name}`
     labelsContainerRef.value.appendChild(labelElement)
   }
 
@@ -160,11 +136,13 @@ const drawNewBox = (startPoint, endPoint, label = null) => {
 const loadImageToCanvas = (imageSrc, imageName, labels) => {
   fabric.Image.fromURL(imageSrc, (img) => {
     canvas.clear()
+    const scaleX = canvas.width / img.width
+    const scaleY = canvas.height / img.height
     img.set({
       left: 0,
       top: 0,
-      scaleX: canvas.width / img.width,
-      scaleY: canvas.height / img.height
+      scaleX,
+      scaleY
     })
     canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas))
     canvas.getObjects().forEach((obj) => {
@@ -173,13 +151,19 @@ const loadImageToCanvas = (imageSrc, imageName, labels) => {
       }
     })
 
+    const boxesForImage = []
+
     if (labels && Array.isArray(labels)) {
       labels.forEach((label) => {
-        const box = drawNewBox(null, null, label)
+        const [x1, y1, x2, y2] = label.bbox.split(' ').map(parseFloat)
+        const box = drawNewBox(x1, y1, x2, y2, { class_name: label.class_name })
         box.imageName = imageName
-        submittedBoxes.value.push(box)
+        boxesForImage.push(box)
       })
     }
+
+    canvas.renderAll()
+    submittedBoxes.value.push(...boxesForImage)
   })
   selectedImageName.value = imageName
 }
@@ -218,7 +202,11 @@ const onMouseMove = (event) => {
     if (currentBox) {
       canvas.remove(currentBox)
     }
-    drawNewBox(startPoint, currentPoint)
+    const x1 = startPoint.x
+    const y1 = startPoint.y
+    const x2 = currentPoint.x
+    const y2 = currentPoint.y
+    drawNewBox(x1, y1, x2, y2)
   } else if (mode.value === 'pointer' && (isDragging || isResizing)) {
     canvas.renderAll()
   }
@@ -351,14 +339,14 @@ const saveAnnotations = async () => {
     objects.forEach((obj) => {
       if (
         obj.type === 'rect' &&
-        typeof obj.centerX === 'number' &&
-        typeof obj.centerY === 'number' &&
-        typeof obj.normalizedWidth === 'number' &&
-        typeof obj.normalizedHeight === 'number'
+        typeof obj.x1 === 'number' &&
+        typeof obj.y1 === 'number' &&
+        typeof obj.x2 === 'number' &&
+        typeof obj.y2 === 'number'
       ) {
         annotatedData.label.push({
           class_name: obj.name,
-          bbox: `${obj.centerX.toFixed(6)} ${obj.centerY.toFixed(6)} ${obj.normalizedWidth.toFixed(6)} ${obj.normalizedHeight.toFixed(6)}`
+          bbox: `${obj.x1} ${obj.y1} ${obj.x2} ${obj.y2}`
         })
       }
     })
@@ -463,6 +451,9 @@ onMounted(() => {
           </div>
         </div>
         <canvas ref="canvasRef" class="canvas-wrapper" width="500" height="500"></canvas>
+        <div class="mouse-coordinates">
+          X: {{ mouseCoordinates.x }}, Y: {{ mouseCoordinates.y }}
+        </div>
       </div>
       <div class="labels-container bg-white" ref="labelsContainer">
         <h2>Labels</h2>
@@ -691,7 +682,7 @@ onMounted(() => {
 .image-grid {
   display: flex;
   flex-wrap: wrap;
-  max-height: 90%;
+  max-height: 70%;
   overflow-y: auto;
 }
 
