@@ -140,4 +140,8 @@ const togglePopup = () => {
   justify-content: center; /* Horizontally center the content */
   align-items: center; /* Vertically center the content */
 }
+#input-box {
+  background-color: #FEFEFE;
+}
+
 </style>
