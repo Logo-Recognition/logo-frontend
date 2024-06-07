@@ -295,26 +295,25 @@ const fetchImages = async (tab) => {
       let images = []
 
       if (tab.toLowerCase() === 'unannotated') {
-        const imageUrls = await response.json()
-        images = imageUrls.map((url, index) => {
-          const imageName = url.split('/').pop().split('?')[0]
+        const imageData = await response.json()
+        images = imageData.map((data, index) => {
           return {
             id: `image-${index}`,
-            src: url,
+            src: data.url,
             alt: `Image ${index + 1}`,
-            name: imageName
+            name: data.image_name
           }
         })
+        console.log(images)
         unannotatedImages.value = images
       } else if (tab.toLowerCase() === 'annotated') {
         const imageData = await response.json()
         images = imageData.map((data, index) => {
-          const imageName = data.image.split('/').pop().split('?')[0]
           return {
             id: `image-${index}`,
             src: data.image,
             alt: `Image ${index + 1}`,
-            name: imageName,
+            name: data.image_name,
             labels: data.label
           }
         })
