@@ -461,7 +461,7 @@ onMounted(() => {
         </div>
       </div>
       <div class="labels-container bg-white" ref="labelsContainer">
-        <h2>Labels</h2>
+        <h2 class="text-base text-dark font-medium">Labels</h2>
         <div v-if="canvas">
           <div v-for="obj in visibleObjects" :key="obj.id" class="label-item">
             <span>
@@ -469,8 +469,8 @@ onMounted(() => {
             </span>
           </div>
         </div>
-        <div class="submit-button bg-secondary text-white">
-          <button class="button is-primary" @click="saveAnnotations">Apply</button>
+        <div class="submit-button ">
+          <button class="button  bg-secondary text-white hover:bg-hover" @click="saveAnnotations">Apply</button>
         </div>
       </div>
 
@@ -577,18 +577,14 @@ onMounted(() => {
 .annotation-section {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  grid-template-rows: 1fr 1fr;
+  grid-template-rows: 1fr 2fr;
   grid-template-areas:
     'left top'
     'left bottom';
-  /* height: 100vh; */
-  /* width: 60%; */
   gap: 32px 24px;
 }
 
 .canvas-container {
-  /* grid-column: 1 / 2;
-  grid-row: 1 / 3; */
   grid-area: left;
   border-radius: 16px;
   padding: 24px;
@@ -663,20 +659,12 @@ onMounted(() => {
   justify-content: space-between;
 }
 
-.submit-button {
-  text-align: center;
-  border-radius: 8px;
-  padding: 8px 16px;
-  min-width: 72px;
-}
-
 .labels-container {
   grid-area: top;
-  /* grid-column: 2 / 3;
-  grid-row: 1 / 2; */
   border-radius: 16px;
   padding: 16px;
   overflow-y: auto;
+  position: relative;
 }
 
 .label-item {
@@ -684,10 +672,27 @@ onMounted(() => {
   border-bottom: 1px solid #d8dbd8;
 }
 
+.submit-button {
+  text-align: center;
+  border-radius: 8px;
+  width: calc(100% - 32px);
+  position: absolute;
+  bottom: 16px;
+}
+
+.submit-button button {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease; 
+}
+
 .images-container {
   grid-area: bottom;
-  /* grid-column: 2 / 3;
-  grid-row: 2 / 3; */
   display: flex;
   flex-direction: column;
 }
