@@ -577,8 +577,27 @@ onMounted(() => {
 .annotation-section {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: 1fr 1fr;
+  grid-template-areas:
+    'left top'
+    'left bottom';
+  /* height: 100vh; */
+  /* width: 60%; */
   gap: 32px 24px;
+}
+
+.canvas-container {
+  /* grid-column: 1 / 2;
+  grid-row: 1 / 3; */
+  grid-area: left;
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.canvas-wrapper {
+  background: ghostwhite;
+  border: 1px solid gainsboro;
+  width: 100%;
 }
 
 .toolbar-container {
@@ -630,19 +649,6 @@ onMounted(() => {
   opacity: 1;
 }
 
-.canvas-container {
-  grid-column: 1 / 2;
-  grid-row: 1 / 3;
-  border-radius: 16px;
-  padding: 24px;
-}
-
-.canvas-wrapper {
-  background: ghostwhite;
-  border: 1px solid gainsboro;
-  width: 100%;
-}
-
 .mouse-coordinates {
   margin-top: 16px;
   padding: 8px;
@@ -665,8 +671,9 @@ onMounted(() => {
 }
 
 .labels-container {
-  grid-column: 2 / 3;
-  grid-row: 1 / 2;
+  grid-area: top;
+  /* grid-column: 2 / 3;
+  grid-row: 1 / 2; */
   border-radius: 16px;
   padding: 16px;
   overflow-y: auto;
@@ -678,8 +685,9 @@ onMounted(() => {
 }
 
 .images-container {
-  grid-column: 2 / 3;
-  grid-row: 2 / 3;
+  grid-area: bottom;
+  /* grid-column: 2 / 3;
+  grid-row: 2 / 3; */
   display: flex;
   flex-direction: column;
 }
