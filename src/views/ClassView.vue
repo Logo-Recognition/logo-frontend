@@ -96,8 +96,6 @@ const togglePopup = () => {
 <style scoped>
 #Class-page {
   width: 100%;
-  height: 100%;
-  background-color: #f0f0f0;
   padding: 10px;
 }
 #class-box {
@@ -142,4 +140,8 @@ const togglePopup = () => {
   justify-content: center; /* Horizontally center the content */
   align-items: center; /* Vertically center the content */
 }
+#input-box {
+  background-color: #FEFEFE;
+}
+
 </style>

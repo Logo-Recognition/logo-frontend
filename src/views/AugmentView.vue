@@ -683,7 +683,8 @@ onMounted(() => {
 <style scoped>
 #main {
   width: 100%;
-  background-color: #f0f0f0;
+ 
+
   padding: 10px;
 }
 #title {

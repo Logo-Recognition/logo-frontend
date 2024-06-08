@@ -25,7 +25,7 @@ const openModal = () => {
             <div id="menu" class="flex flex-col items-center p-6">
                 <button @click="openModal" id="upload-img-button" >
                     <IconUploadImage />
-                    <span id="upload-img-text" class="p-1 text-white text-xs">Upload Image</span>
+                    <span id="upload-img-text" class="p-1 text-light text-xs">Upload Image</span>
                 </button>
                 <div id="logo-management" class="w-full flex flex-col justify-start">
                     <span class="menu-title">LOGO MANAGEMENT</span>
@@ -63,7 +63,7 @@ const openModal = () => {
             </div>
         </div>
         
-        <div id="user-card" class="flex flex-row h-24 items-center border-t border-light-accent p-6">
+        <div id="user-card" class="flex flex-row h-24 items-center border-t border-light-accent p-6 bg-light">
             <div id="user-avatar" class="w-10 h-10 bg-primary rounded-full"></div>
             <div class="flex flex-col justify-center px-4">
                 <span class="text-sm text-primary-dark font-medium">Deko Ahmed</span>
@@ -84,7 +84,7 @@ const openModal = () => {
     width: 256px;
     height: 100vh;
     border-right: 1px solid #D9D9D9;
-    background-color: #FEFEFE
+    background-color: #071b40
 }
 #title{
     display: flex;
@@ -109,16 +109,16 @@ hr {
     margin-bottom: 24px;
     border: none;
     border-radius: 8px;
-    background-color: #0D4F72;
-    text-decoration-color: #FEFEFE;
+    background-color: #00B500;
+    text-decoration-color: #EFF1FF;
 }
 #upload-img-button:hover{
-    background-color: #003045;
+    background-color: #00B500F0 ;
 }
 
 .menu-title{
     font-size: 10px;
-    color: #5C5E64;
+    color: #ABADAB;
 }
 .button{
     width: 100%;
@@ -127,8 +127,8 @@ hr {
     flex-direction: row;
     align-items: center; 
     justify-content:start; 
-    background-color: #FEFEFE;
-    color : #7E7E7E;
+    background-color: #071b40;
+    color : #D8DBD8;
     border-radius: 8px;
     margin-top: 8px;
     padding-left: 12px;
@@ -136,14 +136,15 @@ hr {
 }
 .button:hover {
     background-color: #F0F0F0;
-    color: #0D4F72;
+    color: #071b40;
 }
 .text{
     padding-left: 12px
 }
 .router-link-active {
-  background-color: #F0F0F0;
-  color: #0D4F72;
+  background-color: #EFF1FF;
+  color: #071b40;
 }
+
 
 </style>
