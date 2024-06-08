@@ -94,11 +94,11 @@ const triggerFileInput = () => {
 </script>
 
 <template>
-  <div class="modal-content">
+  <div class="modal-content-run">
     <H2 class="font-bold mb-5">Upload Model</H2>
-    <div class="upload-content content-around flex">
+    <div class="upload-content-run content-around flex">
       <input
-        class="file"
+        class="file-run"
         ref="fileInputRef"
         type="file"
         multiple
@@ -142,7 +142,7 @@ const triggerFileInput = () => {
   background-color: rgba(0, 0, 0, 0.4);
 }
 
-.modal-content {
+.modal-content-run {
   width: 95%; /* Adjust the width percentage as needed */
   height: auto;
   border-radius: 16px;
@@ -164,7 +164,7 @@ const triggerFileInput = () => {
   padding: auto;
 }
 
-.upload-content {
+.upload-content-run {
   background-color: #eff1ff;
   box-shadow: 0px 1px 5px 0px #64748b1f;
   border-radius: 8px;
@@ -188,7 +188,7 @@ const triggerFileInput = () => {
   border: 1px dashed #0d4f72;
 }
 
-.file {
+.file-run {
   opacity: 0;
   width: 65%;
   height: 88px;
