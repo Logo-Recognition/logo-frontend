@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
-
+import IconDropdown from '@/components/icons/IconDropdown.vue'
+import UploadImageRun from '@/components/UploadImageRun.vue'
 // Initialize the selected model with a default value
 const model = ref('RT-DETR')
 // Initialize a reactive state for the dropdown visibility
@@ -31,12 +32,12 @@ window.addEventListener('click', closeDropdown)
 <template>
   <main id="" class="flex-col">
     <div id="title">
-      <H1>Classes</H1>
-    </div>
-    <div class="flex-col" id="class-box">
-      <H2 class="font-bold mb-5">Select Model</H2>
-      <div class="dropdown justify-center">
-        <button class="dropbtn" id="selectedModel" @click="toggleDropdown">{{ model }}</button>
+      <div class="dropdown">
+        <button class="dropbtn flex items-center" id="selectedModel" @click="toggleDropdown">
+          {{ model }}
+          <div class="w-1"></div>
+          <IconDropdown />
+        </button>
         <div class="dropdown-content" :class="{ show: isDropdownOpen }">
           <a href="#" @click.prevent="selectModel('RT-DETR')">RT-DETR</a>
           <a href="#" @click.prevent="selectModel('YOLO V8')">YOLO V8</a>
@@ -44,6 +45,7 @@ window.addEventListener('click', closeDropdown)
         </div>
       </div>
     </div>
+    <UploadImageRun />
   </main>
 </template>
 
@@ -64,19 +66,16 @@ window.addEventListener('click', closeDropdown)
   margin: 30px;
 }
 .dropbtn {
-  width: 100%;
   height: 58px;
   padding: 16px;
   gap: 0px;
   border-radius: 8px;
   opacity: 0px;
-  background: #eff1ff;
   text-align: start;
 }
 /* Dropdown Content (Hidden by Default) */
 .dropdown-content {
   display: none;
-  width: 100%;
   position: absolute;
   background-color: #f9f9f9;
   min-width: 160px;
@@ -94,16 +93,13 @@ window.addEventListener('click', closeDropdown)
   padding: 12px 16px;
   text-decoration: none;
   display: block;
-  text-align: center; /* Center the text within the links */
 }
 /* Change color of dropdown links on hover */
 .dropdown-content a:hover {
   background-color: #f1f1f1;
 }
-.dropdown{
+.dropdown {
   position: relative;
   display: flex;
-  justify-content: center; /* Center the button horizontally */
-  width: 100%; /* Ensure the container spans full width */
 }
 </style>
