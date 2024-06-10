@@ -1,11 +1,15 @@
 <script setup>
-import { ref } from 'vue'
-import IconDropdown from '@/components/icons/IconDropdown.vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+// import IconDropdown from '@/components/icons/IconDropdown.vue'
+import IconSearch from '@/components/icons/IconSearch.vue'
 import UploadImageRun from '@/components/UploadImageRun.vue'
+
 // Initialize the selected model with a default value
 const model = ref('RT-DETR')
+const modellist = ref(['RT-DETR', 'YOLOV8', 'YOLOV9', 'YOLOV10'])
 // Initialize a reactive state for the dropdown visibility
 const isDropdownOpen = ref(false)
+const searchQuery = ref('')
 
 // Function to toggle the dropdown visibility
 function toggleDropdown() {
@@ -26,22 +30,50 @@ function closeDropdown(event) {
 }
 
 // Listen for clicks outside the dropdown
-window.addEventListener('click', closeDropdown)
+onMounted(() => {
+  window.addEventListener('click', closeDropdown)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('click', closeDropdown)
+})
+
+// Computed property to filter models based on search query
+const filteredModels = computed(() => {
+  return modellist.value.filter((model) =>
+    model.toLowerCase().includes(searchQuery.value.toLowerCase())
+  )
+})
 </script>
 
 <template>
-  <main id="" class="flex-col">
+  <main class="flex-col">
     <div id="title">
       <div class="dropdown">
-        <button class="dropbtn flex items-center" id="selectedModel" @click="toggleDropdown">
+        <button class="dropbtn flex items-center justify-around" @click="toggleDropdown">
           {{ model }}
           <div class="w-1"></div>
-          <IconDropdown />
+          <!-- <IconDropdown /> -->
         </button>
         <div class="dropdown-content" :class="{ show: isDropdownOpen }">
-          <a href="#" @click.prevent="selectModel('RT-DETR')">RT-DETR</a>
-          <a href="#" @click.prevent="selectModel('YOLO V8')">YOLO V8</a>
-          <a href="#" @click.prevent="selectModel('YOLO V9')">YOLO V9</a>
+          <div class="p-2">
+            <IconSearch/>
+            <input
+              type="text"
+              v-model="searchQuery"
+              placeholder="Search"
+              class="dropdown-search"
+            />
+          </div>
+          <a
+            id=""
+            v-for="modelItem in filteredModels"
+            :key="modelItem"
+            href="#"
+            @click.prevent="selectModel(modelItem)"
+          >
+            {{ modelItem }}
+          </a>
         </div>
       </div>
     </div>
@@ -50,6 +82,7 @@ window.addEventListener('click', closeDropdown)
 </template>
 
 <style scoped>
+
 #class-box {
   width: 95%; /* Adjust the width percentage as needed */
   height: auto;
@@ -62,26 +95,43 @@ window.addEventListener('click', closeDropdown)
   font-size: 18px;
   font-weight: 500;
   gap: 0px;
-  opacity: 0px;
   margin: 30px;
 }
 .dropbtn {
-  height: 58px;
+  width: fit-content;
+  height: 50px;
   padding: 16px;
-  gap: 0px;
   border-radius: 8px;
-  opacity: 0px;
   text-align: start;
+  display: flex;
+  align-items: center;
+  background-color: #EFF1FF;
+  margin-bottom: 8px;
 }
 /* Dropdown Content (Hidden by Default) */
 .dropdown-content {
   display: none;
   position: absolute;
-  background-color: #f9f9f9;
+  background-color: #fefefe;
   min-width: 160px;
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 1;
   top: 100%; /* Position the dropdown below the button */
+  border-radius: 10px;
+  border: 1px solid #7585ff;
+}
+.dropdown-search {
+  width: 100%;
+  height: 38px;
+  padding: 8px;
+  border-radius: 8px;
+  background-color: #eff1ff;
+  box-sizing: border-box;
+  border: 1px solid #ddd;
+}
+.dropdown-search:focus {
+  border: 1px solid #7585ff;
+  outline: none; /* Remove default outline */
 }
 /* Show the dropdown menu when isDropdownOpen is true */
 .dropdown-content.show {
@@ -93,13 +143,16 @@ window.addEventListener('click', closeDropdown)
   padding: 12px 16px;
   text-decoration: none;
   display: block;
+  border-bottom: 1px solid #ddd; /* Add this line to set a bottom border */
 }
 /* Change color of dropdown links on hover */
 .dropdown-content a:hover {
-  background-color: #f1f1f1;
+  background-color: #eff1ff;
 }
 .dropdown {
   position: relative;
   display: flex;
+  flex-direction: column;
 }
+
 </style>

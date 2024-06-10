@@ -2,22 +2,21 @@
 import { ref } from 'vue'
 import { toast } from 'vue3-toastify'
 import PreviewImage from './PreviewImage.vue'
-import { API_URL } from '@/config.js'
-const props = defineProps({
-  isOpen: {
-    type: Boolean,
-    required: true
-  }
-})
+import axios from 'axios'
 
 const emit = defineEmits(['close'])
 
 const previewImages = ref([])
 const fileInputRef = ref(null)
+const active = ref(false)
 
-const closeModal = () => {
-  emit('close')
-  previewImages.value = []
+const uploadMessage = ref('')
+const processedImageUrls = ref([])
+const isLoading = ref(false)
+const selectedFile = ref()
+
+const toggleActive = (isActive) => {
+  active.value = isActive
 }
 
 const onUploadedSuccess = () => {
@@ -35,85 +34,92 @@ const onUploadedFail = () => {
 }
 
 const onFileChange = (event) => {
-  const files = event.target.files
-  for (var index = 0; index < files.length; index++) {
-    var reader = new FileReader()
+  const files = event.target.files || event.dataTransfer.files
+  for (let index = 0; index < files.length; index++) {
+    const reader = new FileReader()
     reader.onload = function (event) {
       const imageUrl = event.target.result
       previewImages.value.push(imageUrl)
     }
     reader.readAsDataURL(files[index])
   }
-}
-
-const sendImagesToServer = async () => {
-  try {
-    const images = previewImages.value.map((imageUrl) => {
-      const byteString = atob(imageUrl.split(',')[1])
-      const mimeString = imageUrl.split(',')[0].split(':')[1].split(';')[0]
-      const ab = new ArrayBuffer(byteString.length)
-      const ia = new Uint8Array(ab)
-
-      for (let i = 0; i < byteString.length; i++) {
-        ia[i] = byteString.charCodeAt(i)
-      }
-
-      const blob = new Blob([ab], { type: mimeString })
-      const file = new File([blob], `image-${Date.now()}.${mimeString.split('/')[1]}`, {
-        type: mimeString
-      })
-      return file
-    })
-
-    const formData = new FormData()
-    images.forEach((file) => formData.append('files[]', file))
-
-    const response = await fetch(`${API_URL}/api/upload-image`, {
-      method: 'POST',
-      body: formData
-    })
-
-    if (response.ok) {
-      console.log('Images uploaded successfully')
-      onUploadedSuccess()
-    } else {
-      console.error('Error uploading images')
-      onUploadedFail()
-    }
-  } catch (error) {
-    console.error('Error:', error)
-  }
+  selectedFile.value = Array.from(files)
 }
 
 const removeImage = (index) => {
   previewImages.value.splice(index, 1)
 }
+
 const triggerFileInput = () => {
   fileInputRef.value.click()
+}
+
+const uploadImage = async () => {
+  if (selectedFile.value.length === 0) {
+    return
+  }
+
+  const formData = new FormData()
+  selectedFile.value.forEach((file) => {
+    formData.append('images', file)
+  })
+  formData.append('model', 'yolov8')
+  isLoading.value = true
+
+  try {
+    const response = await axios.post('http://192.168.2.44:5000/api/model/run-realtime', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+
+    uploadMessage.value = 'Images uploaded successfully!'
+    console.log('Server response:', response)
+    processedImageUrls.value = response.data.processed_image_urls
+    onUploadedSuccess()
+  } catch (error) {
+    uploadMessage.value = 'Error uploading images.'
+    console.error('Error uploading images:', error)
+    onUploadedFail()
+  } finally {
+    isLoading.value = false
+    selectedFile.value = []
+    previewImages.value = []
+  }
 }
 </script>
 
 <template>
   <div class="modal-content-run">
     <H2 class="font-bold mb-5">Upload Model</H2>
-    <div class="upload-content-run content-around flex">
-      <input
-        class="file-run"
-        ref="fileInputRef"
-        type="file"
-        multiple
-        @change="onFileChange"
-        accept="image/*"
-      />
-      <img alt="Upload image" class="m-5" src="@/assets/images/upload-btn.svg" width="90" />
-      <div class="content-around">
-        <p class="text-[#052443]">Upload or Drop image here</p>
-        <p class="text-[#7E7E7E]">Limit JNG,JPG,JPEG</p>
+    <div
+      @dragenter.prevent="toggleActive(true)"
+      @dragleave.prevent="toggleActive(false)"
+      @dragover.prevent
+      @drop.prevent="onFileChange"
+      :class="{ 'active-dropzone': active }"
+    >
+      <div class="upload-content-run content-around flex">
+        <input
+          class="file-run"
+          ref="fileInputRef"
+          type="file"
+          multiple
+          @change="onFileChange"
+          accept="image/*"
+        />
+        <img alt="Upload image" class="m-5" src="@/assets/images/upload-btn.svg" width="90" />
+        <div class="content-around">
+          <p class="text-[#052443]">Upload or Drop image here</p>
+          <p class="text-[#7E7E7E]">Limit JNG,JPG,JPEG</p>
+        </div>
+
+        <button class="browse-button content-center justify-self-end" @click="triggerFileInput">
+          Browse files
+        </button>
       </div>
-      <button class="browse-button content-center justify-self-end" @click="triggerFileInput">
-        Browse files
-      </button>
     </div>
+
     <div v-if="previewImages.length > 0" class="preview-container">
       <div v-if="previewImages" class="preview-area">
         <div v-for="(image, index) in previewImages" :key="index" class="preview-items">
@@ -122,13 +128,15 @@ const triggerFileInput = () => {
       </div>
     </div>
     <div class="flex flex-row pt-5">
-      <button class="save-button" @click="sendImagesToServer">Save</button>
-      <button class="cancel-button" @click="closeModal">Cancel</button>
+      <button class="create-button" @click="uploadImage">Create</button>
     </div>
+  </div>
+  <div v-for="(imageUrl, index) in processedImageUrls" :key="index">
+    <img :src="imageUrl" :alt="'Processed Image ' + index" crossorigin="anonymous" />
   </div>
 </template>
 
-<style>
+<style scoped>
 .modal {
   display: flex;
   justify-content: center;
@@ -189,11 +197,7 @@ const triggerFileInput = () => {
 }
 
 .file-run {
-  opacity: 0;
-  width: 65%;
-  height: 88px;
-  position: absolute;
-  cursor: pointer;
+  display: none;
 }
 
 .preview-container {
@@ -213,15 +217,15 @@ const triggerFileInput = () => {
   margin-right: 16px;
 }
 
-.save-button {
-  width: 144px;
-  height: 32px;
+.create-button {
+  width: 124px;
+  height: 40px;
+  gap: 8px;
   border-radius: 8px;
-  background-color: #48a393;
+  opacity: 0px;
+  background: #7585ff;
   color: #fefefe;
-  font-size: 12px;
-  font-weight: 600;
-  margin-right: 16px;
+  padding: auto;
 }
 
 .cancel-button {
