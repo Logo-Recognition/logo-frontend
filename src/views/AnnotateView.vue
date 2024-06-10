@@ -136,6 +136,9 @@ const drawNewBox = (x1, y1, x2, y2, label = null) => {
 const loadImageToCanvas = (imageSrc, imageName, labels) => {
   fabric.Image.fromURL(imageSrc, (img) => {
     canvas.clear()
+    canvas.setWidth(img.width)
+    canvas.setHeight(img.height)
+
     const scaleX = canvas.width / img.width
     const scaleY = canvas.height / img.height
     img.set({
@@ -145,6 +148,7 @@ const loadImageToCanvas = (imageSrc, imageName, labels) => {
       scaleY
     })
     canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas))
+
     canvas.getObjects().forEach((obj) => {
       if (obj.type !== 'rect') {
         canvas.remove(obj)
@@ -455,7 +459,7 @@ onMounted(() => {
             <span class="tooltip-text">Zoom Out</span>
           </div>
         </div>
-        <canvas ref="canvasRef" class="canvas-wrapper" width="500" height="500"></canvas>
+        <canvas ref="canvasRef" class="canvas-wrapper"></canvas>
         <div class="mouse-coordinates">
           X: {{ mouseCoordinates.x }}, Y: {{ mouseCoordinates.y }}
         </div>
@@ -469,8 +473,10 @@ onMounted(() => {
             </span>
           </div>
         </div>
-        <div class="submit-button ">
-          <button class="button  bg-secondary text-white hover:bg-hover" @click="saveAnnotations">Apply</button>
+        <div class="submit-button">
+          <button class="button bg-secondary text-white hover:bg-hover" @click="saveAnnotations">
+            Apply
+          </button>
         </div>
       </div>
 
@@ -588,12 +594,13 @@ onMounted(() => {
   grid-area: left;
   border-radius: 16px;
   padding: 24px;
+  height: 100vh;
 }
 
 .canvas-wrapper {
   background: ghostwhite;
   border: 1px solid gainsboro;
-  width: 100%;
+  max-width: 100%;
 }
 
 .toolbar-container {
@@ -688,7 +695,7 @@ onMounted(() => {
   border-radius: 8px;
   padding: 8px 16px;
   cursor: pointer;
-  transition: background-color 0.3s ease; 
+  transition: background-color 0.3s ease;
 }
 
 .images-container {
