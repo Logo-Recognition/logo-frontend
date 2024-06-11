@@ -3,6 +3,7 @@ import { RouterView } from 'vue-router'
 import { ref } from 'vue'
 import SideBar from '@/components/SideBar.vue'
 import ModalUploadImage from './components/ModalUploadImage.vue'
+
 const showModal = ref(false)
 
 const openModal = () => {
