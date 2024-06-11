@@ -1,6 +1,7 @@
 <script setup>
 import IconSourceImage from '@/components/icons/IconSourceImage.vue';
 import IconTrainTestSplit from '@/components/icons/IconTrainTestSplit.vue';
+import IconAugment from '@/components/icons/IconAugment.vue';
 import { ref,onMounted,watch } from 'vue';
 import {API_URL} from '@/config.js'
 import Slider from '@vueform/slider';
@@ -63,8 +64,8 @@ const onDownload = async () => {
           rotate : augmentParameterStore.augmentationParam.rotate,
           flip_horizontal : augmentParameterStore.augmentationParam.flip_horizontal,
           flip_verical: augmentParameterStore.augmentationParam.flip_verical,
-          gaussian_noise: augmentParameterStore.augmentationParam.gaussian_noise,
-          pepper_noise: augmentParameterStore.augmentationParam.pepper_noise,
+          gaussian_noise: augmentParameterStore.augmentationParam.gaussian_noise == 0 ? 0 : augmentParameterStore.augmentationParam.gaussian_noise/100,
+          pepper_noise: augmentParameterStore.augmentationParam.pepper_noise == 0 ? 0 : augmentParameterStore.augmentationParam.pepper_noise/100,
           scaling: augmentParameterStore.augmentationParam.scaling,
           brightness: augmentParameterStore.augmentationParam.brightness,
           saturation: augmentParameterStore.augmentationParam.saturation,
@@ -186,7 +187,7 @@ onMounted(async () => {
     <div id="augment" class="flex flex-row bg-white rounded-3xl px-8 py-6 mt-6">
       <div class="flex flex-row justify-between items-center h-8 w-full">
         <div class="flex flex-row justify-start items-center">
-          <IconSourceImage />
+          <IconAugment style="color: #459E19;"/>
           <span class="text-base font-medium text-sub-primary pl-3">Augmentation options</span>
           <div class="tooltip">
             <img class="px-1" src="@/assets/images/tooltip.svg" alt="tooltipImg">
@@ -244,6 +245,5 @@ onMounted(async () => {
   --toggle-height: 18px;
   --toggle-bg-on: #459E19;
   --toggle-border-on: #459E19;
-
 }
 </style>
