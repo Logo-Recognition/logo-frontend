@@ -38,7 +38,7 @@ const currentTab = ref('Unannotated')
 const unannotatedImages = ref([])
 const annotatedImages = ref([])
 const selectedClasses = ref([])
-const selectedImageName = ref('')
+const selectedImage = ref({name: "", width:0.0, height:0.0})
 
 const toTextFile = async () => {
   const canvasWidth = canvas.width
@@ -85,7 +85,7 @@ const visibleObjects = computed(() => {
           o.y1 === obj.y1 &&
           o.x2 === obj.x2 &&
           o.y2 === obj.y2 &&
-          o.imageName === selectedImageName.value
+          o.imageName === selectedImage.value.name
       ) === index
   )
   return filteredObjects
@@ -126,7 +126,7 @@ const drawNewBox = (x1, y1, x2, y2, label = null) => {
     cornerColor: '#f00',
     selectable: true,
     hasControls: true,
-    imageName: selectedImageName.value,
+    imageName: selectedImage.value.name,
     name: label ? label.class_name : '',
     classId: 0,
     x1,
@@ -184,7 +184,7 @@ const loadImageToCanvas = (imageSrc, imageName, labels) => {
     if (labels && Array.isArray(labels)) {
       labels.forEach((label) => {
         const [x1, y1, x2, y2] = label.bbox.split(' ').map(parseFloat)
-        const box = drawNewBox(x1, y1, x2, y2, { class_name: label.class_name })
+        const box = drawNewBox(x1*scale, y1*scale, x2*scale, y2*scale, { class_name: label.class_name })
         box.imageName = imageName
         boxesForImage.push(box)
       })
@@ -202,8 +202,11 @@ const loadImageToCanvas = (imageSrc, imageName, labels) => {
     })
     canvas.add(verticalLine, horizontalLine)
     canvas.renderAll()
+    selectedImage.value.name = imageName
+    selectedImage.value.width = img.width
+    selectedImage.value.height = img.height
   })
-  selectedImageName.value = imageName
+  
 }
 
 const onMouseDown = (event) => {
@@ -375,8 +378,15 @@ const switchTab = (tab) => {
 const saveAnnotations = async () => {
   try {
     const objects = canvas.getObjects()
+    const containerWidth = canvasRef.value.offsetWidth
+    const containerHeight = canvasRef.value.offsetHeight
+
+    const scaleX = containerWidth / selectedImage.value.width
+    const scaleY = containerHeight / selectedImage.value.height
+    const scale = Math.min(scaleX, scaleY)
+
     const annotatedData = {
-      image_name: selectedImageName.value,
+      image_name: selectedImage.value.name,
       label: []
     }
 
@@ -390,7 +400,7 @@ const saveAnnotations = async () => {
       ) {
         annotatedData.label.push({
           class_name: obj.name,
-          bbox: `${obj.x1} ${obj.y1} ${obj.x2} ${obj.y2}`
+          bbox: `${obj.x1/scale} ${obj.y1/scale} ${obj.x2/scale} ${obj.y2/scale}`
         })
       }
     })
