@@ -136,16 +136,22 @@ const drawNewBox = (x1, y1, x2, y2, label = null) => {
 const loadImageToCanvas = (imageSrc, imageName, labels) => {
   fabric.Image.fromURL(imageSrc, (img) => {
     canvas.clear()
-    canvas.setWidth(img.width)
-    canvas.setHeight(img.height)
 
-    const scaleX = canvas.width / img.width
-    const scaleY = canvas.height / img.height
+    const containerWidth = canvasRef.value.offsetWidth
+    const containerHeight = canvasRef.value.offsetHeight
+
+    const scaleX = containerWidth / img.width
+    const scaleY = containerHeight / img.height
+    const scale = Math.min(scaleX, scaleY)
+
+    canvas.setWidth(containerWidth)
+    canvas.setHeight(containerHeight)
+
     img.set({
       left: 0,
       top: 0,
-      scaleX,
-      scaleY
+      scaleX: scale,
+      scaleY: scale
     })
     canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas))
 
@@ -172,6 +178,13 @@ const loadImageToCanvas = (imageSrc, imageName, labels) => {
     canvas.renderAll()
     submittedBoxes.value.push(...boxesForImage)
 
+    verticalLine.set({ x1: containerWidth / 2, x2: containerWidth / 2, y1: 0, y2: containerHeight })
+    horizontalLine.set({
+      x1: 0,
+      x2: containerWidth,
+      y1: containerHeight / 2,
+      y2: containerHeight / 2
+    })
     canvas.add(verticalLine, horizontalLine)
     canvas.renderAll()
   })
@@ -459,7 +472,7 @@ onMounted(() => {
             <span class="tooltip-text">Zoom Out</span>
           </div>
         </div>
-        <canvas ref="canvasRef" class="canvas-wrapper"></canvas>
+        <canvas ref="canvasRef" class="canvas-wrapper" width="720" height="460"></canvas>
         <div class="mouse-coordinates">
           X: {{ mouseCoordinates.x }}, Y: {{ mouseCoordinates.y }}
         </div>
@@ -594,13 +607,17 @@ onMounted(() => {
   grid-area: left;
   border-radius: 16px;
   padding: 24px;
-  height: 100vh;
+  max-width: calc(100vw - 480px);
+  max-height: calc(100vh - 80px);
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .canvas-wrapper {
+  width: 100%;
   background: ghostwhite;
   border: 1px solid gainsboro;
-  max-width: 100%;
 }
 
 .toolbar-container {
