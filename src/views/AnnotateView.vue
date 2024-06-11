@@ -9,6 +9,7 @@ import IconZoomIn from '@/components/icons/IconZoomIn.vue'
 import IconZoomOut from '@/components/icons/IconZoomOut.vue'
 import BoxNameModal from '@/components/LabelModal.vue'
 import { API_URL } from '@/config.js'
+import axios from 'axios'
 
 const canvasRef = ref(null)
 const labelsContainerRef = ref(null)
@@ -27,6 +28,8 @@ let currentBox = null
 const submittedBoxes = ref([])
 
 const showModal = ref(false)
+const useDefaultClass = ref(false)
+const classList = ref([])
 
 const currentTab = ref('Unannotated')
 const unannotatedImages = ref([])
@@ -91,6 +94,15 @@ function isProxy(obj) {
 
 function isObject(val) {
   return val !== null && typeof val === 'object'
+}
+
+const fetchClassList = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/api/class`)
+    classList.value = response.data.classes
+  } catch (error) {
+    console.error('Error fetching class list:', error)
+  }
 }
 
 const drawNewBox = (x1, y1, x2, y2, label = null) => {
@@ -422,6 +434,7 @@ onMounted(() => {
   canvas.on('mouse:move', showCoordinates)
 
   fetchImages('Unannotated')
+  fetchClassList()
 })
 </script>
 
@@ -479,6 +492,21 @@ onMounted(() => {
       </div>
       <div class="labels-container bg-white" ref="labelsContainer">
         <h2 class="text-base text-dark font-medium">Labels</h2>
+        <div class="default-labels">
+          <input
+            type="checkbox"
+            id="checkbox"
+            v-model="useDefaultClass"
+            @click="showModal = false"
+          />
+          <label for="checkbox">Default Label</label>
+          <select v-model="selected">
+            <option disabled value="">Please select class</option>
+            <option v-for="(classItem, index) in classList" :key="index" :value="classItem">
+              {{ classItem }}
+            </option>
+          </select>
+        </div>
         <div v-if="canvas">
           <div v-for="obj in visibleObjects" :key="obj.id" class="label-item">
             <span>
@@ -494,7 +522,7 @@ onMounted(() => {
       </div>
 
       <BoxNameModal
-        v-if="showModal"
+        v-if="showModal && !useDefaultClass"
         @close="discardCurrentBox"
         @submit="handleModalSubmit"
         @classSelected="addSelectedClass"
