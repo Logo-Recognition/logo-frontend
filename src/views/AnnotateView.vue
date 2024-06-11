@@ -494,7 +494,7 @@ onMounted(() => {
             <span class="tooltip-text">Zoom Out</span>
           </div>
         </div>
-        <canvas ref="canvasRef" class="canvas-wrapper" width="720" height="460"></canvas>
+        <canvas ref="canvasRef" class="canvas-wrapper" width="715" height="460"></canvas>
         <div class="mouse-coordinates">
           X: {{ mouseCoordinates.x }}, Y: {{ mouseCoordinates.y }}
         </div>
@@ -509,7 +509,7 @@ onMounted(() => {
             @click="showModal = false"
           />
           <label for="checkbox">Default Label</label>
-          <select class="dropdown-select" v-model="defaultClass" @click="fetchClassList()">
+          <select class="dropdown-select bg-light" v-model="defaultClass" @click="fetchClassList()">
             <option disabled value="">Select class</option>
             <option
               v-for="(classItem, index) in classList"
@@ -745,9 +745,17 @@ onMounted(() => {
 }
 
 .default-labels {
+  justify-items: stretch;
 }
 
 .dropdown-select {
+  border-radius: 4px;
+  border: 1px solid #7585ff;
+}
+
+input[type="checkbox"]:hover {
+  border-radius: 4px;
+  border: 1px solid #7585ff;
 }
 
 .label-item {
