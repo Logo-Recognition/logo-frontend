@@ -19,6 +19,7 @@ const uploadMessage = ref('')
 const processedImageUrls = ref([])
 const isLoading = ref(false)
 const selectedFile = ref()
+const currentImageIndex = ref(0)
 
 const toggleActive = (isActive) => {
   active.value = isActive
@@ -91,6 +92,13 @@ const uploadImage = async () => {
     previewImages.value = []
   }
 }
+const showNextImage = () => {
+  if (currentImageIndex.value < processedImageUrls.value.length - 1) {
+    currentImageIndex.value++
+  } else {
+    currentImageIndex.value = 0
+  }
+}
 </script>
 
 <template>
@@ -138,10 +146,14 @@ const uploadImage = async () => {
   <!-- <div v-for="(imageUrl, index) in processedImageUrls" :key="index">
     <img :src="imageUrl" :alt="'Processed Image ' + index" crossorigin="anonymous" />
   </div> -->
-  <div id="show-picture-card">
-    <div v-for="(imageUrl, index) in processedImageUrls" :key="index">
-      <img :src="imageUrl" :alt="'Processed Image ' + index" crossorigin="anonymous" />
-    </div>
+  <div id="show-picture-card" v-if="processedImageUrls.length > 0">
+    <img
+      :src="processedImageUrls[currentImageIndex]"
+      :alt="'Processed Image ' + currentImageIndex"
+      @click="showNextImage"
+      crossorigin="anonymous"
+      style="cursor: pointer"
+    />
   </div>
 </template>
 
