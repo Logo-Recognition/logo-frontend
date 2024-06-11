@@ -3,23 +3,25 @@ import { ref } from 'vue'
 import { toast } from 'vue3-toastify'
 import PreviewImage from './PreviewImage.vue'
 import axios from 'axios'
-
-// const props = defineProps({
-//   Model: {
-//     type: String,
-//     required: true
-//   }
-// });
-
+import IconShare from '@/components/icons/IconShare.vue'
+import IconView from '@/components/icons/IconView.vue'
+import JSZip from 'jszip'
+const props = defineProps({
+  Model: {
+    type: String,
+    required: true
+  }
+})
 const previewImages = ref([])
 const fileInputRef = ref(null)
 const active = ref(false)
-
+const viewMode = ref('single') // New state to manage view mode
 const uploadMessage = ref('')
 const processedImageUrls = ref([])
 const isLoading = ref(false)
-const selectedFile = ref()
 const currentImageIndex = ref(0)
+
+const selectedModel = ref('')
 
 const toggleActive = (isActive) => {
   active.value = isActive
@@ -29,7 +31,6 @@ const onUploadedSuccess = () => {
   toast.success('Images uploaded successfully!', {
     autoClose: 3000
   })
-  previewImages.value = []
 }
 
 const onUploadedFail = () => {
@@ -44,15 +45,21 @@ const onFileChange = (event) => {
     const reader = new FileReader()
     reader.onload = function (event) {
       const imageUrl = event.target.result
-      previewImages.value.push(imageUrl)
+      previewImages.value.push({
+        file: files[index],
+        url: imageUrl
+      })
     }
     reader.readAsDataURL(files[index])
   }
-  selectedFile.value = Array.from(files)
 }
 
 const removeImage = (index) => {
   previewImages.value.splice(index, 1)
+}
+
+const clearImage = () => {
+  previewImages.value = []
 }
 
 const triggerFileInput = () => {
@@ -60,15 +67,15 @@ const triggerFileInput = () => {
 }
 
 const uploadImage = async () => {
-  if (selectedFile.value.length === 0) {
+  if (previewImages.value.length === 0) {
     return
   }
 
   const formData = new FormData()
-  selectedFile.value.forEach((file) => {
-    formData.append('images', file)
+  previewImages.value.forEach((image) => {
+    formData.append('images', image.file)
   })
-  formData.append('model', 'yolov8')
+  formData.append('model', props.Model === 'RT-DETR' ? 'rtdetr' : props.Model.toLowerCase())
   isLoading.value = true
 
   try {
@@ -88,22 +95,73 @@ const uploadImage = async () => {
     onUploadedFail()
   } finally {
     isLoading.value = false
-    selectedFile.value = []
-    previewImages.value = []
+    currentImageIndex.value = 0
+    selectedModel.value = props.Model
   }
 }
+
+const downloadAllImages = async () => {
+  if (processedImageUrls.value.length === 0) {
+    toast.error('No images to download.', {
+      autoClose: 3000
+    })
+    return
+  }
+
+  try {
+    const zip = new JSZip()
+    const folder = zip.folder('images')
+
+    for (let i = 0; i < processedImageUrls.value.length; i++) {
+      const imageUrl = processedImageUrls.value[i]
+      const filename = `image_${i + 1}.jpg`
+
+      const response = await fetch(imageUrl)
+      const imageBlob = await response.blob()
+      folder.file(filename, imageBlob)
+    }
+
+    const zipBlob = await zip.generateAsync({ type: 'blob' })
+    const url = window.URL.createObjectURL(zipBlob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'images.zip'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+
+    toast.success('Images downloaded successfully!', {
+      autoClose: 3000
+    })
+  } catch (error) {
+    toast.error('Error downloading images.', {
+      autoClose: 3000
+    })
+    console.error('Error downloading images:', error)
+  }
+}
+
 const showNextImage = () => {
   if (currentImageIndex.value < processedImageUrls.value.length - 1) {
     currentImageIndex.value++
-  } else {
-    currentImageIndex.value = 0
   }
+}
+
+const showPreviousImage = () => {
+  if (currentImageIndex.value > 0) {
+    currentImageIndex.value--
+  }
+}
+
+const toggleViewMode = () => {
+  viewMode.value = viewMode.value === 'single' ? 'grid' : 'single'
 }
 </script>
 
 <template>
   <div class="modal-content-run">
-    <H2 class="font-bold mb-5">Upload Model</H2>
+    <H2 class="font-bold mb-5">Upload Images</H2>
     <div
       @dragenter.prevent="toggleActive(true)"
       @dragleave.prevent="toggleActive(false)"
@@ -123,7 +181,7 @@ const showNextImage = () => {
         <img alt="Upload image" class="m-5" src="@/assets/images/upload-btn.svg" width="90" />
         <div class="content-around">
           <p class="text-[#052443]">Upload or Drop image here</p>
-          <p class="text-[#7E7E7E]">Limit JNG,JPG,JPEG</p>
+          <p class="text-[#7E7E7E]">Limit PNG,JPG,JPEG</p>
         </div>
 
         <button class="browse-button content-center justify-self-end" @click="triggerFileInput">
@@ -135,25 +193,41 @@ const showNextImage = () => {
     <div v-if="previewImages.length > 0" class="preview-container">
       <div v-if="previewImages" class="preview-area">
         <div v-for="(image, index) in previewImages" :key="index" class="preview-items">
-          <PreviewImage :src="image" @img-removed="removeImage(index)"></PreviewImage>
+          <PreviewImage :src="image.url" @img-removed="removeImage(index)"></PreviewImage>
         </div>
       </div>
     </div>
-    <div class="flex flex-row pt-5">
+    <div class="flex flex-row">
       <button class="create-button" @click="uploadImage">Create</button>
+      <button class="clear-button ml-1" @click="clearImage">Clear</button>
     </div>
   </div>
-  <!-- <div v-for="(imageUrl, index) in processedImageUrls" :key="index">
-    <img :src="imageUrl" :alt="'Processed Image ' + index" crossorigin="anonymous" />
-  </div> -->
   <div id="show-picture-card" v-if="processedImageUrls.length > 0">
-    <img
-      :src="processedImageUrls[currentImageIndex]"
-      :alt="'Processed Image ' + currentImageIndex"
-      @click="showNextImage"
-      crossorigin="anonymous"
-      style="cursor: pointer"
-    />
+    <div class="flex justify-between">
+      <div class="flex flex-col">
+        <h3>Result</h3>
+        <p class="text-[#5A5D6C]">{{ selectedModel }}</p>
+      </div>
+      <p>{{ currentImageIndex + 1 }} / {{ processedImageUrls.length }}</p>
+      <div class="navigation-buttons flex items-center">
+        <button @click="toggleViewMode"><IconView /></button>
+        <button @click="downloadAllImages"><IconShare /></button>
+      </div>
+    </div>
+    <div v-if="viewMode === 'single'" class="flex justify-around">
+      <button @click="showPreviousImage">&lt;</button>
+      <img
+        :src="processedImageUrls[currentImageIndex]"
+        :alt="'Processed Image ' + currentImageIndex"
+        crossorigin="anonymous"
+      />
+      <button @click="showNextImage">&gt;</button>
+    </div>
+    <div v-else class="grid-container">
+      <div v-for="(image, index) in processedImageUrls" :key="index" class="grid-item">
+        <img :src="image" :alt="'Processed Image ' + index" crossorigin="anonymous" />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -240,12 +314,24 @@ const showNextImage = () => {
 
 .create-button {
   width: 124px;
-  height: 40px;
+  height: 32px;
   gap: 8px;
   border-radius: 8px;
   opacity: 0px;
   background: #7585ff;
   color: #fefefe;
+  padding: auto;
+}
+
+.clear-button {
+  width: 124px;
+  height: 32px;
+  gap: 8px;
+  border-radius: 8px;
+  opacity: 0px;
+  background: #fefefe;
+  color: #7e7e7e;
+  border: 1px solid #7e7e7e;
   padding: auto;
 }
 
@@ -267,5 +353,29 @@ const showNextImage = () => {
   padding: 20px;
   margin: 30px;
   background-color: #ffffff;
+}
+#show-picture-card h3 {
+  font-size: 20px;
+  font-weight: 700;
+}
+#show-picture-card img {
+  width: 70%; /* Limit the maximum width */
+  height: 400px; /* Maintain aspect ratio */
+  object-fit: contain; /* Ensure the entire image fits within the set dimensions */
+  /* border-radius: 16px; */
+  border: 1px dashed #3745be;
+  padding: auto;
+}
+.grid-container {
+  width: 70%; /* Limit the maximum width */
+  height: 400px; /* Maintain aspect ratio */
+  object-fit: contain; /* Ensure the entire image fits within the set dimensions */
+  /* border-radius: 16px; */
+  border: 1px dashed #3745be;
+  padding: auto;
+}
+.grid-item{
+  width: 50px; /* Limit the maximum width */
+  height: 50px; /* Maintain aspect ratio */
 }
 </style>
