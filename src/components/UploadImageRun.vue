@@ -4,7 +4,12 @@ import { toast } from 'vue3-toastify'
 import PreviewImage from './PreviewImage.vue'
 import axios from 'axios'
 
-const emit = defineEmits(['close'])
+// const props = defineProps({
+//   Model: {
+//     type: String,
+//     required: true
+//   }
+// });
 
 const previewImages = ref([])
 const fileInputRef = ref(null)
@@ -23,7 +28,6 @@ const onUploadedSuccess = () => {
   toast.success('Images uploaded successfully!', {
     autoClose: 3000
   })
-  emit('close')
   previewImages.value = []
 }
 
@@ -131,8 +135,13 @@ const uploadImage = async () => {
       <button class="create-button" @click="uploadImage">Create</button>
     </div>
   </div>
-  <div v-for="(imageUrl, index) in processedImageUrls" :key="index">
+  <!-- <div v-for="(imageUrl, index) in processedImageUrls" :key="index">
     <img :src="imageUrl" :alt="'Processed Image ' + index" crossorigin="anonymous" />
+  </div> -->
+  <div id="show-picture-card">
+    <div v-for="(imageUrl, index) in processedImageUrls" :key="index">
+      <img :src="imageUrl" :alt="'Processed Image ' + index" crossorigin="anonymous" />
+    </div>
   </div>
 </template>
 
@@ -237,5 +246,14 @@ const uploadImage = async () => {
   background-color: #fff1f1;
   font-size: 12px;
   font-weight: 600;
+}
+#show-picture-card {
+  width: 95%; /* Adjust the width percentage as needed */
+  height: auto;
+  border-radius: 16px;
+  background-color: #fefefe;
+  padding: 20px;
+  margin: 30px;
+  background-color: #ffffff;
 }
 </style>

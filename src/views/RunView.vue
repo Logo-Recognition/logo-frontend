@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
-// import IconDropdown from '@/components/icons/IconDropdown.vue'
-import IconSearch from '@/components/icons/IconSearch.vue'
+import IconDropdown from '@/components/icons/IconDropdown.vue'
+// import IconSearch from '@/components/icons/IconSearch.vue'
 import UploadImageRun from '@/components/UploadImageRun.vue'
 
 // Initialize the selected model with a default value
@@ -53,11 +53,11 @@ const filteredModels = computed(() => {
         <button class="dropbtn flex items-center justify-around" @click="toggleDropdown">
           {{ model }}
           <div class="w-1"></div>
-          <!-- <IconDropdown /> -->
+          <IconDropdown />
         </button>
         <div class="dropdown-content" :class="{ show: isDropdownOpen }">
           <div class="p-2">
-            <IconSearch/>
+            <!-- <IconSearch/> -->
             <input
               type="text"
               v-model="searchQuery"
@@ -77,7 +77,7 @@ const filteredModels = computed(() => {
         </div>
       </div>
     </div>
-    <UploadImageRun />
+    <UploadImageRun :Model="model"/>
   </main>
 </template>
 
@@ -132,6 +132,7 @@ const filteredModels = computed(() => {
 .dropdown-search:focus {
   border: 1px solid #7585ff;
   outline: none; /* Remove default outline */
+  background-color: #eff1ff;
 }
 /* Show the dropdown menu when isDropdownOpen is true */
 .dropdown-content.show {
@@ -144,6 +145,13 @@ const filteredModels = computed(() => {
   text-decoration: none;
   display: block;
   border-bottom: 1px solid #ddd; /* Add this line to set a bottom border */
+}
+.dropdown-content a:last-child {
+  border-bottom: none; /* Remove border from the last <a> element */
+}
+.dropdown-content a:last-child:hover {
+  border-bottom: none; /* Remove border from the last <a> element */
+    border-radius:0px 0px 10px 10px  ;
 }
 /* Change color of dropdown links on hover */
 .dropdown-content a:hover {
