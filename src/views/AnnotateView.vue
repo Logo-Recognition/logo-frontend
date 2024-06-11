@@ -11,6 +11,8 @@ import BoxNameModal from '@/components/LabelModal.vue'
 import { API_URL } from '@/config.js'
 import axios from 'axios'
 
+const loading = ref(true)
+
 const canvasRef = ref(null)
 const labelsContainerRef = ref(null)
 let canvas = null
@@ -29,6 +31,7 @@ const submittedBoxes = ref([])
 
 const showModal = ref(false)
 const useDefaultClass = ref(false)
+const defaultClass = ref('')
 const classList = ref([])
 
 const currentTab = ref('Unannotated')
@@ -251,7 +254,12 @@ const onMouseUp = () => {
   if (mode.value === 'drawing') {
     isDrawing = false
     if (currentBox) {
-      showModal.value = true
+      if (useDefaultClass.value) {
+        currentBox.set('name', defaultClass.value)
+        submittedBoxes.value.push(currentBox)
+      } else {
+        showModal.value = true
+      }
     } else {
       console.error('No currentBox set')
     }
@@ -317,6 +325,8 @@ const getTabClass = (tab) => {
 }
 
 const fetchImages = async (tab) => {
+  loading.value = true
+
   try {
     const endpoint = tab.toLowerCase() === 'unannotated' ? 'images' : 'annotated-images'
     const response = await fetch(`${API_URL}/api/${endpoint}`)
@@ -434,7 +444,6 @@ onMounted(() => {
   canvas.on('mouse:move', showCoordinates)
 
   fetchImages('Unannotated')
-  fetchClassList()
 })
 </script>
 
@@ -500,9 +509,14 @@ onMounted(() => {
             @click="showModal = false"
           />
           <label for="checkbox">Default Label</label>
-          <select v-model="selected">
-            <option disabled value="">Please select class</option>
-            <option v-for="(classItem, index) in classList" :key="index" :value="classItem">
+          <select class="dropdown-select" v-model="defaultClass" @click="fetchClassList()">
+            <option disabled value="">Select class</option>
+            <option
+              v-for="(classItem, index) in classList"
+              :key="index"
+              :value="classItem"
+              :v-model="classItem"
+            >
               {{ classItem }}
             </option>
           </select>
@@ -605,6 +619,17 @@ onMounted(() => {
             >
               <img :src="image.src" :alt="image.alt" class="image" />
             </div>
+            <!-- <div ref="scrollContainer" class="image-container">
+              <img
+                v-lazy="image.src"
+                v-for="image in annotatedImages"
+                :key="image.id"
+                :alt="image.alt"
+                :class="image - item"
+                @click="loadImageToCanvas(image.src, image.name, image.labels)"
+              />
+              <div v-if="loading" class="loading-spinner">Loading...</div>
+            </div> -->
           </div>
         </div>
       </div>
@@ -717,6 +742,12 @@ onMounted(() => {
   padding: 16px;
   overflow-y: auto;
   position: relative;
+}
+
+.default-labels {
+}
+
+.dropdown-select {
 }
 
 .label-item {
