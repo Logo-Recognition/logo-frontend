@@ -661,8 +661,7 @@ onMounted(() => {
   border-radius: 16px;
   padding: 24px;
   max-width: calc(100vw - 480px);
-  max-height: calc(100vh - 80px);
-  overflow: auto;
+  max-height: calc(100vh - 100px);
   display: flex;
   flex-direction: column;
 }
@@ -740,6 +739,8 @@ onMounted(() => {
   grid-area: top;
   border-radius: 16px;
   padding: 16px;
+  height: 30vh;
+
   overflow-y: auto;
   position: relative;
 }
@@ -753,7 +754,7 @@ onMounted(() => {
   border: 1px solid #7585ff;
 }
 
-input[type="checkbox"]:hover {
+input[type='checkbox']:hover {
   border-radius: 4px;
   border: 1px solid #7585ff;
 }
@@ -761,6 +762,8 @@ input[type="checkbox"]:hover {
 .label-item {
   padding: 4px;
   border-bottom: 1px solid #d8dbd8;
+  height: 30vh;
+
 }
 
 .submit-button {
@@ -784,6 +787,7 @@ input[type="checkbox"]:hover {
 
 .images-container {
   grid-area: bottom;
+
   display: flex;
   flex-direction: column;
 }
@@ -791,7 +795,7 @@ input[type="checkbox"]:hover {
 .image-grid {
   display: flex;
   flex-wrap: wrap;
-  max-height: 70%;
+  height: 40vh;
   overflow-y: auto;
 }
 
