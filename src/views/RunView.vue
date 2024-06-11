@@ -6,7 +6,7 @@ import UploadImageRun from '@/components/UploadImageRun.vue'
 
 // Initialize the selected model with a default value
 const model = ref('RT-DETR')
-const modellist = ref(['RT-DETR', 'YOLOV8', 'YOLOV9', 'YOLOV10'])
+const modellist = ref(['RT-DETR', 'YOLOV8'])
 // Initialize a reactive state for the dropdown visibility
 const isDropdownOpen = ref(false)
 const searchQuery = ref('')
