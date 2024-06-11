@@ -1,10 +1,13 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { toast } from 'vue3-toastify'
 import axios from 'axios'
 import { API_URL } from '@/config.js'
+import IconSearch from '@/components/icons/IconSearch.vue'
 
 const classList = ref([])
+const filteredClassList = ref([])
+const search = ref('')
 const selectedClass = ref('')
 const emit = defineEmits(['close', 'submit', 'classSelected'])
 
@@ -12,6 +15,7 @@ const fetchClassList = async () => {
   try {
     const response = await axios.get(`${API_URL}/api/class`)
     classList.value = response.data.classes
+    filteredClassList.value = classList.value
   } catch (error) {
     console.error('Error fetching class list:', error)
   }
@@ -43,9 +47,21 @@ const cancelBoxDrawing = () => {
   emit('close')
 }
 
+const filterClasses = () => {
+  if (search.value) {
+    filteredClassList.value = classList.value.filter((classItem) =>
+      classItem.toLowerCase().includes(search.value.toLowerCase())
+    )
+  } else {
+    filteredClassList.value = classList.value
+  }
+}
+
 onMounted(() => {
   fetchClassList()
 })
+
+watch(search, filterClasses)
 </script>
 
 <template>
@@ -54,8 +70,14 @@ onMounted(() => {
       <div class="modal-container">
         <div class="modal-header bg-primary text-white">Label Image</div>
         <div class="modal-body">
+          <div class="search-wrapper">
+            <IconSearch class="search-icon" />
+            <input type="text" v-model="search" placeholder="Search classes" class="search-input" />
+            <i class="fas fa-search search-icon"></i>
+
+          </div>
           <ul>
-            <li v-for="(classItem, index) in classList" :key="index">
+            <li v-for="(classItem, index) in filteredClassList" :key="index">
               <button
                 class="class-item"
                 :class="{ selected: classItem === selectedClass }"
@@ -66,6 +88,9 @@ onMounted(() => {
               <div class="divider" v-if="index !== classList.length - 1"></div>
             </li>
           </ul>
+          <div class="item-error text-dark" v-if="!filteredClassList.length">
+            <p>No class found</p>
+          </div>
         </div>
         <div class="modal-footer">
           <button
@@ -115,6 +140,31 @@ onMounted(() => {
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
   padding: 12px 20px;
+}
+
+.search-wrapper {
+  position: relative;
+}
+
+.search-icon {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-45%);
+}
+
+.search-input {
+  width: 100%;
+  padding: 8px 12px 8px 36px;
+  margin: 8px 0;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  box-sizing: border-box;
+}
+
+.search-input:focus {
+  outline: 1px solid #7585ff;
+  background-color: #eff1ff;
 }
 
 .modal-footer {
@@ -169,6 +219,10 @@ onMounted(() => {
 
 .divider {
   border-bottom: 1px solid #e0e0e0;
+}
+
+.item-error {
+ margin: 8px 16px;
 }
 
 .button.is-success {

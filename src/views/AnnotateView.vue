@@ -9,6 +9,9 @@ import IconZoomIn from '@/components/icons/IconZoomIn.vue'
 import IconZoomOut from '@/components/icons/IconZoomOut.vue'
 import BoxNameModal from '@/components/LabelModal.vue'
 import { API_URL } from '@/config.js'
+import axios from 'axios'
+
+const loading = ref(true)
 
 const canvasRef = ref(null)
 const labelsContainerRef = ref(null)
@@ -27,6 +30,9 @@ let currentBox = null
 const submittedBoxes = ref([])
 
 const showModal = ref(false)
+const useDefaultClass = ref(false)
+const defaultClass = ref('')
+const classList = ref([])
 
 const currentTab = ref('Unannotated')
 const unannotatedImages = ref([])
@@ -93,6 +99,15 @@ function isObject(val) {
   return val !== null && typeof val === 'object'
 }
 
+const fetchClassList = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/api/class`)
+    classList.value = response.data.classes
+  } catch (error) {
+    console.error('Error fetching class list:', error)
+  }
+}
+
 const drawNewBox = (x1, y1, x2, y2, label = null) => {
   const left = x1
   const top = y1
@@ -136,15 +151,25 @@ const drawNewBox = (x1, y1, x2, y2, label = null) => {
 const loadImageToCanvas = (imageSrc, imageName, labels) => {
   fabric.Image.fromURL(imageSrc, (img) => {
     canvas.clear()
-    const scaleX = canvas.width / img.width
-    const scaleY = canvas.height / img.height
+
+    const containerWidth = canvasRef.value.offsetWidth
+    const containerHeight = canvasRef.value.offsetHeight
+
+    const scaleX = containerWidth / img.width
+    const scaleY = containerHeight / img.height
+    const scale = Math.min(scaleX, scaleY)
+
+    canvas.setWidth(containerWidth)
+    canvas.setHeight(containerHeight)
+
     img.set({
       left: 0,
       top: 0,
-      scaleX,
-      scaleY
+      scaleX: scale,
+      scaleY: scale
     })
     canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas))
+
     canvas.getObjects().forEach((obj) => {
       if (obj.type !== 'rect') {
         canvas.remove(obj)
@@ -168,6 +193,13 @@ const loadImageToCanvas = (imageSrc, imageName, labels) => {
     canvas.renderAll()
     submittedBoxes.value.push(...boxesForImage)
 
+    verticalLine.set({ x1: containerWidth / 2, x2: containerWidth / 2, y1: 0, y2: containerHeight })
+    horizontalLine.set({
+      x1: 0,
+      x2: containerWidth,
+      y1: containerHeight / 2,
+      y2: containerHeight / 2
+    })
     canvas.add(verticalLine, horizontalLine)
     canvas.renderAll()
   })
@@ -222,7 +254,12 @@ const onMouseUp = () => {
   if (mode.value === 'drawing') {
     isDrawing = false
     if (currentBox) {
-      showModal.value = true
+      if (useDefaultClass.value) {
+        currentBox.set('name', defaultClass.value)
+        submittedBoxes.value.push(currentBox)
+      } else {
+        showModal.value = true
+      }
     } else {
       console.error('No currentBox set')
     }
@@ -288,6 +325,8 @@ const getTabClass = (tab) => {
 }
 
 const fetchImages = async (tab) => {
+  loading.value = true
+
   try {
     const endpoint = tab.toLowerCase() === 'unannotated' ? 'images' : 'annotated-images'
     const response = await fetch(`${API_URL}/api/${endpoint}`)
@@ -295,26 +334,25 @@ const fetchImages = async (tab) => {
       let images = []
 
       if (tab.toLowerCase() === 'unannotated') {
-        const imageUrls = await response.json()
-        images = imageUrls.map((url, index) => {
-          const imageName = url.split('/').pop().split('?')[0]
+        const imageData = await response.json()
+        images = imageData.map((data, index) => {
           return {
             id: `image-${index}`,
-            src: url,
+            src: data.url,
             alt: `Image ${index + 1}`,
-            name: imageName
+            name: data.image_name
           }
         })
+        console.log(images)
         unannotatedImages.value = images
       } else if (tab.toLowerCase() === 'annotated') {
         const imageData = await response.json()
         images = imageData.map((data, index) => {
-          const imageName = data.image.split('/').pop().split('?')[0]
           return {
             id: `image-${index}`,
             src: data.image,
             alt: `Image ${index + 1}`,
-            name: imageName,
+            name: data.image_name,
             labels: data.label
           }
         })
@@ -456,13 +494,33 @@ onMounted(() => {
             <span class="tooltip-text">Zoom Out</span>
           </div>
         </div>
-        <canvas ref="canvasRef" class="canvas-wrapper" width="500" height="500"></canvas>
+        <canvas ref="canvasRef" class="canvas-wrapper" width="720" height="460"></canvas>
         <div class="mouse-coordinates">
           X: {{ mouseCoordinates.x }}, Y: {{ mouseCoordinates.y }}
         </div>
       </div>
       <div class="labels-container bg-white" ref="labelsContainer">
-        <h2>Labels</h2>
+        <h2 class="text-base text-dark font-medium">Labels</h2>
+        <div class="default-labels">
+          <input
+            type="checkbox"
+            id="checkbox"
+            v-model="useDefaultClass"
+            @click="showModal = false"
+          />
+          <label for="checkbox">Default Label</label>
+          <select class="dropdown-select" v-model="defaultClass" @click="fetchClassList()">
+            <option disabled value="">Select class</option>
+            <option
+              v-for="(classItem, index) in classList"
+              :key="index"
+              :value="classItem"
+              :v-model="classItem"
+            >
+              {{ classItem }}
+            </option>
+          </select>
+        </div>
         <div v-if="canvas">
           <div v-for="obj in visibleObjects" :key="obj.id" class="label-item">
             <span>
@@ -470,13 +528,15 @@ onMounted(() => {
             </span>
           </div>
         </div>
-        <div class="submit-button bg-secondary text-white">
-          <button class="button is-primary" @click="saveAnnotations">Apply</button>
+        <div class="submit-button">
+          <button class="button bg-secondary text-white hover:bg-hover" @click="saveAnnotations">
+            Apply
+          </button>
         </div>
       </div>
 
       <BoxNameModal
-        v-if="showModal"
+        v-if="showModal && !useDefaultClass"
         @close="discardCurrentBox"
         @submit="handleModalSubmit"
         @classSelected="addSelectedClass"
@@ -559,6 +619,17 @@ onMounted(() => {
             >
               <img :src="image.src" :alt="image.alt" class="image" />
             </div>
+            <!-- <div ref="scrollContainer" class="image-container">
+              <img
+                v-lazy="image.src"
+                v-for="image in annotatedImages"
+                :key="image.id"
+                :alt="image.alt"
+                :class="image - item"
+                @click="loadImageToCanvas(image.src, image.name, image.labels)"
+              />
+              <div v-if="loading" class="loading-spinner">Loading...</div>
+            </div> -->
           </div>
         </div>
       </div>
@@ -578,8 +649,28 @@ onMounted(() => {
 .annotation-section {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: 1fr 2fr;
+  grid-template-areas:
+    'left top'
+    'left bottom';
   gap: 32px 24px;
+}
+
+.canvas-container {
+  grid-area: left;
+  border-radius: 16px;
+  padding: 24px;
+  max-width: calc(100vw - 480px);
+  max-height: calc(100vh - 80px);
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.canvas-wrapper {
+  width: 100%;
+  background: ghostwhite;
+  border: 1px solid gainsboro;
 }
 
 .toolbar-container {
@@ -631,19 +722,6 @@ onMounted(() => {
   opacity: 1;
 }
 
-.canvas-container {
-  grid-column: 1 / 2;
-  grid-row: 1 / 3;
-  border-radius: 16px;
-  padding: 24px;
-}
-
-.canvas-wrapper {
-  background: ghostwhite;
-  border: 1px solid gainsboro;
-  width: 100%;
-}
-
 .mouse-coordinates {
   margin-top: 16px;
   padding: 8px;
@@ -658,19 +736,18 @@ onMounted(() => {
   justify-content: space-between;
 }
 
-.submit-button {
-  text-align: center;
-  border-radius: 8px;
-  padding: 8px 16px;
-  min-width: 72px;
-}
-
 .labels-container {
-  grid-column: 2 / 3;
-  grid-row: 1 / 2;
+  grid-area: top;
   border-radius: 16px;
   padding: 16px;
   overflow-y: auto;
+  position: relative;
+}
+
+.default-labels {
+}
+
+.dropdown-select {
 }
 
 .label-item {
@@ -678,9 +755,27 @@ onMounted(() => {
   border-bottom: 1px solid #d8dbd8;
 }
 
+.submit-button {
+  text-align: center;
+  border-radius: 8px;
+  width: calc(100% - 32px);
+  position: absolute;
+  bottom: 16px;
+}
+
+.submit-button button {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
 .images-container {
-  grid-column: 2 / 3;
-  grid-row: 2 / 3;
+  grid-area: bottom;
   display: flex;
   flex-direction: column;
 }
