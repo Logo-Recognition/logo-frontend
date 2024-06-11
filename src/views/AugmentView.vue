@@ -116,7 +116,7 @@ const handleData = (data) => {
 const handleImageClick = (src) => {
   selectedImageSrc.value = src
   originalImage.value = new Image()
-  originalImage.value.crossOrigin = 'Anonymous'
+  originalImage.value.crossOrigin = 'Anonymous' 
   originalImage.value.src = src
   originalImage.value.onload = () => {
     isImage.value = true
