@@ -12,12 +12,6 @@ import { API_URL } from '@/config.js'
 import axios from 'axios'
 import { useIntersectionObserver } from '@vueuse/core'
 
-const displayedAnnotatedImages = ref([])
-const loading = ref(false)
-const hasMoreData = ref(true)
-
-const scrollContainer = ref(null)
-
 const canvasRef = ref(null)
 const labelsContainerRef = ref(null)
 let canvas = null
@@ -43,7 +37,15 @@ const lastUsedClass = ref('')
 const currentTab = ref('Unannotated')
 const unannotatedImages = ref([])
 const annotatedImages = ref([])
+
+const loading = ref(false)
+const hasMoreData = ref(true)
+const scrollContainer = ref(null)
+// const displayedUnannotatedImages = ref([])
+const displayedAnnotatedImages = ref([])
+
 const selectedClasses = ref([])
+const isImageSelected = ref(false)
 const selectedImage = ref({ name: '', width: 0.0, height: 0.0 })
 
 const intersectionObserver = computed(() => {
@@ -66,16 +68,16 @@ const loadMoreImages = () => {
   loading.value = true
 
   const start = displayedAnnotatedImages.value.length
-  const end = start + 20 // Load 20 images at a time (adjust as needed)
+  const end = start + 10
 
   const newImages = annotatedImages.value.slice(start, end)
 
   if (newImages.length === 0) {
     hasMoreData.value = false
-    loading.value = false // Reset loading state when there are no more images
+    loading.value = false
   } else {
     displayedAnnotatedImages.value.push(...newImages)
-    loading.value = false // Reset loading state after updating displayedAnnotatedImages
+    loading.value = false
   }
 }
 
@@ -247,9 +249,28 @@ const loadImageToCanvas = (imageSrc, imageName, labels) => {
     selectedImage.value.width = img.width
     selectedImage.value.height = img.height
   })
+
+  isImageSelected.value = true
 }
 
+const isDefaultClassInvalid = computed(() => {
+  return useDefaultClass.value && (!defaultClass.value || defaultClass.value.trim() === '')
+})
+
 const onMouseDown = (event) => {
+  if (!isImageSelected.value) {
+    toast.warning('Please Select the Image', {
+      autoClose: 3000
+    })
+    return
+  }
+  if (isDefaultClassInvalid.value) {
+    toast.warning('Please Select the Class', {
+      autoClose: 3000
+    })
+    return
+  }
+
   if (mode.value === 'drawing') {
     isDrawing = true
     startPoint = canvas.getPointer(event.e)
@@ -401,7 +422,7 @@ const fetchImages = async (tab) => {
           }
         })
         annotatedImages.value = images
-        displayedAnnotatedImages.value = images.slice(0, 20)
+        displayedAnnotatedImages.value = annotatedImages.value.slice(0, 20)
         console.log(displayedAnnotatedImages.value)
       }
     } else {
@@ -499,9 +520,11 @@ onMounted(() => {
 
   fetchImages('Unannotated')
 
-  displayedAnnotatedImages.value = annotatedImages.value.slice(0, 20)
+  displayedAnnotatedImages.value = annotatedImages.value.slice(0, 10)
 
   nextTick(() => {
+    console.log('lazyload display', displayedAnnotatedImages.value)
+
     if (scrollContainer.value) {
       intersectionObserver.value = useIntersectionObserver(
         scrollContainer.value,
@@ -538,7 +561,11 @@ onMounted(() => {
           <div class="tooltip">
             <button
               class="action-button drawing"
-              :class="{ active: mode === 'drawing' }"
+              :class="{
+                active: mode === 'drawing',
+                disabled: !isImageSelected || isDefaultClassInvalid
+              }"
+              :disabled="!isImageSelected || isDefaultClassInvalid"
               @click="mode = 'drawing'"
             >
               <IconBoundingBox />
@@ -658,7 +685,7 @@ onMounted(() => {
             </a>
           </li>
         </ul>
-        <div
+        <!-- <div
           v-if="currentTab === 'Unannotated'"
           class="tab-content"
           id="tabs-unannotated"
@@ -674,16 +701,17 @@ onMounted(() => {
               <img :src="image.src" :alt="image.alt" class="image" />
             </div>
           </div>
-        </div>
-        <!-- <div
-          v-else-if="currentTab === 'Annotated'"
+        </div> -->
+        <div
+          v-if="currentTab === 'Unannotated'"
           class="tab-content"
-          id="tabs-annotated"
+          id="tabs-unannotated"
           role="tabpanel"
+          ref="scrollContainer"
         >
           <div class="image-grid">
             <div
-              v-for="image in annotatedImages"
+              v-for="image in unannotatedImages"
               :key="image.id"
               class="image-item"
               @click="loadImageToCanvas(image.src, image.name, image.labels)"
@@ -691,7 +719,8 @@ onMounted(() => {
               <img :src="image.src" :alt="image.alt" class="image" />
             </div>
           </div>
-        </div> -->
+          <div v-if="loading" class="loading-spinner">Loading...</div>
+        </div>
         <div
           v-else-if="currentTab === 'Annotated'"
           class="tab-content"
@@ -706,7 +735,7 @@ onMounted(() => {
               class="image-item"
               @click="loadImageToCanvas(image.src, image.name, image.labels)"
             >
-              <img v-lazy="image.src" :alt="image.alt" class="image" />
+              <img :src="image.src" :alt="image.alt" class="image" />
             </div>
           </div>
           <div v-if="loading" class="loading-spinner">Loading...</div>
@@ -870,16 +899,20 @@ input[type='checkbox']:hover {
 
 .images-container {
   grid-area: bottom;
-
   display: flex;
   flex-direction: column;
 }
 
-.image-grid {
+/* .image-grid {
   display: flex;
   flex-wrap: wrap;
   height: 40vh;
   overflow-y: auto;
+} */
+.image-grid {
+  display: flex;
+  flex-wrap: wrap;
+  overflow-y: auto; /* Keep this property */
 }
 
 .image-item {
@@ -903,10 +936,17 @@ input[type='checkbox']:hover {
   transform: scale(1.05);
 }
 
+/* .tab-content {
+  transition: opacity 0.3s ease-in-out;
+  display: flex;
+  flex-wrap: wrap;
+} */
 .tab-content {
   transition: opacity 0.3s ease-in-out;
   display: flex;
   flex-wrap: wrap;
+  max-height: 40vh; /* Adjust this value as needed */
+  overflow-y: auto;
 }
 
 .badge {
