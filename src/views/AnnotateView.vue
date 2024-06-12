@@ -318,9 +318,10 @@ const onMouseUp = () => {
   if (mode.value === 'drawing') {
     isDrawing = false
     if (currentBox) {
-      if (useDefaultClass.value) {
+      if (useDefaultClass.value && defaultClass.value) {
         currentBox.set('name', defaultClass.value)
         submittedBoxes.value.push(currentBox)
+        currentBox = null
       } else {
         showModal.value = true
       }
@@ -340,6 +341,13 @@ const addSelectedClass = (className) => {
   } else {
     console.log(`${className} has already been selected.`)
     console.log('Selected Classes:', selectedClasses.value)
+  }
+}
+
+const deleteLabel = (obj) => {
+  if (obj) {
+    canvas.remove(obj)
+    submittedBoxes.value = submittedBoxes.value.filter((box) => box !== obj)
   }
 }
 
@@ -620,9 +628,10 @@ onMounted(() => {
         </div>
         <div v-if="canvas" class="labels-wrapper">
           <div v-for="obj in visibleObjects" :key="obj.id" class="label-item">
-            <span>
-              {{ obj.name || '' }}
-            </span>
+            <span>{{ obj.name || '' }}</span>
+            <div class="label-actions">
+              <button class="delete-button" @click="deleteLabel(obj)">Delete</button>
+            </div>
           </div>
         </div>
         <div class="submit-button">
@@ -874,8 +883,24 @@ input[type='checkbox']:hover {
 }
 
 .label-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 4px;
   border-bottom: 1px solid #d8dbd8;
+}
+
+.label-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.edit-button {
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #f0f0f0;
+  color: #333;
 }
 
 .submit-button {
