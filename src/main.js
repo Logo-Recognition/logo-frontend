@@ -5,6 +5,7 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import piniaPersist from 'pinia-plugin-persist'
 import './assets/main.css'
+import VueLazyload from 'vue-lazyload'
 
 import App from './App.vue'
 import router from './router'
@@ -17,5 +18,8 @@ app.use(router)
 app.use(Vue3Toastify, {
   position: 'top-right',
   transition: 'Vue-Toastify__bounce'
+})
+app.use(VueLazyload, {
+  attempt: 1
 })
 app.mount('#app')

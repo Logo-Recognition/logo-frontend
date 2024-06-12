@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, nextTick } from 'vue'
 import { fabric } from 'fabric'
 import { toast } from 'vue3-toastify'
 import IconCursorPointer from '@/components/icons/IconCursorPointer.vue'
@@ -10,8 +10,13 @@ import IconZoomOut from '@/components/icons/IconZoomOut.vue'
 import BoxNameModal from '@/components/LabelModal.vue'
 import { API_URL } from '@/config.js'
 import axios from 'axios'
+import { useIntersectionObserver } from '@vueuse/core'
 
-const loading = ref(true)
+const displayedAnnotatedImages = ref([])
+const loading = ref(false)
+const hasMoreData = ref(true)
+
+const scrollContainer = ref(null)
 
 const canvasRef = ref(null)
 const labelsContainerRef = ref(null)
@@ -39,7 +44,40 @@ const currentTab = ref('Unannotated')
 const unannotatedImages = ref([])
 const annotatedImages = ref([])
 const selectedClasses = ref([])
-const selectedImage = ref({name: "", width:0.0, height:0.0})
+const selectedImage = ref({ name: '', width: 0.0, height: 0.0 })
+
+const intersectionObserver = computed(() => {
+  if (!scrollContainer.value) return null
+
+  return useIntersectionObserver(
+    scrollContainer.value,
+    ([{ isIntersecting }]) => {
+      if (isIntersecting) {
+        loadMoreImages()
+      }
+    },
+    { root: null, threshold: 0.5 }
+  )
+})
+
+const loadMoreImages = () => {
+  if (!hasMoreData.value || loading.value) return
+
+  loading.value = true
+
+  const start = displayedAnnotatedImages.value.length
+  const end = start + 20 // Load 20 images at a time (adjust as needed)
+
+  const newImages = annotatedImages.value.slice(start, end)
+
+  if (newImages.length === 0) {
+    hasMoreData.value = false
+    loading.value = false // Reset loading state when there are no more images
+  } else {
+    displayedAnnotatedImages.value.push(...newImages)
+    loading.value = false // Reset loading state after updating displayedAnnotatedImages
+  }
+}
 
 const toTextFile = async () => {
   const canvasWidth = canvas.width
@@ -185,7 +223,9 @@ const loadImageToCanvas = (imageSrc, imageName, labels) => {
     if (labels && Array.isArray(labels)) {
       labels.forEach((label) => {
         const [x1, y1, x2, y2] = label.bbox.split(' ').map(parseFloat)
-        const box = drawNewBox(x1*scale, y1*scale, x2*scale, y2*scale, { class_name: label.class_name })
+        const box = drawNewBox(x1 * scale, y1 * scale, x2 * scale, y2 * scale, {
+          class_name: label.class_name
+        })
         box.imageName = imageName
         boxesForImage.push(box)
       })
@@ -207,7 +247,6 @@ const loadImageToCanvas = (imageSrc, imageName, labels) => {
     selectedImage.value.width = img.width
     selectedImage.value.height = img.height
   })
-  
 }
 
 const onMouseDown = (event) => {
@@ -362,13 +401,16 @@ const fetchImages = async (tab) => {
           }
         })
         annotatedImages.value = images
-        console.log(annotatedImages.value)
+        displayedAnnotatedImages.value = images.slice(0, 20)
+        console.log(displayedAnnotatedImages.value)
       }
     } else {
       console.error('Error fetching images:', response.status)
     }
   } catch (error) {
     console.error('Error fetching images:', error)
+  } finally {
+    loading.value = false
   }
 }
 
@@ -402,7 +444,7 @@ const saveAnnotations = async () => {
       ) {
         annotatedData.label.push({
           class_name: obj.name,
-          bbox: `${obj.x1/scale} ${obj.y1/scale} ${obj.x2/scale} ${obj.y2/scale}`
+          bbox: `${obj.x1 / scale} ${obj.y1 / scale} ${obj.x2 / scale} ${obj.y2 / scale}`
         })
       }
     })
@@ -456,6 +498,22 @@ onMounted(() => {
   canvas.on('mouse:move', showCoordinates)
 
   fetchImages('Unannotated')
+
+  displayedAnnotatedImages.value = annotatedImages.value.slice(0, 20)
+
+  nextTick(() => {
+    if (scrollContainer.value) {
+      intersectionObserver.value = useIntersectionObserver(
+        scrollContainer.value,
+        ([{ isIntersecting }]) => {
+          if (isIntersecting) {
+            loadMoreImages()
+          }
+        },
+        { root: null, threshold: 0.5 }
+      )
+    }
+  })
 })
 </script>
 
@@ -617,7 +675,7 @@ onMounted(() => {
             </div>
           </div>
         </div>
-        <div
+        <!-- <div
           v-else-if="currentTab === 'Annotated'"
           class="tab-content"
           id="tabs-annotated"
@@ -632,18 +690,26 @@ onMounted(() => {
             >
               <img :src="image.src" :alt="image.alt" class="image" />
             </div>
-            <!-- <div ref="scrollContainer" class="image-container">
-              <img
-                v-lazy="image.src"
-                v-for="image in annotatedImages"
-                :key="image.id"
-                :alt="image.alt"
-                :class="image - item"
-                @click="loadImageToCanvas(image.src, image.name, image.labels)"
-              />
-              <div v-if="loading" class="loading-spinner">Loading...</div>
-            </div> -->
           </div>
+        </div> -->
+        <div
+          v-else-if="currentTab === 'Annotated'"
+          class="tab-content"
+          id="tabs-annotated"
+          role="tabpanel"
+          ref="scrollContainer"
+        >
+          <div class="image-grid">
+            <div
+              v-for="image in displayedAnnotatedImages"
+              :key="image.id"
+              class="image-item"
+              @click="loadImageToCanvas(image.src, image.name, image.labels)"
+            >
+              <img v-lazy="image.src" :alt="image.alt" class="image" />
+            </div>
+          </div>
+          <div v-if="loading" class="loading-spinner">Loading...</div>
         </div>
       </div>
     </div>
