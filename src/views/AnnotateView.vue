@@ -33,6 +33,7 @@ const showModal = ref(false)
 const useDefaultClass = ref(false)
 const defaultClass = ref('')
 const classList = ref([])
+const lastUsedClass = ref('')
 
 const currentTab = ref('Unannotated')
 const unannotatedImages = ref([])
@@ -300,6 +301,7 @@ const handleModalSubmit = (name) => {
   }
   showModal.value = false
   currentBox = null
+  lastUsedClass.value = name
 }
 
 const showCoordinates = (event) => {
@@ -521,7 +523,7 @@ onMounted(() => {
             </option>
           </select>
         </div>
-        <div v-if="canvas">
+        <div v-if="canvas" class="labels-wrapper">
           <div v-for="obj in visibleObjects" :key="obj.id" class="label-item">
             <span>
               {{ obj.name || '' }}
@@ -542,6 +544,7 @@ onMounted(() => {
         @classSelected="addSelectedClass"
         :selectedClasses="selectedClasses"
         :currentBox="currentBox"
+        :lastUsedClass="lastUsedClass"
       />
 
       <div class="images-container">
@@ -740,18 +743,20 @@ onMounted(() => {
   border-radius: 16px;
   padding: 16px;
   height: 30vh;
-
-  overflow-y: auto;
   position: relative;
 }
 
 .default-labels {
-  justify-items: stretch;
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  gap: 12px;
 }
 
 .dropdown-select {
   border-radius: 4px;
   border: 1px solid #7585ff;
+  align-self: stretch;
 }
 
 input[type='checkbox']:hover {
@@ -759,11 +764,13 @@ input[type='checkbox']:hover {
   border: 1px solid #7585ff;
 }
 
+.labels-wrapper {
+  overflow-y: auto;
+}
+
 .label-item {
   padding: 4px;
   border-bottom: 1px solid #d8dbd8;
-  height: 30vh;
-
 }
 
 .submit-button {
