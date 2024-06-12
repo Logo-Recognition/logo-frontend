@@ -113,33 +113,6 @@ const toTextFile = async () => {
   URL.revokeObjectURL(blobURL)
 }
 
-const visibleObjects = computed(() => {
-  const allObjects = [...canvas.getObjects(), ...submittedBoxes.value]
-  const filteredObjects = allObjects.filter(
-    (obj, index, self) =>
-      !isProxy(obj) &&
-      self.findIndex(
-        (o) =>
-          o &&
-          o.type === 'rect' &&
-          o.x1 === obj.x1 &&
-          o.y1 === obj.y1 &&
-          o.x2 === obj.x2 &&
-          o.y2 === obj.y2 &&
-          o.imageName === selectedImage.value.name
-      ) === index
-  )
-  return filteredObjects
-})
-
-function isProxy(obj) {
-  return isObject(obj) && isObject(obj.__v_isProxy)
-}
-
-function isObject(val) {
-  return val !== null && typeof val === 'object'
-}
-
 const fetchClassList = async () => {
   try {
     const response = await axios.get(`${API_URL}/api/class`)
@@ -342,6 +315,33 @@ const addSelectedClass = (className) => {
     console.log(`${className} has already been selected.`)
     console.log('Selected Classes:', selectedClasses.value)
   }
+}
+
+const visibleObjects = computed(() => {
+  const allObjects = [...canvas.getObjects(), ...submittedBoxes.value]
+  const filteredObjects = allObjects.filter(
+    (obj, index, self) =>
+      !isProxy(obj) &&
+      self.findIndex(
+        (o) =>
+          o &&
+          o.type === 'rect' &&
+          o.x1 === obj.x1 &&
+          o.y1 === obj.y1 &&
+          o.x2 === obj.x2 &&
+          o.y2 === obj.y2 &&
+          o.imageName === selectedImage.value.name
+      ) === index
+  )
+  return filteredObjects
+})
+
+function isProxy(obj) {
+  return isObject(obj) && isObject(obj.__v_isProxy)
+}
+
+function isObject(val) {
+  return val !== null && typeof val === 'object'
 }
 
 const deleteLabel = (obj) => {
@@ -628,7 +628,7 @@ onMounted(() => {
         </div>
         <div v-if="canvas" class="labels-wrapper">
           <div v-for="obj in visibleObjects" :key="obj.id" class="label-item">
-            <span>{{ obj.name || '' }}</span>
+            <span>{{ obj.name }}</span>
             <div class="label-actions">
               <button class="delete-button" @click="deleteLabel(obj)">Delete</button>
             </div>
@@ -937,7 +937,7 @@ input[type='checkbox']:hover {
 .image-grid {
   display: flex;
   flex-wrap: wrap;
-  overflow-y: auto; /* Keep this property */
+  overflow-y: auto;
 }
 
 .image-item {
@@ -970,7 +970,7 @@ input[type='checkbox']:hover {
   transition: opacity 0.3s ease-in-out;
   display: flex;
   flex-wrap: wrap;
-  max-height: 40vh; /* Adjust this value as needed */
+  max-height: 40vh;
   overflow-y: auto;
 }
 
