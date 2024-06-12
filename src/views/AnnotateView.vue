@@ -85,19 +85,19 @@ const toTextFile = async () => {
   const canvasWidth = canvas.width
   const canvasHeight = canvas.height
 
-  const objects = canvas.getObjects()
+  const objects = submittedBoxes.value
 
   let textContent = ''
 
   objects.forEach((obj) => {
     if (obj.type === 'rect') {
-      const classId = 0
+      const classId = obj.classId !== undefined ? obj.classId : 0
       const centerX = (obj.left + obj.width / 2) / canvasWidth
       const centerY = (obj.top + obj.height / 2) / canvasHeight
       const width = obj.width / canvasWidth
       const height = obj.height / canvasHeight
 
-      const yoloString = `${classId} ${centerX.toFixed(6)} ${centerY.toFixed(6)} ${width.toFixed(6)} ${height.toFixed(6)} ${obj.name || ''}`
+      const yoloString = `${classId} ${centerX.toFixed(6)} ${centerY.toFixed(6)} ${width.toFixed(6)} ${height.toFixed(6)}`
       textContent += yoloString + '\n'
     }
   })
@@ -107,7 +107,7 @@ const toTextFile = async () => {
 
   const a = document.createElement('a')
   a.href = blobURL
-  a.download = 'annotations.txt'
+  a.download = `${selectedImage.value.name.split('.')[0]}.txt`
   a.click()
 
   URL.revokeObjectURL(blobURL)
@@ -361,7 +361,18 @@ const discardCurrentBox = () => {
 
 const handleModalSubmit = (name) => {
   if (currentBox) {
+    let classId
+    if (classList.value.length === 0) {
+      classId = 0
+    } else {
+      classId = classList.value.indexOf(name)
+      if (classId === -1) {
+        classId = 0
+      }
+    }
+
     currentBox.set('name', name)
+    currentBox.set('classId', classId)
 
     if (!selectedClasses.value.includes(name)) {
       selectedClasses.value.push(name)
@@ -879,6 +890,7 @@ input[type='checkbox']:hover {
 }
 
 .labels-wrapper {
+  height: 13vh;
   overflow-y: auto;
 }
 
