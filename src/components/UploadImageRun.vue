@@ -5,6 +5,8 @@ import PreviewImage from './PreviewImage.vue'
 import axios from 'axios'
 import IconShare from '@/components/icons/IconShare.vue'
 import IconView from '@/components/icons/IconView.vue'
+import IconArrowL from '@/components/icons/IconArrowL.vue'
+import IconArrowR from '@/components/icons/IconArrowR.vue'
 import JSZip from 'jszip'
 const props = defineProps({
   Model: {
@@ -215,20 +217,22 @@ const toggleDropdown = () => {
       </div>
       <p>{{ currentImageIndex + 1 }} / {{ processedImageUrls.length }}</p>
       <div class="navigation-buttons flex items-center">
-        <button @click="toggleDropdown"><IconView /></button>
+        <button @click="toggleDropdown" :class="{ active: showDropdown }" id="predicted-bar-button">
+          <IconView />
+        </button>
         <button @click="downloadAllImages"><IconShare /></button>
       </div>
     </div>
     <div class="show-predicted flex justify-around">
-      <button @click="showPreviousImage">&lt;</button>
+      <button @click="showPreviousImage"><IconArrowL/></button>
       <img
         v-lazy="processedImageUrls[currentImageIndex]"
         :alt="'Processed Image ' + currentImageIndex"
         crossorigin="anonymous"
       />
-      <button @click="showNextImage">&gt;</button>
+      <button @click="showNextImage"><IconArrowR/></button>
     </div>
-    <div v-if="showDropdown">
+    <div v-if="showDropdown" class="mt-2">
       <div class="preview-container">
         <div class="preview-area">
           <div v-for="(image, index) in processedImageUrls" :key="index" class="preview-items">
@@ -434,5 +438,11 @@ const toggleDropdown = () => {
   object-fit: fill;
   cursor: pointer;
   margin-top: 5px;
+}
+#predicted-bar-button {
+  color: #5A5D6C;
+}
+#predicted-bar-button.active {
+  color: #7585ff;
 }
 </style>
