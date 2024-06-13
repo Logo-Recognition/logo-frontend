@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import IconDropdown from '@/components/icons/IconDropdown.vue'
-// import IconSearch from '@/components/icons/IconSearch.vue'
+import IconSearch from '@/components/icons/IconSearch.vue'
 import UploadImageRun from '@/components/UploadImageRun.vue'
 
 // Initialize the selected model with a default value
@@ -56,14 +56,9 @@ const filteredModels = computed(() => {
           <IconDropdown />
         </button>
         <div class="dropdown-content" :class="{ show: isDropdownOpen }">
-          <div class="p-2">
-            <!-- <IconSearch/> -->
-            <input
-              type="text"
-              v-model="searchQuery"
-              placeholder="Search"
-              class="dropdown-search"
-            />
+          <div class="serch-wrapper p-2">
+            <IconSearch id="icon-serch" />
+            <input type="text" v-model="searchQuery" placeholder="Search" class="dropdown-search" />
           </div>
           <a
             id=""
@@ -77,12 +72,11 @@ const filteredModels = computed(() => {
         </div>
       </div>
     </div>
-    <UploadImageRun :Model="model"/>
+    <UploadImageRun :Model="model" />
   </main>
 </template>
 
 <style scoped>
-
 #class-box {
   width: 95%; /* Adjust the width percentage as needed */
   height: auto;
@@ -105,7 +99,7 @@ const filteredModels = computed(() => {
   text-align: start;
   display: flex;
   align-items: center;
-  background-color: #EFF1FF;
+  background-color: #eff1ff;
   margin-bottom: 8px;
 }
 /* Dropdown Content (Hidden by Default) */
@@ -123,7 +117,8 @@ const filteredModels = computed(() => {
 .dropdown-search {
   width: 100%;
   height: 38px;
-  padding: 8px;
+  padding: 8px 8px 8px 22px;
+  
   border-radius: 8px;
   background-color: #eff1ff;
   box-sizing: border-box;
@@ -151,7 +146,7 @@ const filteredModels = computed(() => {
 }
 .dropdown-content a:last-child:hover {
   border-bottom: none; /* Remove border from the last <a> element */
-    border-radius:0px 0px 10px 10px  ;
+  border-radius: 0px 0px 10px 10px;
 }
 /* Change color of dropdown links on hover */
 .dropdown-content a:hover {
@@ -162,5 +157,13 @@ const filteredModels = computed(() => {
   display: flex;
   flex-direction: column;
 }
-
+.serch-wrapper {
+  position: relative;
+}
+#icon-serch {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-45%);
+}
 </style>

@@ -12,14 +12,15 @@ const props = defineProps({
     required: true
   }
 })
+
 const previewImages = ref([])
 const fileInputRef = ref(null)
 const active = ref(false)
-const viewMode = ref('single') // New state to manage view mode
 const uploadMessage = ref('')
 const processedImageUrls = ref([])
 const isLoading = ref(false)
 const currentImageIndex = ref(0)
+const showDropdown = ref(false)
 
 const selectedModel = ref('')
 
@@ -153,15 +154,18 @@ const showPreviousImage = () => {
     currentImageIndex.value--
   }
 }
+const setImageIndex = (index) => {
+  currentImageIndex.value = index
+}
 
-const toggleViewMode = () => {
-  viewMode.value = viewMode.value === 'single' ? 'grid' : 'single'
+const toggleDropdown = () => {
+  showDropdown.value = !showDropdown.value
 }
 </script>
 
 <template>
   <div class="modal-content-run">
-    <H2 class="font-bold mb-5">Upload Images</H2>
+    <h2 class="font-bold mb-5">Upload Images</h2>
     <div
       @dragenter.prevent="toggleActive(true)"
       @dragleave.prevent="toggleActive(false)"
@@ -191,7 +195,7 @@ const toggleViewMode = () => {
     </div>
 
     <div v-if="previewImages.length > 0" class="preview-container">
-      <div v-if="previewImages" class="preview-area">
+      <div class="preview-area">
         <div v-for="(image, index) in previewImages" :key="index" class="preview-items">
           <PreviewImage :src="image.url" @img-removed="removeImage(index)"></PreviewImage>
         </div>
@@ -202,6 +206,7 @@ const toggleViewMode = () => {
       <button class="clear-button ml-1" @click="clearImage">Clear</button>
     </div>
   </div>
+
   <div id="show-picture-card" v-if="processedImageUrls.length > 0">
     <div class="flex justify-between">
       <div class="flex flex-col">
@@ -210,22 +215,31 @@ const toggleViewMode = () => {
       </div>
       <p>{{ currentImageIndex + 1 }} / {{ processedImageUrls.length }}</p>
       <div class="navigation-buttons flex items-center">
-        <button @click="toggleViewMode"><IconView /></button>
+        <button @click="toggleDropdown"><IconView /></button>
         <button @click="downloadAllImages"><IconShare /></button>
       </div>
     </div>
-    <div v-if="viewMode === 'single'" class="flex justify-around">
+    <div class="show-predicted flex justify-around">
       <button @click="showPreviousImage">&lt;</button>
       <img
-        :src="processedImageUrls[currentImageIndex]"
+        v-lazy="processedImageUrls[currentImageIndex]"
         :alt="'Processed Image ' + currentImageIndex"
         crossorigin="anonymous"
       />
       <button @click="showNextImage">&gt;</button>
     </div>
-    <div v-else class="grid-container">
-      <div v-for="(image, index) in processedImageUrls" :key="index" class="grid-item">
-        <img :src="image" :alt="'Processed Image ' + index" crossorigin="anonymous" />
+    <div v-if="showDropdown">
+      <div class="preview-container">
+        <div class="preview-area">
+          <div v-for="(image, index) in processedImageUrls" :key="index" class="preview-items">
+            <img
+              v-lazy="image"
+              class="preview-img"
+              @click="setImageIndex(index)"
+              crossorigin="anonymous"
+            />
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -285,6 +299,8 @@ const toggleViewMode = () => {
   border: 1px dashed #9e9e9e;
   margin: 24px;
   position: relative;
+  flex-wrap: nowrap;
+  overflow-x: auto;
 }
 
 .drop-area:hover {
@@ -300,16 +316,6 @@ const toggleViewMode = () => {
   white-space: nowrap;
   margin-inline: 24px;
   margin-bottom: 24px;
-}
-
-.preview-area {
-  display: inline-flex;
-}
-
-.preview-items {
-  width: 150px;
-  height: 100px;
-  margin-right: 16px;
 }
 
 .create-button {
@@ -345,6 +351,7 @@ const toggleViewMode = () => {
   font-size: 12px;
   font-weight: 600;
 }
+
 #show-picture-card {
   width: 95%; /* Adjust the width percentage as needed */
   height: auto;
@@ -354,11 +361,13 @@ const toggleViewMode = () => {
   margin: 30px;
   background-color: #ffffff;
 }
+
 #show-picture-card h3 {
   font-size: 20px;
   font-weight: 700;
 }
-#show-picture-card img {
+
+.show-predicted img {
   width: 70%; /* Limit the maximum width */
   height: 400px; /* Maintain aspect ratio */
   object-fit: contain; /* Ensure the entire image fits within the set dimensions */
@@ -366,16 +375,64 @@ const toggleViewMode = () => {
   border: 1px dashed #3745be;
   padding: auto;
 }
+
 .grid-container {
-  width: 70%; /* Limit the maximum width */
-  height: 400px; /* Maintain aspect ratio */
-  object-fit: contain; /* Ensure the entire image fits within the set dimensions */
-  /* border-radius: 16px; */
-  border: 1px dashed #3745be;
-  padding: auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 columns */
+  gap: 10px;
+  justify-items: center;
 }
-.grid-item{
-  width: 50px; /* Limit the maximum width */
-  height: 50px; /* Maintain aspect ratio */
+
+.grid-item {
+  width: 100%;
+  height: auto;
+  padding: 5px;
+}
+
+.grid-item img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.dropdown-container {
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 300px; /* Adjust as needed */
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 10px;
+  position: absolute;
+  z-index: 1000;
+}
+
+.dropdown-item {
+  width: 50px;
+  height: 50px;
+  margin: 5px;
+  cursor: pointer;
+}
+
+.dropdown-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.preview-area {
+  display: inline-flex; /* Use flexbox layout */
+  gap: 10px; /* Add spacing between items */
+}
+
+.preview-items {
+  flex: 0 0 auto; /* Prevent items from shrinking */
+}
+
+.preview-img {
+  border-radius: 10px;
+  width: 150px;
+  height: 100px;
+  object-fit: fill;
+  cursor: pointer;
+  margin-top: 5px;
 }
 </style>
