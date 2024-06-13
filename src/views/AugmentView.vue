@@ -697,7 +697,7 @@ onMounted(() => {
   display: flex;
   flex-wrap: wrap;
   margin-left: 30px;
-  display: flex;
+  
   flex-wrap: nowrap;
   overflow-x: auto;
 }
