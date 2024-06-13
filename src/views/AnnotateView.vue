@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { fabric } from 'fabric'
 import { toast } from 'vue3-toastify'
+import { ContentLoader } from 'vue-content-loader'
 import IconCursorPointer from '@/components/icons/IconCursorPointer.vue'
 import IconBoundingBox from '@/components/icons/IconBoundingBox.vue'
 import IconTxtFile from '@/components/icons/IconTxtFile.vue'
@@ -293,7 +294,7 @@ const addSelectedClass = (className) => {
   if (!selectedClasses.value.includes(className)) {
     selectedClasses.value.push(className)
     console.log('Selected Classes:', selectedClasses.value)
-  } 
+  }
 }
 
 const discardCurrentBox = () => {
@@ -645,7 +646,16 @@ onMounted(() => {
             >
               <img v-lazy="image.src" :alt="image.alt" class="image" />
             </div>
-            <div v-if="loading" class="loading-spinner">Loading...</div>
+            <div v-if="loading" class="loading-spinner">
+              <ContentLoader viewBox="0 0 250 110">
+                <rect x="0" y="0" rx="3" ry="3" width="250" height="10" />
+                <rect x="20" y="20" rx="3" ry="3" width="220" height="10" />
+                <rect x="20" y="40" rx="3" ry="3" width="170" height="10" />
+                <rect x="0" y="60" rx="3" ry="3" width="250" height="10" />
+                <rect x="20" y="80" rx="3" ry="3" width="200" height="10" />
+                <rect x="20" y="100" rx="3" ry="3" width="80" height="10" />
+              </ContentLoader>
+            </div>
           </div>
         </div>
         <div
@@ -664,7 +674,16 @@ onMounted(() => {
               <img v-lazy="image.src" :alt="image.alt" class="image" />
             </div>
           </div>
-          <div v-if="loading" class="loading-spinner">Loading...</div>
+          <div v-if="loading" class="loading-spinner">
+            <ContentLoader viewBox="0 0 250 110">
+              <rect x="0" y="0" rx="3" ry="3" width="250" height="10" />
+              <rect x="20" y="20" rx="3" ry="3" width="220" height="10" />
+              <rect x="20" y="40" rx="3" ry="3" width="170" height="10" />
+              <rect x="0" y="60" rx="3" ry="3" width="250" height="10" />
+              <rect x="20" y="80" rx="3" ry="3" width="200" height="10" />
+              <rect x="20" y="100" rx="3" ry="3" width="80" height="10" />
+            </ContentLoader>
+          </div>
         </div>
       </div>
     </div>

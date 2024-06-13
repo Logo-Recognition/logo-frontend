@@ -20,9 +20,6 @@ app.use(Vue3Toastify, {
   transition: 'Vue-Toastify__bounce'
 })
 app.use(VueLazyload, {
-  attempt: 1
-})
-app.use(VueLazyload, {
   preLoad: 1.3,
   attempt: 1
 })
