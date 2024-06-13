@@ -75,6 +75,7 @@ const uploadImage = async () => {
     uploadMessage.value = 'Error uploading images.'
     console.error('Error uploading images:', error)
     onUploadedFail()
+    emit('loading',false)
   } finally {
     isLoading.value = false
     selectedFile.value = []
@@ -145,9 +146,10 @@ const uploadImage = async () => {
 .modal-content-ocr {
   height: auto;
   border-radius: 16px;
-  background-color: #fefefe;
-  margin-inline: 32px;
+  background-color: #FEFEFE;
   margin-block: 24px;
+  padding-inline: 32px;
+  padding-block: 24px;
 }
 
 .browse-button {
