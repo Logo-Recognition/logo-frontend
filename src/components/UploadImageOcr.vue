@@ -143,11 +143,9 @@ const uploadImage = async () => {
 }
 
 .modal-content-ocr {
-  width: 95%; /* Adjust the width percentage as needed */
   height: auto;
   border-radius: 16px;
   background-color: #fefefe;
-  padding-top: 36px;
   margin-inline: 32px;
   margin-block: 24px;
 }

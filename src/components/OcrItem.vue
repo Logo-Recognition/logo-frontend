@@ -6,11 +6,11 @@ const props = defineProps({
 </script>
 
 <template>
-    <div id="row-container">
+    <div id="row-container" class="max-h-60">
         <div id="img-section">
-          <img :src="props.imageSrc" crossorigin="anonymous">
+          <img v-lazy="props.imageSrc" class="h-full rounded-xl object-fill "  crossorigin="anonymous">
         </div>
-        <div id="txt-section">
+        <div id="txt-section" class="mx-6 py-8 px-6 border border-secondary rounded-xl bg-light">
           <p>{{ props.text }}</p>
         </div>
     </div>
@@ -20,6 +20,7 @@ const props = defineProps({
 #row-container{
   display: grid;
   grid-template-columns: 1fr 2fr;
+  margin-bottom: 24px
 }
 
 </style>
