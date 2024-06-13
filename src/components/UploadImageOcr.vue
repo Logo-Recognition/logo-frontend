@@ -7,7 +7,7 @@ import axios from 'axios'
 const previewImages = ref([])
 const fileInputRef = ref(null)
 const active = ref(false)
-const emit = defineEmits(['send-data'])
+const emit = defineEmits(['send-data','loading'])
 const uploadMessage = ref('')
 const isLoading = ref(false)
 const selectedFile = ref()
@@ -59,8 +59,7 @@ const uploadImage = async () => {
   selectedFile.value.forEach((file) => {
     formData.append('images', file)
   })
-  isLoading.value = true
-
+  emit('loading',true)
   try {
     const response = await axios.post('http://192.168.2.44:5000/api/ocr', formData, {
       headers: {
@@ -69,6 +68,7 @@ const uploadImage = async () => {
     })
     uploadMessage.value = 'Images uploaded successfully!'
     console.log('Server response:', response)
+    emit('loading',false)
     emit('send-data',response.data)
     onUploadedSuccess()
   } catch (error) {
