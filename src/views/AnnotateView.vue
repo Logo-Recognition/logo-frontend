@@ -5,13 +5,10 @@ import { toast } from 'vue3-toastify'
 import IconCursorPointer from '@/components/icons/IconCursorPointer.vue'
 import IconBoundingBox from '@/components/icons/IconBoundingBox.vue'
 import IconTxtFile from '@/components/icons/IconTxtFile.vue'
-// import IconZoomIn from '@/components/icons/IconZoomIn.vue'
-// import IconZoomOut from '@/components/icons/IconZoomOut.vue'
 import IconBin from '@/components/icons/IconBin.vue'
 import BoxNameModal from '@/components/LabelModal.vue'
 import { API_URL } from '@/config.js'
 import axios from 'axios'
-// import { useIntersectionObserver } from '@vueuse/core'
 
 const canvasRef = ref(null)
 const labelsContainerRef = ref(null)
@@ -20,14 +17,13 @@ let canvas = null
 const mode = ref('pointer')
 let isDragging = false
 let isResizing = false
-
-const mouseCoordinates = ref({ x: 0, y: 0 })
-let verticalLine, horizontalLine
-
 let isDrawing = false
-let startPoint = { x: 0, y: 0 }
 let currentBox = null
 const submittedBoxes = ref([])
+
+let startPoint = { x: 0, y: 0 }
+const mouseCoordinates = ref({ x: 0, y: 0 })
+let verticalLine, horizontalLine
 
 const showModal = ref(false)
 const useDefaultClass = ref(false)
@@ -36,83 +32,13 @@ const classList = ref([])
 const lastUsedClass = ref('')
 
 const currentTab = ref('Unannotated')
+const loading = ref(false)
 const unannotatedImages = ref([])
 const annotatedImages = ref([])
 
-const loading = ref(false)
-// const hasMoreData = ref(true)
-const scrollContainer = ref(null)
-// const displayedUnannotatedImages = ref([])
-// const displayedAnnotatedImages = ref([])
-
-const selectedClasses = ref([])
 const isImageSelected = ref(false)
+const selectedClasses = ref([])
 const selectedImage = ref({ name: '', width: 0.0, height: 0.0 })
-
-// const intersectionObserver = computed(() => {
-//   if (!scrollContainer.value) return null
-
-//   return useIntersectionObserver(
-//     scrollContainer.value,
-//     ([{ isIntersecting }]) => {
-//       if (isIntersecting) {
-//         loadMoreImages()
-//       }
-//     },
-//     { root: null, threshold: 0.5 }
-//   )
-// })
-
-// const loadMoreImages = () => {
-//   if (!hasMoreData.value || loading.value) return
-
-//   loading.value = true
-
-//   const start = displayedAnnotatedImages.value.length
-//   const end = start + 10
-
-//   const newImages = annotatedImages.value.slice(start, end)
-
-//   if (newImages.length === 0) {
-//     hasMoreData.value = false
-//     loading.value = false
-//   } else {
-//     displayedAnnotatedImages.value.push(...newImages)
-//     loading.value = false
-//   }
-// }
-
-const toTextFile = async () => {
-  const canvasWidth = canvas.width
-  const canvasHeight = canvas.height
-
-  const objects = submittedBoxes.value
-
-  let textContent = ''
-
-  objects.forEach((obj) => {
-    if (obj.type === 'rect') {
-      const classId = obj.classId !== undefined ? obj.classId : 0
-      const centerX = (obj.left + obj.width / 2) / canvasWidth
-      const centerY = (obj.top + obj.height / 2) / canvasHeight
-      const width = obj.width / canvasWidth
-      const height = obj.height / canvasHeight
-
-      const yoloString = `${classId} ${centerX.toFixed(6)} ${centerY.toFixed(6)} ${width.toFixed(6)} ${height.toFixed(6)}`
-      textContent += yoloString + '\n'
-    }
-  })
-
-  const blob = new Blob([textContent], { type: 'text/plain' })
-  const blobURL = URL.createObjectURL(blob)
-
-  const a = document.createElement('a')
-  a.href = blobURL
-  a.download = `${selectedImage.value.name.split('.')[0]}.txt`
-  a.click()
-
-  URL.revokeObjectURL(blobURL)
-}
 
 const fetchClassList = async () => {
   try {
@@ -121,46 +47,6 @@ const fetchClassList = async () => {
   } catch (error) {
     console.error('Error fetching class list:', error)
   }
-}
-
-const drawNewBox = (x1, y1, x2, y2, label = null) => {
-  const left = x1
-  const top = y1
-  const width = x2 - x1
-  const height = y2 - y1
-
-  const rect = new fabric.Rect({
-    left,
-    top,
-    width,
-    height,
-    fill: 'rgba(255, 0, 0, 0.2)',
-    stroke: '#f00',
-    strokeWidth: 2,
-    cornerSize: 10,
-    cornerColor: '#f00',
-    selectable: true,
-    hasControls: true,
-    imageName: selectedImage.value.name,
-    name: label ? label.class_name : '',
-    classId: 0,
-    x1,
-    y1,
-    x2,
-    y2
-  })
-  canvas.add(rect)
-  canvas.setActiveObject(rect)
-  currentBox = rect
-
-  if (labelsContainerRef.value) {
-    const labelElement = document.createElement('div')
-    labelElement.className = 'label-item'
-    labelElement.textContent = `Coordinates: (${x1}, ${y1}), (${x2}, ${y2}) - ${rect.name}`
-    labelsContainerRef.value.appendChild(labelElement)
-  }
-
-  return rect
 }
 
 const loadImageToCanvas = (imageSrc, imageName, labels) => {
@@ -227,9 +113,104 @@ const loadImageToCanvas = (imageSrc, imageName, labels) => {
   isImageSelected.value = true
 }
 
-const isDefaultClassInvalid = computed(() => {
-  return useDefaultClass.value && (!defaultClass.value || defaultClass.value.trim() === '')
+const drawNewBox = (x1, y1, x2, y2, label = null) => {
+  const left = x1
+  const top = y1
+  const width = x2 - x1
+  const height = y2 - y1
+
+  const rect = new fabric.Rect({
+    left,
+    top,
+    width,
+    height,
+    fill: 'rgba(255, 0, 0, 0.2)',
+    stroke: '#f00',
+    strokeWidth: 2,
+    cornerSize: 10,
+    cornerColor: '#f00',
+    selectable: true,
+    hasControls: true,
+    imageName: selectedImage.value.name,
+    name: label ? label.class_name : '',
+    classId: 0,
+    x1,
+    y1,
+    x2,
+    y2
+  })
+  canvas.add(rect)
+  canvas.setActiveObject(rect)
+  currentBox = rect
+
+  if (labelsContainerRef.value) {
+    const labelElement = document.createElement('div')
+    labelElement.className = 'label-item'
+    labelElement.textContent = `Coordinates: (${x1}, ${y1}), (${x2}, ${y2}) - ${rect.name}`
+    labelsContainerRef.value.appendChild(labelElement)
+  }
+
+  return rect
+}
+
+const toTextFile = async () => {
+  const canvasWidth = canvas.width
+  const canvasHeight = canvas.height
+
+  const objects = submittedBoxes.value
+
+  let textContent = ''
+
+  objects.forEach((obj) => {
+    if (obj.type === 'rect') {
+      const classId = obj.classId !== undefined ? obj.classId : 0
+      const centerX = (obj.left + obj.width / 2) / canvasWidth
+      const centerY = (obj.top + obj.height / 2) / canvasHeight
+      const width = obj.width / canvasWidth
+      const height = obj.height / canvasHeight
+
+      const yoloString = `${classId} ${centerX.toFixed(6)} ${centerY.toFixed(6)} ${width.toFixed(6)} ${height.toFixed(6)}`
+      textContent += yoloString + '\n'
+    }
+  })
+
+  const blob = new Blob([textContent], { type: 'text/plain' })
+  const blobURL = URL.createObjectURL(blob)
+
+  const a = document.createElement('a')
+  a.href = blobURL
+  a.download = `${selectedImage.value.name.split('.')[0]}.txt`
+  a.click()
+
+  URL.revokeObjectURL(blobURL)
+}
+
+const visibleObjects = computed(() => {
+  const allObjects = [...canvas.getObjects(), ...submittedBoxes.value]
+  const filteredObjects = allObjects.filter(
+    (obj, index, self) =>
+      !isProxy(obj) &&
+      self.findIndex(
+        (o) =>
+          o &&
+          o.type === 'rect' &&
+          o.x1 === obj.x1 &&
+          o.y1 === obj.y1 &&
+          o.x2 === obj.x2 &&
+          o.y2 === obj.y2 &&
+          o.imageName === selectedImage.value.name
+      ) === index
+  )
+  return filteredObjects
 })
+
+function isProxy(obj) {
+  return isObject(obj) && isObject(obj.__v_isProxy)
+}
+
+function isObject(val) {
+  return val !== null && typeof val === 'object'
+}
 
 const onMouseDown = (event) => {
   if (!isImageSelected.value) {
@@ -312,44 +293,7 @@ const addSelectedClass = (className) => {
   if (!selectedClasses.value.includes(className)) {
     selectedClasses.value.push(className)
     console.log('Selected Classes:', selectedClasses.value)
-  } else {
-    console.log(`${className} has already been selected.`)
-    console.log('Selected Classes:', selectedClasses.value)
-  }
-}
-
-const visibleObjects = computed(() => {
-  const allObjects = [...canvas.getObjects(), ...submittedBoxes.value]
-  const filteredObjects = allObjects.filter(
-    (obj, index, self) =>
-      !isProxy(obj) &&
-      self.findIndex(
-        (o) =>
-          o &&
-          o.type === 'rect' &&
-          o.x1 === obj.x1 &&
-          o.y1 === obj.y1 &&
-          o.x2 === obj.x2 &&
-          o.y2 === obj.y2 &&
-          o.imageName === selectedImage.value.name
-      ) === index
-  )
-  return filteredObjects
-})
-
-function isProxy(obj) {
-  return isObject(obj) && isObject(obj.__v_isProxy)
-}
-
-function isObject(val) {
-  return val !== null && typeof val === 'object'
-}
-
-const deleteLabel = (obj) => {
-  if (obj) {
-    canvas.remove(obj)
-    submittedBoxes.value = submittedBoxes.value.filter((box) => box !== obj)
-  }
+  } 
 }
 
 const discardCurrentBox = () => {
@@ -399,65 +343,15 @@ const showCoordinates = (event) => {
   canvas.renderAll()
 }
 
-const getTabClass = (tab) => {
-  const isActive = currentTab.value === tab
-  return [
-    'my-2 block px-7 pb-3.5 pt-4 text-s font-medium leading-tight',
-    isActive
-      ? 'text-primary border-b-2 border-primary'
-      : 'text-grey-text border-b-2 border-grey-border hover:border-dark hover:text-dark hover:border-dark'
-  ].join(' ')
-}
+const isDefaultClassInvalid = computed(() => {
+  return useDefaultClass.value && (!defaultClass.value || defaultClass.value.trim() === '')
+})
 
-const fetchImages = async (tab) => {
-  loading.value = true
-
-  try {
-    const endpoint = tab.toLowerCase() === 'unannotated' ? 'images' : 'annotated-images'
-    const response = await fetch(`${API_URL}/api/${endpoint}`)
-    if (response.ok) {
-      let images = []
-
-      if (tab.toLowerCase() === 'unannotated') {
-        const imageData = await response.json()
-        images = imageData.map((data, index) => {
-          return {
-            id: `image-${index}`,
-            src: data.url,
-            alt: `Image ${index + 1}`,
-            name: data.image_name
-          }
-        })
-        console.log(images)
-        unannotatedImages.value = images
-      } else if (tab.toLowerCase() === 'annotated') {
-        const imageData = await response.json()
-        images = imageData.map((data, index) => {
-          return {
-            id: `image-${index}`,
-            src: data.image,
-            alt: `Image ${index + 1}`,
-            name: data.image_name,
-            labels: data.label
-          }
-        })
-        annotatedImages.value = images
-        // displayedAnnotatedImages.value = annotatedImages.value.slice(0, 20)
-        console.log(annotatedImages.value)
-      }
-    } else {
-      console.error('Error fetching images:', response.status)
-    }
-  } catch (error) {
-    console.error('Error fetching images:', error)
-  } finally {
-    loading.value = false
+const deleteLabel = (obj) => {
+  if (obj) {
+    canvas.remove(obj)
+    submittedBoxes.value = submittedBoxes.value.filter((box) => box !== obj)
   }
-}
-
-const switchTab = (tab) => {
-  currentTab.value = tab
-  fetchImages(tab)
 }
 
 const saveAnnotations = async () => {
@@ -513,6 +407,66 @@ const saveAnnotations = async () => {
   }
 }
 
+const getTabClass = (tab) => {
+  const isActive = currentTab.value === tab
+  return [
+    'my-2 block px-7 pb-3.5 pt-4 text-s font-medium leading-tight',
+    isActive
+      ? 'text-primary border-b-2 border-primary'
+      : 'text-grey-text border-b-2 border-grey-border hover:border-dark hover:text-dark hover:border-dark'
+  ].join(' ')
+}
+
+const switchTab = (tab) => {
+  currentTab.value = tab
+  fetchImages(tab)
+}
+
+const fetchImages = async (tab) => {
+  loading.value = true
+
+  try {
+    const endpoint = tab.toLowerCase() === 'unannotated' ? 'images' : 'annotated-images'
+    const response = await fetch(`${API_URL}/api/${endpoint}`)
+    if (response.ok) {
+      let images = []
+
+      if (tab.toLowerCase() === 'unannotated') {
+        const imageData = await response.json()
+        images = imageData.map((data, index) => {
+          return {
+            id: `image-${index}`,
+            src: data.url,
+            alt: `Image ${index + 1}`,
+            name: data.image_name
+          }
+        })
+        console.log(images)
+        unannotatedImages.value = images
+      } else if (tab.toLowerCase() === 'annotated') {
+        const imageData = await response.json()
+        images = imageData.map((data, index) => {
+          return {
+            id: `image-${index}`,
+            src: data.image,
+            alt: `Image ${index + 1}`,
+            name: data.image_name,
+            labels: data.label
+          }
+        })
+        annotatedImages.value = images
+        console.log(annotatedImages.value)
+      }
+    } else {
+      console.error('Error fetching images:', response.status)
+    }
+  } catch (error) {
+    console.error('Error fetching images:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
 onMounted(() => {
   canvas = new fabric.Canvas(canvasRef.value, {
     isDrawingMode: false
@@ -539,24 +493,6 @@ onMounted(() => {
   canvas.on('mouse:move', showCoordinates)
 
   fetchImages('Unannotated')
-
-  // displayedAnnotatedImages.value = annotatedImages.value.slice(0, 10)
-
-  // nextTick(() => {
-  //   console.log('lazyload display', displayedAnnotatedImages.value)
-
-  //   if (scrollContainer.value) {
-  //     intersectionObserver.value = useIntersectionObserver(
-  //       scrollContainer.value,
-  //       ([{ isIntersecting }]) => {
-  //         if (isIntersecting) {
-  //           loadMoreImages()
-  //         }
-  //       },
-  //       { root: null, threshold: 0.5 }
-  //     )
-  //   }
-  // })
 })
 </script>
 
@@ -598,18 +534,6 @@ onMounted(() => {
             </button>
             <span class="tooltip-text">Save YOLO format</span>
           </div>
-          <!-- <div class="tooltip">
-            <button class="action-button zoom-in" @click="onZoomIn">
-              <IconZoomIn />
-            </button>
-            <span class="tooltip-text">Zoom In</span>
-          </div>
-          <div class="tooltip">
-            <button class="action-button zoom-out" @click="onZoomOut">
-              <IconZoomOut />
-            </button>
-            <span class="tooltip-text">Zoom Out</span>
-          </div> -->
         </div>
         <canvas ref="canvasRef" class="canvas-wrapper" width="715" height="460"></canvas>
         <div class="mouse-coordinates">
@@ -721,33 +645,14 @@ onMounted(() => {
             >
               <img v-lazy="image.src" :alt="image.alt" class="image" />
             </div>
+            <div v-if="loading" class="loading-spinner">Loading...</div>
           </div>
         </div>
-        <!-- <div
-          v-if="currentTab === 'Unannotated'"
-          class="tab-content"
-          id="tabs-unannotated"
-          role="tabpanel"
-          ref="scrollContainer"
-        >
-          <div class="image-grid">
-            <div
-              v-for="image in unannotatedImages"displayedAnnotatedImages
-              :key="image.id"
-              class="image-item"
-              @click="loadImageToCanvas(image.src, image.name, image.labels)"
-            >
-              <img :src="image.src" :alt="image.alt" class="image" />
-            </div>
-          </div>
-          <div v-if="loading" class="loading-spinner">Loading...</div>
-        </div> -->
         <div
           v-else-if="currentTab === 'Annotated'"
           class="tab-content"
           id="tabs-annotated"
           role="tabpanel"
-          ref="scrollContainer"
         >
           <div class="image-grid">
             <div
@@ -941,12 +846,6 @@ input[type='checkbox']:hover {
   flex-direction: column;
 }
 
-/* .image-grid {
-  display: flex;
-  flex-wrap: wrap;
-  height: 40vh;
-  overflow-y: auto;
-} */
 .image-grid {
   display: flex;
   flex-wrap: wrap;
@@ -974,11 +873,6 @@ input[type='checkbox']:hover {
   transform: scale(1.05);
 }
 
-/* .tab-content {
-  transition: opacity 0.3s ease-in-out;
-  display: flex;
-  flex-wrap: wrap;
-} */
 .tab-content {
   transition: opacity 0.3s ease-in-out;
   display: flex;
