@@ -1,21 +1,37 @@
+import DatasetView from '@/views/DatasetView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import ClassView from '@/views/ClassView.vue'
+import AugmentView from '@/views/AugmentView.vue'
+import RunView from '@/views/RunView.vue'
+import AnnotateView from '@/views/AnnotateView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: HomeView
+      name: 'class',
+      component: ClassView
     },
     {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue')
+      path: '/augment', // New path
+      name: 'augment', // Name for the route
+      component: AugmentView // Component to render
+    },
+    {
+      path: '/model', // New path
+      name: 'model', // Name for the route
+      component: RunView // Component to render
+    },
+    {
+      path: '/dataset',
+      name: 'dataset',
+      component: DatasetView
+    },
+    {
+      path: '/annotate',
+      name: 'annotate',
+      component: AnnotateView
     }
   ]
 })
