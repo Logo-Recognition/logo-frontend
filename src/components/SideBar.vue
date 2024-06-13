@@ -53,9 +53,9 @@ const openModal = () => {
                         <span class="text">Run</span>
                     </router-link>
                 </div>
-                <div id="text-convert" class="w-full flex flex-col justify-start pt-6">
+                <div id="ocr" class="w-full flex flex-col justify-start pt-6">
                     <span class="menu-title">TEXT CONVERT</span>
-                    <router-link to='/text-convert' class="button">
+                    <router-link to='/ocr' class="button">
                         <IconOCR/>
                         <span class="text">OCR</span>
                     </router-link>
