@@ -21,8 +21,6 @@ app.use(Vue3Toastify, {
 })
 app.use(VueLazyload, {
   preLoad: 1.3,
-  // error: 'https://lottie.host/embed/01b7b699-1dbe-422c-adce-24c9afe61bdd/1ti45YAMqN.json',
-  // loading: '@/assets/LoadinfGif.vue',
   attempt: 1
 })
 app.mount('#app')

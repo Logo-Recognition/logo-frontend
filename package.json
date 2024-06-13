@@ -22,6 +22,7 @@
     "vue": "^3.4.21",
     "vue-annotator": "^0.13.2",
     "vue-axios": "^3.5.2",
+    "vue-content-loader": "^2.0.1",
     "vue-lazyload": "^3.0.0",
     "vue-router": "^4.3.0",
     "vue-slider-component": "^3.2.24",
