@@ -6,7 +6,6 @@ import { createPinia } from 'pinia'
 import piniaPersist from 'pinia-plugin-persist'
 import VueLazyload from 'vue-lazyload'
 import './assets/main.css'
-import VueLazyload from 'vue-lazyload'
 import App from './App.vue'
 import router from './router'
 
