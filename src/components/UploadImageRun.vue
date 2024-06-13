@@ -7,6 +7,7 @@ import IconShare from '@/components/icons/IconShare.vue'
 import IconView from '@/components/icons/IconView.vue'
 import IconArrowL from '@/components/icons/IconArrowL.vue'
 import IconArrowR from '@/components/icons/IconArrowR.vue'
+import LoadingIndicator from '@/components/LoadingIndicator.vue'
 import JSZip from 'jszip'
 const props = defineProps({
   Model: {
@@ -25,7 +26,6 @@ const currentImageIndex = ref(0)
 const showDropdown = ref(false)
 
 const selectedModel = ref('')
-
 const toggleActive = (isActive) => {
   active.value = isActive
 }
@@ -73,7 +73,7 @@ const uploadImage = async () => {
   if (previewImages.value.length === 0) {
     return
   }
-
+  showDropdown.value = false
   const formData = new FormData()
   previewImages.value.forEach((image) => {
     formData.append('images', image.file)
@@ -209,7 +209,7 @@ const toggleDropdown = () => {
     </div>
   </div>
 
-  <div id="show-picture-card" v-if="processedImageUrls.length > 0">
+  <!-- <div id="show-picture-card" v-if="processedImageUrls.length > 0">
     <div class="flex justify-between">
       <div class="flex flex-col">
         <h3>Result</h3>
@@ -224,13 +224,13 @@ const toggleDropdown = () => {
       </div>
     </div>
     <div class="show-predicted flex justify-around">
-      <button @click="showPreviousImage"><IconArrowL/></button>
+      <button @click="showPreviousImage"><IconArrowL /></button>
       <img
         v-lazy="processedImageUrls[currentImageIndex]"
         :alt="'Processed Image ' + currentImageIndex"
         crossorigin="anonymous"
       />
-      <button @click="showNextImage"><IconArrowR/></button>
+      <button @click="showNextImage"><IconArrowR /></button>
     </div>
     <div v-if="showDropdown" class="mt-2">
       <div class="preview-container">
@@ -242,6 +242,76 @@ const toggleDropdown = () => {
               @click="setImageIndex(index)"
               crossorigin="anonymous"
             />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
+
+  <div v-if="isLoading">
+    <div id="show-picture-card">
+      <div class="flex justify-between">
+        <div class="flex flex-col">
+          <h3>Result</h3>
+          <p class="text-[#5A5D6C]">{{ props.Model }}</p>
+        </div>
+        <div class="navigation-buttons flex items-center">
+          <button
+            @click="toggleDropdown"
+            :class="{ active: showDropdown }"
+            id="predicted-bar-button"
+            disabled
+          >
+            <IconView />
+          </button>
+          <button @click="downloadAllImages" disabled><IconShare /></button>
+        </div>
+      </div>
+      <div class="show-predicted flex justify-around">
+        <div id="the-predicted-image" class="grid place-content-center"><LoadingIndicator /></div>
+      </div>
+    </div>
+  </div>
+  <div v-else>
+    <div id="show-picture-card" v-if="processedImageUrls.length > 0">
+      <div class="flex justify-between">
+        <div class="flex flex-col">
+          <h3>Result</h3>
+          <p class="text-[#5A5D6C]">{{ selectedModel }}</p>
+        </div>
+        <p>{{ currentImageIndex + 1 }} / {{ processedImageUrls.length }}</p>
+        <div class="navigation-buttons flex items-center">
+          <button
+            @click="toggleDropdown"
+            :class="{ active: showDropdown }"
+            id="predicted-bar-button"
+          >
+            <IconView />
+          </button>
+          <button @click="downloadAllImages"><IconShare /></button>
+        </div>
+      </div>
+      <div class="show-predicted flex justify-around">
+        <button @click="showPreviousImage"><IconArrowL /></button>
+        <img
+          v-lazy="processedImageUrls[currentImageIndex]"
+          :alt="'Processed Image ' + currentImageIndex"
+          crossorigin="anonymous"
+          id="the-predicted-image"
+        />
+        <button @click="showNextImage"><IconArrowR /></button>
+      </div>
+      <div v-if="showDropdown" class="mt-2">
+        <div class="preview-container">
+          <div class="preview-area">
+            <div v-for="(image, index) in processedImageUrls" :key="index" class="preview-items">
+              <img
+                v-lazy="image"
+                class="preview-img"
+                @click="setImageIndex(index)"
+                crossorigin="anonymous"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -371,7 +441,7 @@ const toggleDropdown = () => {
   font-weight: 700;
 }
 
-.show-predicted img {
+#the-predicted-image {
   width: 70%; /* Limit the maximum width */
   height: 400px; /* Maintain aspect ratio */
   object-fit: contain; /* Ensure the entire image fits within the set dimensions */
@@ -440,7 +510,7 @@ const toggleDropdown = () => {
   margin-top: 5px;
 }
 #predicted-bar-button {
-  color: #5A5D6C;
+  color: #5a5d6c;
 }
 #predicted-bar-button.active {
   color: #7585ff;
