@@ -95,7 +95,7 @@ const onDownload = async () => {
       },
       body: requestBody,
     });
-
+    console.log(requestBody)
     const response = await fetch(request);
 
     const blob = await response.blob();
