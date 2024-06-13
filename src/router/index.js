@@ -4,6 +4,7 @@ import ClassView from '@/views/ClassView.vue'
 import AugmentView from '@/views/AugmentView.vue'
 import RunView from '@/views/RunView.vue'
 import AnnotateView from '@/views/AnnotateView.vue'
+import OcrView from '@/views/OcrView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -32,6 +33,11 @@ const router = createRouter({
       path: '/annotate',
       name: 'annotate',
       component: AnnotateView
+    },
+    {
+      path: '/ocr',
+      name: 'ocr',
+      component: OcrView
     }
   ]
 })

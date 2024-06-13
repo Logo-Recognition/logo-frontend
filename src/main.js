@@ -6,13 +6,13 @@ import { createPinia } from 'pinia'
 import piniaPersist from 'pinia-plugin-persist'
 import VueLazyload from 'vue-lazyload'
 import './assets/main.css'
-
 import App from './App.vue'
 import router from './router'
 
 const pinia = createPinia()
 const app = createApp(App)
 pinia.use(piniaPersist)
+app.use(VueLazyload)
 app.use(pinia)
 app.use(router)
 app.use(Vue3Toastify, {
