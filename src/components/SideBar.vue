@@ -81,10 +81,9 @@ const openModal = () => {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    width: 256px;
     height: 100vh;
     border-right: 1px solid #D9D9D9;
-    background-color: #071b40
+    background-color: #071b40;
 }
 #title{
     display: flex;
