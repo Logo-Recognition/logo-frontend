@@ -1,16 +1,17 @@
 <script setup>
-import { ref, onMounted, computed, nextTick } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { fabric } from 'fabric'
 import { toast } from 'vue3-toastify'
 import IconCursorPointer from '@/components/icons/IconCursorPointer.vue'
 import IconBoundingBox from '@/components/icons/IconBoundingBox.vue'
 import IconTxtFile from '@/components/icons/IconTxtFile.vue'
-import IconZoomIn from '@/components/icons/IconZoomIn.vue'
-import IconZoomOut from '@/components/icons/IconZoomOut.vue'
+// import IconZoomIn from '@/components/icons/IconZoomIn.vue'
+// import IconZoomOut from '@/components/icons/IconZoomOut.vue'
+import IconBin from '@/components/icons/IconBin.vue'
 import BoxNameModal from '@/components/LabelModal.vue'
 import { API_URL } from '@/config.js'
 import axios from 'axios'
-import { useIntersectionObserver } from '@vueuse/core'
+// import { useIntersectionObserver } from '@vueuse/core'
 
 const canvasRef = ref(null)
 const labelsContainerRef = ref(null)
@@ -39,47 +40,47 @@ const unannotatedImages = ref([])
 const annotatedImages = ref([])
 
 const loading = ref(false)
-const hasMoreData = ref(true)
+// const hasMoreData = ref(true)
 const scrollContainer = ref(null)
 // const displayedUnannotatedImages = ref([])
-const displayedAnnotatedImages = ref([])
+// const displayedAnnotatedImages = ref([])
 
 const selectedClasses = ref([])
 const isImageSelected = ref(false)
 const selectedImage = ref({ name: '', width: 0.0, height: 0.0 })
 
-const intersectionObserver = computed(() => {
-  if (!scrollContainer.value) return null
+// const intersectionObserver = computed(() => {
+//   if (!scrollContainer.value) return null
 
-  return useIntersectionObserver(
-    scrollContainer.value,
-    ([{ isIntersecting }]) => {
-      if (isIntersecting) {
-        loadMoreImages()
-      }
-    },
-    { root: null, threshold: 0.5 }
-  )
-})
+//   return useIntersectionObserver(
+//     scrollContainer.value,
+//     ([{ isIntersecting }]) => {
+//       if (isIntersecting) {
+//         loadMoreImages()
+//       }
+//     },
+//     { root: null, threshold: 0.5 }
+//   )
+// })
 
-const loadMoreImages = () => {
-  if (!hasMoreData.value || loading.value) return
+// const loadMoreImages = () => {
+//   if (!hasMoreData.value || loading.value) return
 
-  loading.value = true
+//   loading.value = true
 
-  const start = displayedAnnotatedImages.value.length
-  const end = start + 10
+//   const start = displayedAnnotatedImages.value.length
+//   const end = start + 10
 
-  const newImages = annotatedImages.value.slice(start, end)
+//   const newImages = annotatedImages.value.slice(start, end)
 
-  if (newImages.length === 0) {
-    hasMoreData.value = false
-    loading.value = false
-  } else {
-    displayedAnnotatedImages.value.push(...newImages)
-    loading.value = false
-  }
-}
+//   if (newImages.length === 0) {
+//     hasMoreData.value = false
+//     loading.value = false
+//   } else {
+//     displayedAnnotatedImages.value.push(...newImages)
+//     loading.value = false
+//   }
+// }
 
 const toTextFile = async () => {
   const canvasWidth = canvas.width
@@ -441,8 +442,8 @@ const fetchImages = async (tab) => {
           }
         })
         annotatedImages.value = images
-        displayedAnnotatedImages.value = annotatedImages.value.slice(0, 20)
-        console.log(displayedAnnotatedImages.value)
+        // displayedAnnotatedImages.value = annotatedImages.value.slice(0, 20)
+        console.log(annotatedImages.value)
       }
     } else {
       console.error('Error fetching images:', response.status)
@@ -539,23 +540,23 @@ onMounted(() => {
 
   fetchImages('Unannotated')
 
-  displayedAnnotatedImages.value = annotatedImages.value.slice(0, 10)
+  // displayedAnnotatedImages.value = annotatedImages.value.slice(0, 10)
 
-  nextTick(() => {
-    console.log('lazyload display', displayedAnnotatedImages.value)
+  // nextTick(() => {
+  //   console.log('lazyload display', displayedAnnotatedImages.value)
 
-    if (scrollContainer.value) {
-      intersectionObserver.value = useIntersectionObserver(
-        scrollContainer.value,
-        ([{ isIntersecting }]) => {
-          if (isIntersecting) {
-            loadMoreImages()
-          }
-        },
-        { root: null, threshold: 0.5 }
-      )
-    }
-  })
+  //   if (scrollContainer.value) {
+  //     intersectionObserver.value = useIntersectionObserver(
+  //       scrollContainer.value,
+  //       ([{ isIntersecting }]) => {
+  //         if (isIntersecting) {
+  //           loadMoreImages()
+  //         }
+  //       },
+  //       { root: null, threshold: 0.5 }
+  //     )
+  //   }
+  // })
 })
 </script>
 
@@ -597,7 +598,7 @@ onMounted(() => {
             </button>
             <span class="tooltip-text">Save YOLO format</span>
           </div>
-          <div class="tooltip">
+          <!-- <div class="tooltip">
             <button class="action-button zoom-in" @click="onZoomIn">
               <IconZoomIn />
             </button>
@@ -608,7 +609,7 @@ onMounted(() => {
               <IconZoomOut />
             </button>
             <span class="tooltip-text">Zoom Out</span>
-          </div>
+          </div> -->
         </div>
         <canvas ref="canvasRef" class="canvas-wrapper" width="715" height="460"></canvas>
         <div class="mouse-coordinates">
@@ -641,7 +642,7 @@ onMounted(() => {
           <div v-for="obj in visibleObjects" :key="obj.id" class="label-item">
             <span>{{ obj.name }}</span>
             <div class="label-actions">
-              <button class="delete-button" @click="deleteLabel(obj)">Delete</button>
+              <button class="delete-button" @click="deleteLabel(obj)"><IconBin /></button>
             </div>
           </div>
         </div>
@@ -705,7 +706,7 @@ onMounted(() => {
             </a>
           </li>
         </ul>
-        <!-- <div
+        <div
           v-if="currentTab === 'Unannotated'"
           class="tab-content"
           id="tabs-unannotated"
@@ -718,14 +719,33 @@ onMounted(() => {
               class="image-item"
               @click="loadImageToCanvas(image.src, image.name)"
             >
-              <img :src="image.src" :alt="image.alt" class="image" />
+              <img v-lazy="image.src" :alt="image.alt" class="image" />
             </div>
           </div>
-        </div> -->
-        <div
+        </div>
+        <!-- <div
           v-if="currentTab === 'Unannotated'"
           class="tab-content"
           id="tabs-unannotated"
+          role="tabpanel"
+          ref="scrollContainer"
+        >
+          <div class="image-grid">
+            <div
+              v-for="image in unannotatedImages"displayedAnnotatedImages
+              :key="image.id"
+              class="image-item"
+              @click="loadImageToCanvas(image.src, image.name, image.labels)"
+            >
+              <img :src="image.src" :alt="image.alt" class="image" />
+            </div>
+          </div>
+          <div v-if="loading" class="loading-spinner">Loading...</div>
+        </div> -->
+        <div
+          v-else-if="currentTab === 'Annotated'"
+          class="tab-content"
+          id="tabs-annotated"
           role="tabpanel"
           ref="scrollContainer"
         >
@@ -736,26 +756,7 @@ onMounted(() => {
               class="image-item"
               @click="loadImageToCanvas(image.src, image.name, image.labels)"
             >
-              <img :src="image.src" :alt="image.alt" class="image" />
-            </div>
-          </div>
-          <div v-if="loading" class="loading-spinner">Loading...</div>
-        </div>
-        <div
-          v-else-if="currentTab === 'Annotated'"
-          class="tab-content"
-          id="tabs-annotated"
-          role="tabpanel"
-          ref="scrollContainer"
-        >
-          <div class="image-grid">
-            <div
-              v-for="image in displayedAnnotatedImages"
-              :key="image.id"
-              class="image-item"
-              @click="loadImageToCanvas(image.src, image.name, image.labels)"
-            >
-              <img :src="image.src" :alt="image.alt" class="image" />
+              <img v-lazy="image.src" :alt="image.alt" class="image" />
             </div>
           </div>
           <div v-if="loading" class="loading-spinner">Loading...</div>
