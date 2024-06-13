@@ -6,6 +6,9 @@ import IconView from '@/components/icons/IconView.vue'
 import LoadingIndicator from '@/components/LoadingIndicator.vue';
 import IconArrowL from '@/components/icons/IconArrowL.vue'
 import IconArrowR from '@/components/icons/IconArrowR.vue'
+import JSZip from 'jszip'
+import { toast } from 'vue3-toastify'
+
 import { ref } from 'vue';
 const processed_data = ref([])
 const currentImageIndex = ref(0)
@@ -37,6 +40,49 @@ const toggleShowAllImage = () => {
 
 const setImageIndex = (index) => {
   currentImageIndex.value = index
+}
+
+const downloadAllImages = async () => {
+  if (processed_data.value.length === 0) {
+    toast.error('No images to download.', {
+      autoClose: 3000
+    })
+    return
+  }
+
+  try {
+    const zip = new JSZip()
+    const folder = zip.folder('images')
+
+    for (let i = 0; i < processed_data.value.length; i++) {
+      const imageUrl = processed_data.value[i]['image_url']
+      const imgfilename = `image_${i + 1}.jpg`
+      const txtfilename = `image_${i + 1}.txt`
+      const response = await fetch(imageUrl)
+      const imageBlob = await response.blob()
+      folder.file(imgfilename, imageBlob)
+      folder.file(txtfilename, processed_data.value[i]['text'])
+    }
+
+    const zipBlob = await zip.generateAsync({ type: 'blob' })
+    const url = window.URL.createObjectURL(zipBlob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'images.zip'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+
+    toast.success('Images downloaded successfully!', {
+      autoClose: 3000
+    })
+  } catch (error) {
+    toast.error('Error downloading images.', {
+      autoClose: 3000
+    })
+    console.error('Error downloading images:', error)
+  }
 }
 
 </script>
