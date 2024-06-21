@@ -3,12 +3,14 @@ import { ref } from 'vue'
 import { toast } from 'vue3-toastify'
 import PreviewImage from './PreviewImage.vue'
 import axios from 'axios'
-import IconShare from '@/components/icons/IconShare.vue'
+import IconDownload from '@/components/icons/IconDownload.vue'
 import IconView from '@/components/icons/IconView.vue'
 import IconArrowL from '@/components/icons/IconArrowL.vue'
 import IconArrowR from '@/components/icons/IconArrowR.vue'
 import LoadingIndicator from '@/components/LoadingIndicator.vue'
 import JSZip from 'jszip'
+
+// รับ prop จากพาเรนต์คอมโพเนนต์
 const props = defineProps({
   Model: {
     type: String,
@@ -16,6 +18,7 @@ const props = defineProps({
   }
 })
 
+// ประกาศตัวแปร reactive ต่างๆ
 const previewImages = ref([])
 const fileInputRef = ref(null)
 const active = ref(false)
@@ -24,24 +27,28 @@ const processedImageUrls = ref([])
 const isLoading = ref(false)
 const currentImageIndex = ref(0)
 const showDropdown = ref(false)
-
 const selectedModel = ref('')
+
+// ฟังก์ชันสำหรับการเปลี่ยนสถานะของ dropzone
 const toggleActive = (isActive) => {
   active.value = isActive
 }
 
+// ฟังก์ชันสำหรับแสดง toast เมื่ออัปโหลดสำเร็จ
 const onUploadedSuccess = () => {
   toast.success('Images uploaded successfully!', {
     autoClose: 3000
   })
 }
 
+// ฟังก์ชันสำหรับแสดง toast เมื่ออัปโหลดล้มเหลว
 const onUploadedFail = () => {
   toast.error('Failed to upload images.', {
     autoClose: 3000
   })
 }
 
+// ฟังก์ชันสำหรับจัดการการเปลี่ยนแปลงของไฟล์อินพุต
 const onFileChange = (event) => {
   const files = event.target.files || event.dataTransfer.files
   for (let index = 0; index < files.length; index++) {
@@ -57,18 +64,22 @@ const onFileChange = (event) => {
   }
 }
 
+// ฟังก์ชันสำหรับลบภาพจากพรีวิว
 const removeImage = (index) => {
   previewImages.value.splice(index, 1)
 }
 
+// ฟังก์ชันสำหรับล้างภาพพรีวิวทั้งหมด
 const clearImage = () => {
   previewImages.value = []
 }
 
+// ฟังก์ชันสำหรับเปิดไฟล์อินพุต
 const triggerFileInput = () => {
   fileInputRef.value.click()
 }
 
+// ฟังก์ชันสำหรับอัปโหลดภาพไปยังเซิร์ฟเวอร์
 const uploadImage = async () => {
   if (previewImages.value.length === 0) {
     return
@@ -103,6 +114,7 @@ const uploadImage = async () => {
   }
 }
 
+// ฟังก์ชันสำหรับดาวน์โหลดภาพทั้งหมดเป็นไฟล์ ZIP
 const downloadAllImages = async () => {
   if (processedImageUrls.value.length === 0) {
     toast.error('No images to download.', {
@@ -145,27 +157,33 @@ const downloadAllImages = async () => {
   }
 }
 
+// ฟังก์ชันสำหรับแสดงภาพถัดไป
 const showNextImage = () => {
   if (currentImageIndex.value < processedImageUrls.value.length - 1) {
     currentImageIndex.value++
   }
 }
 
+// ฟังก์ชันสำหรับแสดงภาพก่อนหน้า
 const showPreviousImage = () => {
   if (currentImageIndex.value > 0) {
     currentImageIndex.value--
   }
 }
+
+// ฟังก์ชันสำหรับตั้งค่าดัชนีของภาพปัจจุบัน
 const setImageIndex = (index) => {
   currentImageIndex.value = index
 }
 
+// ฟังก์ชันสำหรับสลับการแสดง dropdown
 const toggleDropdown = () => {
   showDropdown.value = !showDropdown.value
 }
 </script>
 
 <template>
+  <!-- ส่วนที่เป็น modal สำหรับการอัปโหลดภาพ -->
   <div class="modal-content-run">
     <h2 class="font-bold mb-5">Upload Images</h2>
     <div
@@ -196,6 +214,7 @@ const toggleDropdown = () => {
       </div>
     </div>
 
+    <!-- แสดงพรีวิวของภาพที่อัปโหลด -->
     <div v-if="previewImages.length > 0" class="preview-container">
       <div class="preview-area">
         <div v-for="(image, index) in previewImages" :key="index" class="preview-items">
@@ -209,6 +228,7 @@ const toggleDropdown = () => {
     </div>
   </div>
 
+  <!-- แสดงภาพที่ประมวลผลอยู่ -->
   <div v-if="isLoading">
     <div id="show-picture-card">
       <div class="flex justify-between">
@@ -225,7 +245,7 @@ const toggleDropdown = () => {
           >
             <IconView />
           </button>
-          <button @click="downloadAllImages" disabled><IconShare /></button>
+          <button @click="downloadAllImages" disabled><IconDownload /></button>
         </div>
       </div>
       <div class="show-predicted flex justify-around">
@@ -233,6 +253,8 @@ const toggleDropdown = () => {
       </div>
     </div>
   </div>
+
+  <!-- แสดงภาพที่ประมวลผลเสร็จแล้ว -->
   <div v-else>
     <div id="show-picture-card" v-if="processedImageUrls.length > 0">
       <div class="flex justify-between">
@@ -249,7 +271,7 @@ const toggleDropdown = () => {
           >
             <IconView />
           </button>
-          <button @click="downloadAllImages"><IconShare /></button>
+          <button @click="downloadAllImages"><IconDownload /></button>
         </div>
       </div>
       <div class="show-predicted flex justify-around">
