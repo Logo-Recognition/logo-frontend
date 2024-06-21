@@ -102,7 +102,7 @@ const downloadAllImages = async () => {
         <button @click="downloadAllImages"><IconShare /></button>
       </div>
     </div>
-    <div class="show-predicted flex justify-between items-center p-4 h-72">
+    <div class="show-predicted flex justify-between items-center p-4 h-80">
       <button @click="showPreviousImage"><IconArrowL/></button>
       <LoadingIndicator v-if="isLoading"/>
       <OcrItem v-else :image-src="processed_data[currentImageIndex]['image_url']" :text="processed_data[currentImageIndex]['text']"></OcrItem>
@@ -133,5 +133,23 @@ const downloadAllImages = async () => {
   padding-inline: 32px;
   padding-block: 24px;
   border-radius: 16px
+}
+
+.preview-area {
+  display: inline-flex; /* Use flexbox layout */
+  gap: 10px; /* Add spacing between items */
+}
+
+.preview-items {
+  flex: 0 0 auto; /* Prevent items from shrinking */
+}
+
+.preview-img {
+  border-radius: 10px;
+  width: 150px;
+  height: 100px;
+  object-fit: fill;
+  cursor: pointer;
+  margin-top: 5px;
 }
 </style>
