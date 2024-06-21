@@ -666,7 +666,7 @@ onMounted(() => {
         >
           <div class="image-grid">
             <div
-              v-for="image in unannotatedImages"
+              v-for="image in annotatedImages"
               :key="image.id"
               class="image-item"
               @click="loadImageToCanvas(image.src, image.name, image.labels)"
