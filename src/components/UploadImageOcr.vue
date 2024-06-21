@@ -7,7 +7,7 @@ import axios from 'axios'
 const previewImages = ref([])
 const fileInputRef = ref(null)
 const active = ref(false)
-const emit = defineEmits(['send-data'])
+const emit = defineEmits(['send-data','loading'])
 const uploadMessage = ref('')
 const isLoading = ref(false)
 const selectedFile = ref()
@@ -59,8 +59,7 @@ const uploadImage = async () => {
   selectedFile.value.forEach((file) => {
     formData.append('images', file)
   })
-  isLoading.value = true
-
+  emit('loading',true)
   try {
     const response = await axios.post('http://192.168.2.44:5000/api/ocr', formData, {
       headers: {
@@ -69,12 +68,14 @@ const uploadImage = async () => {
     })
     uploadMessage.value = 'Images uploaded successfully!'
     console.log('Server response:', response)
+    emit('loading',false)
     emit('send-data',response.data)
     onUploadedSuccess()
   } catch (error) {
     uploadMessage.value = 'Error uploading images.'
     console.error('Error uploading images:', error)
     onUploadedFail()
+    emit('loading',false)
   } finally {
     isLoading.value = false
     selectedFile.value = []
@@ -145,9 +146,10 @@ const uploadImage = async () => {
 .modal-content-ocr {
   height: auto;
   border-radius: 16px;
-  background-color: #fefefe;
-  margin-inline: 32px;
+  background-color: #FEFEFE;
   margin-block: 24px;
+  padding-inline: 32px;
+  padding-block: 24px;
 }
 
 .browse-button {
