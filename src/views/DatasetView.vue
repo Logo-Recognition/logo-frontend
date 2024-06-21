@@ -8,6 +8,7 @@ import Slider from '@vueform/slider';
 import Toggle from '@vueform/toggle';
 import { useParametersStore } from '@/stores/Augment.js'
 import { toast } from 'vue3-toastify';
+import streamSaver from 'streamsaver';
 
 const augmentParameterStore = useParametersStore()
 const range = ref([augmentParameterStore.trainTestSplitParam.trainSize, augmentParameterStore.trainTestSplitParam.trainSize+augmentParameterStore.trainTestSplitParam.validSize]);
@@ -54,61 +55,93 @@ const onDrag = (value) => {
     updateTestSize(train_test_value.value[2])
 };
 
+const isDownloading = ref(false);
+
 const onDownload = async () => {
+  if (augmentParameterStore.trainTestSplitParam.trainSize == 0) {
+    toast.error("Train set size cannot be zero.")
+    return
+  }
+  isDownloading.value = true;
+  
   try {
-    if(augmentParameterStore.trainTestSplitParam.trainSize == 0){
-      toast.error("Train set size cannot be zero.")
-      return
-    }
-    const  requestBody = JSON.stringify({ augmentation_param : augmentParameterStore.isAugment? {
-          rotate : augmentParameterStore.augmentationParam.rotate,
-          flip_horizontal : augmentParameterStore.augmentationParam.flip_horizontal,
-          flip_verical: augmentParameterStore.augmentationParam.flip_verical,
-          gaussian_noise: augmentParameterStore.augmentationParam.gaussian_noise == 0 ? 0 : augmentParameterStore.augmentationParam.gaussian_noise/100,
-          pepper_noise: augmentParameterStore.augmentationParam.pepper_noise == 0 ? 0 : augmentParameterStore.augmentationParam.pepper_noise/100,
-          scaling: augmentParameterStore.augmentationParam.scaling,
-          brightness: augmentParameterStore.augmentationParam.brightness,
-          saturation: augmentParameterStore.augmentationParam.saturation,
-          contrast: augmentParameterStore.augmentationParam.contrast,
-        } : {
-          rotate: 0,
-          flip_horizontal: false,
-          flip_verical: false,
-          gaussian_noise: 0,
-          pepper_noise: 0,
-          scaling: 1,
-          brightness: 1,
-          saturation: 1,
-          contrast: 1,
-        },
-        train_test_split_param : {
-          train_size: augmentParameterStore.trainTestSplitParam.trainSize / 100,
-          test_size:  augmentParameterStore.trainTestSplitParam.testSize / 100,
-          valid_size:  augmentParameterStore.trainTestSplitParam.validSize / 100,
-        }
-      })
-    console.log(augmentParameterStore.trainTestSplitParam.validSize)
-    const request = new Request(`${API_URL}/api/dataset/download`, {
+    const requestBody = JSON.stringify({
+      augmentation_param: augmentParameterStore.isAugment ? {
+        rotate: augmentParameterStore.augmentationParam.rotate,
+        flip_horizontal: augmentParameterStore.augmentationParam.flip_horizontal,
+        flip_verical: augmentParameterStore.augmentationParam.flip_verical,
+        gaussian_noise: augmentParameterStore.augmentationParam.gaussian_noise/100,
+        pepper_noise: augmentParameterStore.augmentationParam.pepper_noise/100, 
+        scaling: augmentParameterStore.augmentationParam.scaling,
+        brightness: augmentParameterStore.augmentationParam.brightness,
+        saturation: augmentParameterStore.augmentationParam.saturation,
+        contrast: augmentParameterStore.augmentationParam.contrast,
+      } : {
+        rotate: 0,
+        flip_horizontal: false,
+        flip_verical: false,
+        gaussian_noise: 0,
+        pepper_noise: 0,
+        scaling: 1,
+        brightness: 1,
+        saturation: 1,
+        contrast: 1,
+      },
+      train_test_split_param: {
+        train_size: augmentParameterStore.trainTestSplitParam.trainSize / 100,
+        test_size: augmentParameterStore.trainTestSplitParam.testSize / 100,
+        valid_size: augmentParameterStore.trainTestSplitParam.validSize / 100,
+      }
+    })
+
+    const response = await fetch(`${API_URL}/api/dataset/download`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: requestBody,
+      
     });
     console.log(requestBody)
-    const response = await fetch(request);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const contentDisposition = response.headers.get('Content-Disposition');
+    const filenameMatch = contentDisposition && contentDisposition.match(/filename="?(.+)"?\s*$/i);
+    const filename = filenameMatch ? filenameMatch[1] : 'dataset.zip';
 
-    const blob = await response.blob();
-    const zipFilename = 'dataset.zip'; 
-    const url = window.URL.createObjectURL(new Blob([blob]));
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', zipFilename);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    // Create a ReadableStream from the response body
+    const reader = response.body.getReader();
+    const stream = new ReadableStream({
+      start(controller) {
+        return pump();
+        function pump() {
+          return reader.read().then(({ done, value }) => {
+            if (done) {
+              controller.close();
+              return;
+            }
+            controller.enqueue(value);
+            return pump();
+          });
+        }
+      }
+    });
+
+    // Create a download link and trigger the download
+    const downloadStream = () => {
+      const fileStream = streamSaver.createWriteStream(filename);
+      stream.pipeTo(fileStream);
+    };
+
+    downloadStream();
+
+    toast.success("Dataset downloaded successfully!");
   } catch (err) {
     console.error('Error downloading ZIP file:', err);
+    toast.error("Failed to download the dataset. Please try again.");
+  } finally {
+    isDownloading.value = false;
   }
 }
 
