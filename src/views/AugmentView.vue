@@ -20,12 +20,6 @@ const updateRotate = (type, value) => {
 const pathImage = 'http://192.168.2.44:5000/api/annotated-images'
 const images = ref([])
 
-// for (const path in imageModules) {
-//   imageModules[path]().then((mod) => {
-//     images.value.push(mod.default)
-//   })
-// }
-
 const fetchClasses = async () => {
   try {
     const response = await fetch(pathImage)
@@ -116,7 +110,7 @@ const handleData = (data) => {
 const handleImageClick = (src) => {
   selectedImageSrc.value = src
   originalImage.value = new Image()
-  originalImage.value.crossOrigin = 'Anonymous' 
+  originalImage.value.crossOrigin = 'Anonymous'
   originalImage.value.src = src
   originalImage.value.onload = () => {
     isImage.value = true
@@ -379,9 +373,7 @@ const Apply = () => {
       if (selectedNoiseTypeAp.value == 'pepper') {
         //'pepper' or 'chromatic'
         updateRotate('pepper_noise', selectedNoiseLevel.value)
-        // updateRotate('pepper_noise', 0)
       } else {
-        // updateRotate('gaussian_noise', 0)
         updateRotate('gaussian_noise', selectedNoiseLevel.value)
       }
 
@@ -423,8 +415,8 @@ const Apply = () => {
   }
 }
 
-function handleClose({title, type}) {
-   console.log(`Close event received with title: ${title} and type: ${type}`);
+function handleClose({ title, type }) {
+  console.log(`Close event received with title: ${title} and type: ${type}`)
   switch (title) {
     case 'Rotate':
       updateRotate('rotate', 0)
@@ -440,7 +432,7 @@ function handleClose({title, type}) {
 
       break
     case 'Noise':
-      if (type === "pepper") {
+      if (type === 'pepper') {
         updateRotate('pepper_noise', 0)
       } else {
         updateRotate('gaussian_noise', 0)
@@ -448,8 +440,6 @@ function handleClose({title, type}) {
       selectedNoiseLevelAp.value = 0
       selectedNoiseTypeAp.value = 'pepper'
       showCollapseBoxNoise.value = false
-      // updateRotate('gaussian_noise', 0)
-      // updateRotate('pepper_noise', 0)
       console.log('Noise closed')
       break
     case 'Scailing':
@@ -683,7 +673,6 @@ onMounted(() => {
 <style scoped>
 #main {
   width: 100%;
- 
 
   padding: 10px;
 }
@@ -697,7 +686,7 @@ onMounted(() => {
   display: flex;
   flex-wrap: wrap;
   margin-left: 30px;
-  
+
   flex-wrap: nowrap;
   overflow-x: auto;
 }
