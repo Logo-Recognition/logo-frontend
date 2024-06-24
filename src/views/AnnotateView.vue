@@ -7,6 +7,7 @@ import IconCursorPointer from '@/components/icons/IconCursorPointer.vue'
 import IconBoundingBox from '@/components/icons/IconBoundingBox.vue'
 import IconTxtFile from '@/components/icons/IconTxtFile.vue'
 import IconBin from '@/components/icons/IconBin.vue'
+import IconEdit from '@/components/icons/IconEdit.vue'
 import BoxNameModal from '@/components/LabelModal.vue'
 import { API_URL } from '@/config.js'
 import axios from 'axios'
@@ -324,6 +325,10 @@ const handleModalSubmit = (name) => {
       selectedClasses.value.push(name)
     }
 
+    if (!submittedBoxes.value.includes(currentBox)) {
+      submittedBoxes.value.push(currentBox)
+    }
+
     submittedBoxes.value.push(currentBox)
     console.log('submittedBoxes:', submittedBoxes.value)
   }
@@ -347,6 +352,11 @@ const showCoordinates = (event) => {
 const isDefaultClassInvalid = computed(() => {
   return useDefaultClass.value && (!defaultClass.value || defaultClass.value.trim() === '')
 })
+
+const editLabel = (obj) => {
+  currentBox = obj
+  showModal.value = true
+}
 
 const deleteLabel = (obj) => {
   if (obj) {
@@ -567,6 +577,7 @@ onMounted(() => {
           <div v-for="obj in visibleObjects" :key="obj.id" class="label-item">
             <span>{{ obj.name }}</span>
             <div class="label-actions">
+              <button class="delete-button" @click="editLabel(obj)"><IconEdit /></button>
               <button class="delete-button" @click="deleteLabel(obj)"><IconBin /></button>
             </div>
           </div>
@@ -830,14 +841,6 @@ input[type='checkbox']:hover {
 .label-actions {
   display: flex;
   gap: 8px;
-}
-
-.edit-button {
-  padding: 4px 8px;
-  border-radius: 4px;
-  cursor: pointer;
-  background-color: #f0f0f0;
-  color: #333;
 }
 
 .submit-button {
