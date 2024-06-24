@@ -1,7 +1,7 @@
 <script setup>
 import OcrItem from '@/components/OcrItem.vue';
 import UploadImageOcr from '@/components/UploadImageOcr.vue'
-import IconShare from '@/components/icons/IconShare.vue'
+import IconDownload from '@/components/icons/IconDownload.vue'
 import IconView from '@/components/icons/IconView.vue'
 import LoadingIndicator from '@/components/LoadingIndicator.vue';
 import IconArrowL from '@/components/icons/IconArrowL.vue'
@@ -99,7 +99,7 @@ const downloadAllImages = async () => {
       <p v-if="!isLoading">{{ currentImageIndex + 1 }} / {{ processed_data.length }}</p>
       <div class="navigation-buttons flex items-center">
         <button @click="toggleShowAllImage"><IconView /></button>
-        <button @click="downloadAllImages"><IconShare /></button>
+        <button @click="downloadAllImages"><IconDownload /></button>
       </div>
     </div>
     <div class="show-predicted flex justify-between items-center p-4 h-80">
