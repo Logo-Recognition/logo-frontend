@@ -9,6 +9,7 @@ import IconArrowL from '@/components/icons/IconArrowL.vue'
 import IconArrowR from '@/components/icons/IconArrowR.vue'
 import LoadingIndicator from '@/components/LoadingIndicator.vue'
 import JSZip from 'jszip'
+import { API_URL } from '@/config.js'
 
 // รับ prop จากพาเรนต์คอมโพเนนต์
 const props = defineProps({
@@ -93,7 +94,7 @@ const uploadImage = async () => {
   isLoading.value = true
 
   try {
-    const response = await axios.post('http://192.168.2.44:5000/api/model/run-realtime', formData, {
+    const response = await axios.post(`${API_URL}/api/model/run-realtime`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }

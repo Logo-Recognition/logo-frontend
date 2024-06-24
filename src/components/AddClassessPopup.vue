@@ -1,8 +1,9 @@
 <script setup>
 import IconClose from './icons/IconClose.vue'
 import { defineProps, ref } from 'vue'
+import { API_URL } from '@/config.js'
 
-const pathPublic = 'http://192.168.2.44:5000/api/class'
+const pathPublic = `${API_URL}/api/class`
 const props = defineProps({
   fetchClasses: Function,
   togglePopup: Function
