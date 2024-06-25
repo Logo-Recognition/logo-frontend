@@ -18,7 +18,6 @@ const search = ref('')
 const selectedClass = ref(props.lastUsedClass)
 const emit = defineEmits(['close', 'submit', 'classSelected'])
 
-
 const fetchClassList = async () => {
   try {
     const response = await axios.get(`${API_URL}/api/class`)
@@ -29,6 +28,7 @@ const fetchClassList = async () => {
   }
 }
 
+// assigned selected class value to pass by
 const selectClass = (className) => {
   selectedClass.value = className
   emit('classSelected', className)
@@ -36,6 +36,7 @@ const selectClass = (className) => {
   console.log('Selected Class:', selectedClass.value)
 }
 
+// emit submit when pressed on save button
 const handleSubmit = () => {
   if (selectedClass.value) {
     toast.success('Class added successfully!', {
@@ -47,15 +48,16 @@ const handleSubmit = () => {
     toast.warning('Please select a class first', {
       autoClose: 3000
     })
-    console.log('Please select a class first.')
   }
 }
 
+// emit close when pressed on cancel button or background area
 const cancelBoxDrawing = () => {
   selectedClass.value = ''
   emit('close')
 }
 
+// when using search, the relate content will store in filteredClassList
 const filterClasses = () => {
   if (search.value) {
     filteredClassList.value = classList.value.filter((classItem) =>
