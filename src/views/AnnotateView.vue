@@ -187,23 +187,6 @@ const toTextFile = async () => {
   URL.revokeObjectURL(blobURL)
 }
 
-const visibleObjects = computed(() => {
-  const allObjects = [...canvas.getObjects(), ...submittedBoxes.value]
-  const seenObjects = new Set()
-  const filteredObjects = allObjects.filter((obj) => {
-    if (!obj.imageName) return false
-    const key = `${obj.x1}-${obj.y1}-${obj.x2}-${obj.y2}-${obj.imageName}`
-    if (seenObjects.has(key)) {
-      return false
-    }
-    seenObjects.add(key)
-    return true
-  })
-  console.log('allObjects', seenObjects, 'filteredObjects', filteredObjects)
-
-  return filteredObjects
-})
-
 const onMouseDown = (event) => {
   if (!isImageSelected.value) {
     toast.warning('Please Select the Image', {
@@ -341,6 +324,24 @@ const showCoordinates = (event) => {
 
 const isDefaultClassInvalid = computed(() => {
   return useDefaultClass.value && (!defaultClass.value || defaultClass.value.trim() === '')
+})
+
+const visibleObjects = computed(() => {
+  const allObjects = [...canvas.getObjects(), ...submittedBoxes.value]
+  const filteredObjects = allObjects.filter(
+    (obj, index, self) =>
+      self.findIndex(
+        (o) =>
+          o &&
+          o.type === 'rect' &&
+          o.x1 === obj.x1 &&
+          o.y1 === obj.y1 &&
+          o.x2 === obj.x2 &&
+          o.y2 === obj.y2 &&
+          o.imageName === selectedImage.value.name
+      ) === index
+  )
+  return filteredObjects
 })
 
 const editLabel = (obj) => {
