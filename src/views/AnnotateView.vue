@@ -189,30 +189,20 @@ const toTextFile = async () => {
 
 const visibleObjects = computed(() => {
   const allObjects = [...canvas.getObjects(), ...submittedBoxes.value]
-  const filteredObjects = allObjects.filter(
-    (obj, index, self) =>
-      !isProxy(obj) &&
-      self.findIndex(
-        (o) =>
-          o &&
-          o.type === 'rect' &&
-          o.x1 === obj.x1 &&
-          o.y1 === obj.y1 &&
-          o.x2 === obj.x2 &&
-          o.y2 === obj.y2 &&
-          o.imageName === selectedImage.value.name
-      ) === index
-  )
+  const seenObjects = new Set()
+  const filteredObjects = allObjects.filter((obj) => {
+    if (!obj.imageName) return false
+    const key = `${obj.x1}-${obj.y1}-${obj.x2}-${obj.y2}-${obj.imageName}`
+    if (seenObjects.has(key)) {
+      return false
+    }
+    seenObjects.add(key)
+    return true
+  })
+  console.log('allObjects', seenObjects, 'filteredObjects', filteredObjects)
+
   return filteredObjects
 })
-
-function isProxy(obj) {
-  return isObject(obj) && isObject(obj.__v_isProxy)
-}
-
-function isObject(val) {
-  return val !== null && typeof val === 'object'
-}
 
 const onMouseDown = (event) => {
   if (!isImageSelected.value) {
@@ -359,10 +349,17 @@ const editLabel = (obj) => {
 }
 
 const deleteLabel = (obj) => {
-  if (obj) {
-    canvas.remove(obj)
-    submittedBoxes.value = submittedBoxes.value.filter((box) => box !== obj)
-  }
+  canvas.remove(obj)
+  submittedBoxes.value = submittedBoxes.value.filter((box) => {
+    return !(
+      box.x1 === obj.x1 &&
+      box.y1 === obj.y1 &&
+      box.x2 === obj.x2 &&
+      box.y2 === obj.y2 &&
+      box.imageName === obj.imageName
+    )
+  })
+  submittedBoxes.value = [...submittedBoxes.value]
 }
 
 const saveAnnotations = async () => {
@@ -504,6 +501,7 @@ onMounted(() => {
   canvas.on('mouse:move', showCoordinates)
 
   fetchImages('Unannotated')
+  fetchImages('Annotated')
 })
 </script>
 
@@ -577,8 +575,8 @@ onMounted(() => {
           <div v-for="obj in visibleObjects" :key="obj.id" class="label-item">
             <span>{{ obj.name }}</span>
             <div class="label-actions">
-              <button class="delete-button" @click="editLabel(obj)"><IconEdit /></button>
-              <button class="delete-button" @click="deleteLabel(obj)"><IconBin /></button>
+              <button @click="editLabel(obj)"><IconEdit /></button>
+              <button @click="deleteLabel(obj)"><IconBin /></button>
             </div>
           </div>
         </div>
