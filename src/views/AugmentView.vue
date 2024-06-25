@@ -669,8 +669,6 @@ onMounted(() => {
       </div>
     </div>
   </div>
-  {{ selectedFlip }}
-  {{ selectedFlipAp }}
 </template>
 <style src="@vueform/slider/themes/default.css"></style>
 <style scoped>
