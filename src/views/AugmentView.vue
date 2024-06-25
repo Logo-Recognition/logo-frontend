@@ -6,6 +6,7 @@ import NoiseSelectBar from '@/components/NoiseSelectBar.vue'
 import { ref, watch, computed, onMounted } from 'vue'
 import Slider from '@vueform/slider'
 import { useParametersStore } from '@/stores/Augment.js'
+import { API_URL } from '@/config.js'
 
 const store = useParametersStore()
 
@@ -17,7 +18,7 @@ const updateRotate = (type, value) => {
   store.updateAugmentationParam(type, value)
 }
 
-const pathImage = 'http://192.168.2.44:5000/api/annotated-images'
+const pathImage = `${API_URL}/api/annotated-images`
 const images = ref([])
 
 const fetchClasses = async () => {

@@ -2,6 +2,7 @@
 import Popup from '@/components/AddClassessPopup.vue'
 import IconPlus from '@/components/icons/IconPlus.vue'
 import IconBin from '@/components/icons/IconBin.vue'
+import { API_URL } from '@/config.js'
 
 import { ref, onMounted } from 'vue'
 const classes = ref([])
@@ -9,8 +10,7 @@ const input_content = ref('')
 const popupTriggers = ref({
   buttonTrigger: false
 })
-const pathPublic = 'http://192.168.2.44:5000/api/class'
-// const pathPublic = "http://127.0.0.1:5000/api/class"
+const pathPublic = `${API_URL}/api/class`
 
 const isLoading = ref(true)
 const error = ref(null)
