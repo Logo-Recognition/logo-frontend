@@ -10,12 +10,14 @@ import IconSaturation from '@/components/icons/IconSaturation.vue'
 import IconContrast from '@/components/icons/IconContrast.vue'
 import IconClose from './icons/IconClose.vue'
 
+// Define props received from parent component
 const props = defineProps({
   title: String,
   type: String,
   value: [String, Number]
 })
 
+// Computed property to dynamically select the icon component based on the title prop
 const iconComponent = computed(() => {
   switch (props.title) {
     case 'Rotate':
@@ -37,10 +39,11 @@ const iconComponent = computed(() => {
   }
 })
 
+// Computed property to format the displayed value based on the title prop
 const formattedValue = computed(() => {
   switch (props.title) {
     case 'Rotate':
-      return `+${props.value}°/-${props.value}°`
+      return `+${props.value}° / -${props.value}°`
     case 'Noise':
       return `${props.value}%`
     case 'Brightness':
@@ -56,6 +59,7 @@ const formattedValue = computed(() => {
   }
 })
 
+// Computed property to format the title displayed in the component
 const formattedTitle = computed(() => {
   switch (props.title) {
     case 'Noise':
@@ -65,25 +69,35 @@ const formattedTitle = computed(() => {
   }
 })
 
+// Define emitted event for parent component communication
 const emit = defineEmits(['close'])
 
+// Function to emit 'close' event to parent component
 function closePopup() {
   emit('close', { title: props.title, type: props.type })
 }
 </script>
 
+
 <template>
   <div id="Box" class="flex relative">
+    <!-- Display the icon component dynamically based on iconComponent computed property -->
     <div class="w-1/5">
       <component :is="iconComponent" />
     </div>
+    <!-- Display formatted title and value -->
     <div class="flex flex-col w-2/5 ml-5">
       <div id="text-title">{{ formattedTitle }}</div>
       <div id="text">{{ formattedValue }}</div>
     </div>
-    <button class="popup-close" @click="closePopup"><IconClose class="icon-size" /></button>
+    <!-- Close button -->
+    <button class="popup-close" @click="closePopup">
+      <!-- Use IconClose component with specific class -->
+      <IconClose class="icon-size" />
+    </button>
   </div>
 </template>
+
 
 <style scoped>
 #Box {

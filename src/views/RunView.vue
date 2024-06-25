@@ -3,9 +3,11 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import IconDropdown from '@/components/icons/IconDropdown.vue'
 import IconSearch from '@/components/icons/IconSearch.vue'
 import UploadImageRun from '@/components/UploadImageRun.vue'
+
 // Initialize the selected model with a default value
 const model = ref('RT-DETR')
 const modellist = ref(['RT-DETR', 'YOLOV8'])
+
 // Initialize a reactive state for the dropdown visibility
 const isDropdownOpen = ref(false)
 const searchQuery = ref('')
@@ -33,6 +35,7 @@ onMounted(() => {
   window.addEventListener('click', closeDropdown)
 })
 
+// Clean up event listener on component unmount
 onBeforeUnmount(() => {
   window.removeEventListener('click', closeDropdown)
 })
@@ -48,48 +51,48 @@ const filteredModels = computed(() => {
 <template>
   <main class="flex-col">
     <div id="title">
+      <!-- Dropdown component -->
       <div class="dropdown">
+        <!-- Dropdown toggle button -->
         <button class="dropbtn flex items-center justify-around" @click="toggleDropdown">
           {{ model }}
           <div class="w-1"></div>
-          <IconDropdown />
+          <IconDropdown /> <!-- Icon for dropdown -->
         </button>
+
+        <!-- Dropdown content -->
         <div class="dropdown-content" :class="{ show: isDropdownOpen }">
+          <!-- Search input -->
           <div class="serch-wrapper p-2">
-            <IconSearch id="icon-serch" />
+            <IconSearch id="icon-serch" /> <!-- Search icon -->
             <input type="text" v-model="searchQuery" placeholder="Search" class="dropdown-search" />
           </div>
-          <a
-            id=""
-            v-for="modelItem in filteredModels"
-            :key="modelItem"
-            href="#"
-            @click.prevent="selectModel(modelItem)"
-          >
+
+          <!-- List of model options -->
+          <a v-for="modelItem in filteredModels" :key="modelItem" href="#" @click.prevent="selectModel(modelItem)">
             {{ modelItem }}
           </a>
         </div>
       </div>
     </div>
+
+    <!-- Child component that depends on selected model -->
     <UploadImageRun :Model="model" />
   </main>
 </template>
 
 <style scoped>
-#class-box {
-  width: 95%; /* Adjust the width percentage as needed */
-  height: auto;
-  border-radius: 16px;
-  background-color: #fefefe;
-  padding: 20px;
-  margin: 30px;
-}
+/* Scoped styles for the component */
+
+/* Styling for the title section */
 #title {
   font-size: 18px;
   font-weight: 500;
   gap: 0px;
   margin: 30px;
 }
+
+/* Styling for the dropdown button */
 .dropbtn {
   width: fit-content;
   height: 50px;
@@ -101,7 +104,8 @@ const filteredModels = computed(() => {
   background-color: #eff1ff;
   margin-bottom: 8px;
 }
-/* Dropdown Content (Hidden by Default) */
+
+/* Dropdown content (hidden by default) */
 .dropdown-content {
   display: none;
   position: absolute;
@@ -111,28 +115,33 @@ const filteredModels = computed(() => {
   z-index: 1;
   top: 100%; /* Position the dropdown below the button */
   border-radius: 10px;
-  border: 1px solid #7585ff;
+  border: 1px solid #7585ff; /* Border style */
 }
+
+/* Search input styles */
 .dropdown-search {
   width: 100%;
   height: 38px;
   padding: 8px 8px 8px 22px;
-  
   border-radius: 8px;
   background-color: #eff1ff;
   box-sizing: border-box;
   border: 1px solid #ddd;
 }
+
+/* Focus styles for search input */
 .dropdown-search:focus {
   border: 1px solid #7585ff;
   outline: none; /* Remove default outline */
   background-color: #eff1ff;
 }
-/* Show the dropdown menu when isDropdownOpen is true */
+
+/* Show dropdown content when isDropdownOpen is true */
 .dropdown-content.show {
   display: block;
 }
-/* Links inside the dropdown */
+
+/* Styles for links inside the dropdown */
 .dropdown-content a {
   color: black;
   padding: 12px 16px;
@@ -140,25 +149,30 @@ const filteredModels = computed(() => {
   display: block;
   border-bottom: 1px solid #ddd; /* Add this line to set a bottom border */
 }
+
+/* Remove border from the last link element */
 .dropdown-content a:last-child {
-  border-bottom: none; /* Remove border from the last <a> element */
+  border-bottom: none;
 }
-.dropdown-content a:last-child:hover {
-  border-bottom: none; /* Remove border from the last <a> element */
-  border-radius: 0px 0px 10px 10px;
-}
-/* Change color of dropdown links on hover */
+
+/* Hover styles for links inside the dropdown */
 .dropdown-content a:hover {
   background-color: #eff1ff;
 }
+
+/* Dropdown container styling */
 .dropdown {
   position: relative;
   display: flex;
   flex-direction: column;
 }
+
+/* Styles for search wrapper */
 .serch-wrapper {
   position: relative;
 }
+
+/* Search icon positioning */
 #icon-serch {
   position: absolute;
   top: 50%;

@@ -5,36 +5,41 @@ import IconBin from '@/components/icons/IconBin.vue'
 import { API_URL } from '@/config.js'
 
 import { ref, onMounted } from 'vue'
-const classes = ref([])
-const input_content = ref('')
+
+// Defining reactive variables
+const classes = ref([]) // the list of classes
+// const input_content = ref('')
 const popupTriggers = ref({
-  buttonTrigger: false
+  buttonTrigger: false // Determines if the popup should be displayed
 })
-const pathPublic = `${API_URL}/api/class`
+const pathPublic = `${API_URL}/api/class` // API endpoint for classes
 
-const isLoading = ref(true)
-const error = ref(null)
+const isLoading = ref(true) // Indicates if the data is being loaded
+const error = ref(null) // Holds any error messages
 
+// Function to fetch the list of classes from the API
 const fetchClasses = async () => {
   try {
     const response = await fetch(pathPublic)
     const data = await response.json()
 
     if (response.ok) {
-      classes.value = data.classes
+      classes.value = data.classes // Updating the classes list with data from the API
     } else {
-      error.value = 'An error occurred while fetching class data.'
+      error.value = 'An error occurred while fetching class data.' // Setting error message
     }
   } catch (err) {
-    error.value = 'An error occurred while fetching class data.'
+    error.value = 'An error occurred while fetching class data.' // Setting error message
     console.error(err)
   } finally {
-    isLoading.value = false
+    isLoading.value = false // Setting isLoading to false after the fetch operation
   }
 }
 
+// Fetching classes when the component is mounted
 onMounted(fetchClasses)
 
+// Function to remove a class
 const removeClass = async (className) => {
   try {
     const response = await fetch(pathPublic, {
@@ -42,23 +47,22 @@ const removeClass = async (className) => {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ bucket_name: className })
+      body: JSON.stringify({ bucket_name: className }) // Sending the class name to be deleted
     })
     const data = await response.json()
 
     if (response.ok) {
-      // Fetch updated class list after successful addition
-      console.log('sdsdsd')
-      await fetchClasses()
+      await fetchClasses() // Fetching the updated class list after successful deletion
     } else {
-      error.value = data.error
+      error.value = data.error // Setting error message
     }
   } catch (err) {
-    error.value = 'An error occurred while adding the new class.'
+    error.value = 'An error occurred while adding the new class.' // Setting error message
     console.error(err)
   }
 }
 
+// Function to toggle the popup display
 const togglePopup = () => {
   popupTriggers.value.buttonTrigger = !popupTriggers.value.buttonTrigger
 }
@@ -76,7 +80,9 @@ const togglePopup = () => {
           v-model="input_content"
           disabled
         />
-        <button type="submit" id="AddClass-button" class="flex"><IconPlus /> &nbsp; Add Classes</button>
+        <button type="submit" id="AddClass-button" class="flex">
+          <IconPlus /> &nbsp; Add Classes
+        </button>
       </form>
       <hr />
       <div v-for="(item, index) in classes" :key="index">
@@ -141,7 +147,6 @@ const togglePopup = () => {
   align-items: center; /* Vertically center the content */
 }
 #input-box {
-  background-color: #FEFEFE;
+  background-color: #fefefe;
 }
-
 </style>

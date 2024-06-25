@@ -21,6 +21,7 @@ const updateRotate = (type, value) => {
 const pathImage = `${API_URL}/api/annotated-images`
 const images = ref([])
 
+//fetch api to get all image in dataset
 const fetchClasses = async () => {
   try {
     const response = await fetch(pathImage)
@@ -39,28 +40,30 @@ const fetchClasses = async () => {
     console.log('error to get')
   }
 }
-
-const statusnow = ref('Rotate') // current action ('Rotate', 'Flip', 'Noise')
+// Defining reactive variables
+const statusnow = ref('Rotate') // (Rotate,Flip,Noise,Scailing,,Brightness,Saturation,Contrast)
 const selectedImageSrc = ref(null)
 const imageWidth = ref(900)
 const imageHeight = ref(300)
 const originalImage = ref(null)
 const isImage = ref(false)
 
+//variables to store present vulue
 const selectedRotation = ref(0)
 const selectedFlip = ref('none')
 const selectedNoiseLevel = ref(0)
-const selectedNoiseType = ref('pepper') // 'pepper' or 'chromatic'
-const selectedScale = ref(1) // default scale is 1 (no scaling)
-const selectedBrightness = ref(1) // default brightness is 1 (no change)
-const selectedSaturation = ref(1) // default saturation is 1 (no change)
-const selectedContrast = ref(1) // default contrast is 1 (no change)
+const selectedNoiseType = ref('pepper') 
+const selectedScale = ref(1)
+const selectedBrightness = ref(1)
+const selectedSaturation = ref(1)
+const selectedContrast = ref(1)
 
-// const selectedRotationAp = ref(0)
+//variable to store type of flip and Noise that was apply to set in pinia
 const selectedFlipAp = ref('none')
 const selectedNoiseLevelAp = ref(0)
 const selectedNoiseTypeAp = ref('pepper') // 'pepper' or 'chromatic'
 
+//status show of each CollapseBox 
 const showCollapseBoxRotation = ref(false)
 const showCollapseBoxFlip = ref(false)
 const showCollapseBoxNoise = ref(false)
@@ -69,10 +72,13 @@ const showCollapseBoxBrightness = ref(false)
 const showCollapseBoxSaturation = ref(false)
 const showCollapseBoxContrast = ref(false)
 
+//change formet to decimal
 const formatTooltip = (value) => {
   return value.toFixed(1)
 }
 
+
+//handle each value update
 const handleRotationUpdate = (value) => {
   console.log('Rotation value received from child:', value)
   selectedRotation.value = value
@@ -108,10 +114,11 @@ const handleData = (data) => {
   statusnow.value = data
 }
 
+//handle path change to image that was seleted
 const handleImageClick = (src) => {
   selectedImageSrc.value = src
   originalImage.value = new Image()
-  originalImage.value.crossOrigin = 'Anonymous'
+  originalImage.value.crossOrigin = 'Anonymous' // avoid cors error
   originalImage.value.src = src
   originalImage.value.onload = () => {
     isImage.value = true
@@ -119,6 +126,7 @@ const handleImageClick = (src) => {
   }
 }
 
+//apply rotate value to picture and draw in canvas
 const applyRotation = () => {
   const canvas = document.createElement('canvas')
   const ctx = canvas.getContext('2d')
@@ -134,6 +142,7 @@ const applyRotation = () => {
   return canvas.toDataURL('image/jpeg')
 }
 
+//apply flip value to picture and draw in canvas
 const applyFlip = () => {
   const canvas = document.createElement('canvas')
   const ctx = canvas.getContext('2d')
@@ -157,6 +166,7 @@ const applyFlip = () => {
   return canvas.toDataURL('image/jpeg')
 }
 
+//apply pepper noise value to picture and draw in canvas
 const applyPepperNoise = (img, noiseLevel) => {
   const canvas = document.createElement('canvas')
   const ctx = canvas.getContext('2d')
@@ -185,6 +195,7 @@ const applyPepperNoise = (img, noiseLevel) => {
   return canvas.toDataURL('image/jpeg')
 }
 
+//apply Chromatic noise value to picture and draw in canvas
 const applyChromaticNoise = (img, noiseLevel) => {
   const canvas = document.createElement('canvas')
   const ctx = canvas.getContext('2d')
@@ -212,6 +223,7 @@ const applyChromaticNoise = (img, noiseLevel) => {
   return canvas.toDataURL('image/jpeg')
 }
 
+//apply Noise depend on type and use function above
 const applyNoise = () => {
   if (selectedNoiseType.value === 'pepper') {
     return applyPepperNoise(originalImage.value, selectedNoiseLevel.value / 100)
@@ -219,7 +231,7 @@ const applyNoise = () => {
     return applyChromaticNoise(originalImage.value, selectedNoiseLevel.value / 100)
   }
 }
-
+//apply scailing value to picture and draw in canvas
 const applyScaling = () => {
   const canvas = document.createElement('canvas')
   const ctx = canvas.getContext('2d')
@@ -239,7 +251,7 @@ const applyScaling = () => {
 
   return canvas.toDataURL('image/jpeg')
 }
-
+//apply Brightness noise value to picture and draw in canvas
 const applyBrightness = () => {
   const canvas = document.createElement('canvas')
   const ctx = canvas.getContext('2d')
@@ -253,6 +265,7 @@ const applyBrightness = () => {
 
   return canvas.toDataURL('image/jpeg')
 }
+//apply Saturation noise value to picture and draw in canvas
 const applySaturation = () => {
   const canvas = document.createElement('canvas')
   const ctx = canvas.getContext('2d')
@@ -266,7 +279,7 @@ const applySaturation = () => {
 
   return canvas.toDataURL('image/jpeg')
 }
-
+//apply Contrast noise value to picture and draw in canvas
 const applyContrast = () => {
   const canvas = document.createElement('canvas')
   const ctx = canvas.getContext('2d')
@@ -280,7 +293,7 @@ const applyContrast = () => {
 
   return canvas.toDataURL('image/jpeg')
 }
-
+//function to update if augmentvalue was changed
 const updatePreviewImage = () => {
   if (!originalImage.value) return
 
@@ -334,6 +347,7 @@ const getImageName = (path) => {
   return path.split('/').pop()
 }
 
+//add apply augment to image ann update augment parameteri in pinia to pass to backend
 const Apply = () => {
   switch (statusnow.value) {
     case 'Rotate':
@@ -416,6 +430,7 @@ const Apply = () => {
   }
 }
 
+//function to clear augment value that was select in each type
 function handleClose({ title, type }) {
   console.log(`Close event received with title: ${title} and type: ${type}`)
   switch (title) {
@@ -484,6 +499,7 @@ onMounted(() => {
 <template>
   <div id="main" class="flex flex-col">
     <h1 id="title">Augmentation</h1>
+    <!-- List of images -->
     <div id="picture-list" class="flex">
       <div v-for="(image, index) in images" :key="index" class="picture-item">
         <img
@@ -494,21 +510,26 @@ onMounted(() => {
         />
       </div>
     </div>
+
+    <!-- Collapse boxes for different augmentation options -->
     <div id="preview-body" class="flex justify-around">
       <div id="Left-Box">
         <h1 class="mb-5">Collapse</h1>
+        <!-- Rotate -->
         <CollapseBox
           v-if="showCollapseBoxRotation"
           title="Rotate"
           :value="augmentationParam.rotate"
           @close="handleClose"
         />
+        <!-- Flip -->
         <CollapseBox
           v-if="showCollapseBoxFlip"
           title="Flip"
           :value="selectedFlipAp"
           @close="handleClose"
         />
+        <!-- Pepper Noise -->
         <CollapseBox
           v-if="augmentationParam.pepper_noise != 0"
           title="Noise"
@@ -516,6 +537,7 @@ onMounted(() => {
           type="pepper"
           @close="handleClose"
         />
+        <!-- Gaussian Noise -->
         <CollapseBox
           v-if="augmentationParam.gaussian_noise != 0"
           title="Noise"
@@ -523,24 +545,28 @@ onMounted(() => {
           type="chromatic"
           @close="handleClose"
         />
+        <!-- Scaling -->
         <CollapseBox
           v-if="showCollapseBoxScale"
           title="Scailing"
           :value="augmentationParam.scaling"
           @close="handleClose"
         />
+        <!-- Brightness -->
         <CollapseBox
           v-if="showCollapseBoxBrightness"
           title="Brightness"
           :value="augmentationParam.brightness"
           @close="handleClose"
         />
+        <!-- Saturation -->
         <CollapseBox
           v-if="showCollapseBoxSaturation"
           title="Saturation"
           :value="augmentationParam.saturation"
           @close="handleClose"
         />
+        <!-- Contrast -->
         <CollapseBox
           v-if="showCollapseBoxContrast"
           title="Contrast"
@@ -549,8 +575,12 @@ onMounted(() => {
         />
       </div>
 
+      <!-- Right box for sliders and controls based on selected augmentation option -->
       <div id="Right-Box" class="flex flex-col">
+        <!-- Option bar for selecting augmentation type -->
         <AugmentOptionBar @data-emitted="handleData" />
+
+        <!-- Slider for Rotate -->
         <div v-if="statusnow === 'Rotate'" class="mr-10 ml-10">
           <div class="flex w-full justify-between mb-3 mt-3">
             <p class="TextColor">0°</p>
@@ -566,9 +596,13 @@ onMounted(() => {
             @slide="handleRotationUpdate"
           />
         </div>
+
+        <!-- Select bar for Flip -->
         <div v-if="statusnow === 'Flip'" class="mr-10 ml-10">
           <FlipSelectBar @update:checkedName="updateFlipName" :value="selectedFlip" />
         </div>
+
+        <!-- Select bar and slider for Noise -->
         <div v-if="statusnow === 'Noise'" class="mr-10 ml-10">
           <NoiseSelectBar @update:checkedName="updateNoiseName" />
           <div class="flex w-full justify-between mb-3 mt-3">
@@ -586,6 +620,8 @@ onMounted(() => {
             @slide="handleNoiseUpdate"
           />
         </div>
+
+        <!-- Slider for Scaling -->
         <div v-if="statusnow === 'Scailing'" class="mr-10 ml-10">
           <div class="flex w-full justify-between mb-3 mt-3">
             <p class="TextColor">0.1</p>
@@ -603,6 +639,8 @@ onMounted(() => {
             :format="formatTooltip"
           />
         </div>
+
+        <!-- Slider for Brightness -->
         <div v-if="statusnow === 'Brightness'" class="mr-10 ml-10">
           <div class="flex w-full justify-between mb-3 mt-3">
             <p class="TextColor">0.5</p>
@@ -620,6 +658,8 @@ onMounted(() => {
             :format="formatTooltip"
           />
         </div>
+
+        <!-- Slider for Saturation -->
         <div v-if="statusnow === 'Saturation'" class="mr-10 ml-10">
           <div class="flex w-full justify-between mb-3 mt-3">
             <p class="TextColor">0.1</p>
@@ -637,6 +677,8 @@ onMounted(() => {
             :format="formatTooltip"
           />
         </div>
+
+        <!-- Slider for Contrast -->
         <div v-if="statusnow === 'Contrast'" class="mr-10 ml-10">
           <div class="flex w-full justify-between mb-3 mt-3">
             <p class="TextColor">0.1</p>
@@ -654,9 +696,13 @@ onMounted(() => {
             :format="formatTooltip"
           />
         </div>
+
+        <!-- Preview of augmented image -->
         <div v-if="selectedImageSrc" class="flex place-content-center mt-8" id="show-preview-image-section">
           <img :src="selectedImageSrc" alt="Selected Image" id="AugmentedImage" />
         </div>
+
+        <!-- Apply button -->
         <div id="apply-button" class="flex mt-5">
           <div class="w-1/2">
             <p v-if="statusnow === 'Scailing'" class="text-red-700 text-xs">
@@ -670,6 +716,7 @@ onMounted(() => {
     </div>
   </div>
 </template>
+
 <style src="@vueform/slider/themes/default.css"></style>
 <style scoped>
 #main {

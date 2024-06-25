@@ -1,6 +1,7 @@
 <template>
   <div class="grid justify-items-stretch">
     <div class="flex justify-self-center justify-around w-3/4 items-center">
+      <!-- Checkbox for "None" option -->
       <div class="custom-checkbox">
         <input
           type="checkbox"
@@ -12,6 +13,7 @@
         <label for="none">None</label>
       </div>
 
+      <!-- Checkbox for "Vertical" option -->
       <div class="custom-checkbox">
         <input
           type="checkbox"
@@ -23,6 +25,7 @@
         <label for="Vertical">Vertical</label>
       </div>
 
+      <!-- Checkbox for "Horizontal" option -->
       <div class="custom-checkbox">
         <input
           type="checkbox"
@@ -37,25 +40,28 @@
   </div>
 </template>
 
-<script setup>
-import { ref, defineEmits } from 'vue'
 
+<script setup>
+import { ref, defineProps, defineEmits } from 'vue'
+
+// Define props received from parent component
 const props = defineProps({
   value: String
 });
 
-const checkedName = ref('none')
+// Define emitted event for parent component communication
 const emit = defineEmits(['update:checkedName'])
 
+// Reactive reference to store the currently checked checkbox value
+const checkedName = ref(props.value)
+
+// Function to handle checkbox change events
 const onCheckboxChange = (event) => {
-  if (event.target.checked) {
-    checkedName.value = event.target.value
-    emit('update:checkedName', checkedName.value)
-  } else {
-    event.target.checked = true
-  }
+  checkedName.value = event.target.value
+  emit('update:checkedName', checkedName.value)
 }
 </script>
+
 
 <style scoped>
 .flex {

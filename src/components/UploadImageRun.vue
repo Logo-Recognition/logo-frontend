@@ -11,7 +11,7 @@ import LoadingIndicator from '@/components/LoadingIndicator.vue'
 import JSZip from 'jszip'
 import { API_URL } from '@/config.js'
 
-// รับ prop จากพาเรนต์คอมโพเนนต์
+// Props received from parent component
 const props = defineProps({
   Model: {
     type: String,
@@ -19,7 +19,7 @@ const props = defineProps({
   }
 })
 
-// ประกาศตัวแปร reactive ต่างๆ
+// Reactive variables declaration
 const previewImages = ref([])
 const fileInputRef = ref(null)
 const active = ref(false)
@@ -30,26 +30,26 @@ const currentImageIndex = ref(0)
 const showDropdown = ref(false)
 const selectedModel = ref('')
 
-// ฟังก์ชันสำหรับการเปลี่ยนสถานะของ dropzone
+// Function to toggle dropzone state
 const toggleActive = (isActive) => {
   active.value = isActive
 }
 
-// ฟังก์ชันสำหรับแสดง toast เมื่ออัปโหลดสำเร็จ
+// Function to display toast on successful upload
 const onUploadedSuccess = () => {
   toast.success('Images uploaded successfully!', {
     autoClose: 3000
   })
 }
 
-// ฟังก์ชันสำหรับแสดง toast เมื่ออัปโหลดล้มเหลว
+// Function to display toast on upload failure
 const onUploadedFail = () => {
   toast.error('Failed to upload images.', {
     autoClose: 3000
   })
 }
 
-// ฟังก์ชันสำหรับจัดการการเปลี่ยนแปลงของไฟล์อินพุต
+// Function to handle file input changes
 const onFileChange = (event) => {
   const files = event.target.files || event.dataTransfer.files
   for (let index = 0; index < files.length; index++) {
@@ -65,22 +65,22 @@ const onFileChange = (event) => {
   }
 }
 
-// ฟังก์ชันสำหรับลบภาพจากพรีวิว
+// Function to remove an image from preview
 const removeImage = (index) => {
   previewImages.value.splice(index, 1)
 }
 
-// ฟังก์ชันสำหรับล้างภาพพรีวิวทั้งหมด
+// Function to clear all previewed images
 const clearImage = () => {
   previewImages.value = []
 }
 
-// ฟังก์ชันสำหรับเปิดไฟล์อินพุต
+// Function to trigger file input dialog
 const triggerFileInput = () => {
   fileInputRef.value.click()
 }
 
-// ฟังก์ชันสำหรับอัปโหลดภาพไปยังเซิร์ฟเวอร์
+// Function to upload images to the server
 const uploadImage = async () => {
   if (previewImages.value.length === 0) {
     return
@@ -115,7 +115,7 @@ const uploadImage = async () => {
   }
 }
 
-// ฟังก์ชันสำหรับดาวน์โหลดภาพทั้งหมดเป็นไฟล์ ZIP
+// Function to download all processed images as a ZIP file
 const downloadAllImages = async () => {
   if (processedImageUrls.value.length === 0) {
     toast.error('No images to download.', {
@@ -158,33 +158,33 @@ const downloadAllImages = async () => {
   }
 }
 
-// ฟังก์ชันสำหรับแสดงภาพถัดไป
+// Function to show the next processed image
 const showNextImage = () => {
   if (currentImageIndex.value < processedImageUrls.value.length - 1) {
     currentImageIndex.value++
   }
 }
 
-// ฟังก์ชันสำหรับแสดงภาพก่อนหน้า
+// Function to show the previous processed image
 const showPreviousImage = () => {
   if (currentImageIndex.value > 0) {
     currentImageIndex.value--
   }
 }
 
-// ฟังก์ชันสำหรับตั้งค่าดัชนีของภาพปัจจุบัน
+// Function to set the current image index
 const setImageIndex = (index) => {
   currentImageIndex.value = index
 }
 
-// ฟังก์ชันสำหรับสลับการแสดง dropdown
+// Function to toggle dropdown visibility
 const toggleDropdown = () => {
   showDropdown.value = !showDropdown.value
 }
 </script>
 
 <template>
-  <!-- ส่วนที่เป็น modal สำหรับการอัปโหลดภาพ -->
+  <!-- Modal content for uploading images -->
   <div class="modal-content-run">
     <h2 class="font-bold mb-5">Upload Images</h2>
     <div
@@ -215,7 +215,7 @@ const toggleDropdown = () => {
       </div>
     </div>
 
-    <!-- แสดงพรีวิวของภาพที่อัปโหลด -->
+    <!-- Display preview of uploaded images -->
     <div v-if="previewImages.length > 0" class="preview-container">
       <div class="preview-area">
         <div v-for="(image, index) in previewImages" :key="index" class="preview-items">
@@ -229,7 +229,7 @@ const toggleDropdown = () => {
     </div>
   </div>
 
-  <!-- แสดงภาพที่ประมวลผลอยู่ -->
+  <!-- Display while images are being processed -->
   <div v-if="isLoading">
     <div id="show-picture-card">
       <div class="flex justify-between">
@@ -255,7 +255,7 @@ const toggleDropdown = () => {
     </div>
   </div>
 
-  <!-- แสดงภาพที่ประมวลผลเสร็จแล้ว -->
+  <!-- Display after images are processed -->
   <div v-else>
     <div id="show-picture-card" v-if="processedImageUrls.length > 0">
       <div class="flex justify-between">
@@ -476,6 +476,7 @@ const toggleDropdown = () => {
   height: 100%;
   object-fit: cover;
 }
+
 .preview-area {
   display: inline-flex; /* Use flexbox layout */
   gap: 10px; /* Add spacing between items */
@@ -493,9 +494,11 @@ const toggleDropdown = () => {
   cursor: pointer;
   margin-top: 5px;
 }
+
 #predicted-bar-button {
   color: #5a5d6c;
 }
+
 #predicted-bar-button.active {
   color: #7585ff;
 }
