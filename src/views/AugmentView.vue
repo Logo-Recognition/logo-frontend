@@ -566,7 +566,7 @@ onMounted(() => {
           />
         </div>
         <div v-if="statusnow === 'Flip'" class="mr-10 ml-10">
-          <FlipSelectBar @update:checkedName="updateFlipName" />
+          <FlipSelectBar @update:checkedName="updateFlipName" :value="selectedFlip" />
         </div>
         <div v-if="statusnow === 'Noise'" class="mr-10 ml-10">
           <NoiseSelectBar @update:checkedName="updateNoiseName" />
@@ -653,7 +653,7 @@ onMounted(() => {
             :format="formatTooltip"
           />
         </div>
-        <div v-if="selectedImageSrc" class="flex place-content-center mt-8">
+        <div v-if="selectedImageSrc" class="flex place-content-center mt-8" id="show-preview-image-section">
           <img :src="selectedImageSrc" alt="Selected Image" id="AugmentedImage" />
         </div>
         <div id="apply-button" class="flex mt-5">
@@ -668,6 +668,8 @@ onMounted(() => {
       </div>
     </div>
   </div>
+  {{ selectedFlip }}
+  {{ selectedFlipAp }}
 </template>
 <style src="@vueform/slider/themes/default.css"></style>
 <style scoped>

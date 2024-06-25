@@ -1,13 +1,12 @@
 <template>
   <div class="grid justify-items-stretch">
-    <!-- <div>Checked name: {{ checkedName }}</div> -->
     <div class="flex justify-self-center justify-around w-3/4 items-center">
       <div class="custom-checkbox">
         <input
           type="checkbox"
           id="none"
           value="none"
-          :checked="checkedName === 'none'"
+          :checked="props.value === 'none'"
           @change="onCheckboxChange($event)"
         />
         <label for="none">None</label>
@@ -18,7 +17,7 @@
           type="checkbox"
           id="Vertical"
           value="Vertical"
-          :checked="checkedName === 'Vertical'"
+          :checked="props.value === 'Vertical'"
           @change="onCheckboxChange($event)"
         />
         <label for="Vertical">Vertical</label>
@@ -29,7 +28,7 @@
           type="checkbox"
           id="Horizontal"
           value="Horizontal"
-          :checked="checkedName === 'Horizontal'"
+          :checked="props.value === 'Horizontal'"
           @change="onCheckboxChange($event)"
         />
         <label for="Horizontal">Horizontal</label>
@@ -41,6 +40,10 @@
 <script setup>
 import { ref, defineEmits } from 'vue'
 
+const props = defineProps({
+  value: String
+});
+
 const checkedName = ref('none')
 const emit = defineEmits(['update:checkedName'])
 
@@ -49,7 +52,6 @@ const onCheckboxChange = (event) => {
     checkedName.value = event.target.value
     emit('update:checkedName', checkedName.value)
   } else {
-    // Prevent unchecking the currently checked checkbox
     event.target.checked = true
   }
 }
