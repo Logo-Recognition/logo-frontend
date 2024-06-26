@@ -12,7 +12,6 @@ import BoxNameModal from '@/components/LabelModal.vue'
 import { API_URL } from '@/config.js'
 import axios from 'axios'
 import Multiselect from 'vue-multiselect'
-import 'vue-multiselect/dist/vue-multiselect.css'
 
 const canvasRef = ref(null)
 const labelsContainerRef = ref(null)
@@ -554,37 +553,30 @@ onMounted(() => {
         </div>
       </div>
       <div class="labels-container bg-white" ref="labelsContainer">
-        <h2 class="text-base text-dark font-medium">Labels</h2>
+        <h2 class="text-base text-dark font-medium mb-4">Labels</h2>
         <div class="default-labels">
-          <input
-            type="checkbox"
-            id="checkbox"
-            v-model="useDefaultClass"
-            @click="showModal = false"
-          />
-          <label for="checkbox">Default Label</label>
-          <Multiselect
-            v-model="defaultClass"
-            :options="classList"
-            :searchable="true"
-            :close-on-select="true"
-            placeholder="Select class"
-            @open="fetchClassList"
-            class="dropdown-select bg-light"
-          >
-            <template v-slot:noOptions>No classes found.</template>
-          </Multiselect>
-          <!-- <select class="dropdown-select bg-light" v-model="defaultClass" @click="fetchClassList()">
-            <option disabled value="">Select class</option>
-            <option
-              v-for="(classItem, index) in classList"
-              :key="index"
-              :value="classItem"
-              :v-model="classItem"
+          <div class="checkbox-container">
+            <input
+              type="checkbox"
+              id="checkbox"
+              v-model="useDefaultClass"
+              @click="showModal = false"
+            />
+            <label for="checkbox" class="ml-2">Default Label</label>
+          </div>
+          <div class="multiselect-container">
+            <Multiselect
+              v-model="defaultClass"
+              :options="classList"
+              :searchable="true"
+              :close-on-select="true"
+              placeholder="Select class"
+              @open="fetchClassList"
+              class="dropdown-select bg-light"
             >
-              {{ classItem }}
-            </option>
-          </select> -->
+              <template v-slot:noOptions>No classes found</template>
+            </Multiselect>
+          </div>
         </div>
         <div v-if="canvas" class="labels-wrapper">
           <div v-for="obj in visibleObjects" :key="obj.id" class="label-item">
@@ -715,31 +707,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.multiselect {
-  min-height: 40px;
-}
-.multiselect__tags {
-  min-height: 40px;
-  padding: 8px 40px 0 8px;
-  border-radius: 4px;
-  border: 1px solid #7585ff;
-  background: var(--light);
-}
-.multiselect__select {
-  height: 38px;
-}
-.multiselect__input, .multiselect__single {
-  background: var(--light);
-  padding: 0;
-  margin-bottom: 8px;
-}
-.multiselect__option--highlight {
-  background: #7585ff;
-}
-.multiselect__option--selected.multiselect__option--highlight {
-  background: #ff6b6b;
-}
-
 .annotate-container {
   padding: 32px 60px 40px 40px;
 }
@@ -755,7 +722,7 @@ onMounted(() => {
   grid-template-areas:
     'left top'
     'left bottom';
-  gap: 32px 24px;
+  gap: 0px 24px;
 }
 
 .canvas-container {
@@ -841,31 +808,41 @@ onMounted(() => {
   grid-area: top;
   border-radius: 16px;
   padding: 16px;
-  height: 30vh;
+  height: 35vh;
+  display: flex;
+  flex-direction: column;
   position: relative;
 }
 
 .default-labels {
   display: flex;
-  flex-wrap: wrap;
+  align-items: start;
   width: 100%;
   gap: 12px;
+  margin-bottom: 4px;
 }
 
-.dropdown-select {
-  border-radius: 4px;
-  border: 1px solid #7585ff;
-  align-self: stretch;
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
 }
 
-input[type='checkbox']:hover {
-  border-radius: 4px;
-  border: 1px solid #7585ff;
+.multiselect-container {
+  flex-grow: 1;
+  min-width: 150px;
+}
+
+.multiselect {
+  padding: 2px 12px;
+  border-radius: 8px;
+  cursor: pointer;
 }
 
 .labels-wrapper {
-  height: 13vh;
+  flex-grow: 1;
   overflow-y: auto;
+  margin-bottom: 4px;
 }
 
 .label-item {
@@ -882,18 +859,14 @@ input[type='checkbox']:hover {
 }
 
 .submit-button {
-  text-align: center;
-  border-radius: 8px;
-  width: calc(100% - 32px);
-  position: absolute;
   bottom: 16px;
+  left: 16px;
+  right: 16px;
+  width: 100%;
 }
 
 .submit-button button {
-  display: block;
   width: 100%;
-  height: 100%;
-  border: none;
   border-radius: 8px;
   padding: 8px 16px;
   cursor: pointer;
