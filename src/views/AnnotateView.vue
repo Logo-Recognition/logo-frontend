@@ -11,6 +11,7 @@ import IconEdit from '@/components/icons/IconEdit.vue'
 import BoxNameModal from '@/components/LabelModal.vue'
 import { API_URL } from '@/config.js'
 import axios from 'axios'
+import Multiselect from 'vue-multiselect'
 
 const canvasRef = ref(null)
 const labelsContainerRef = ref(null)
@@ -156,35 +157,37 @@ const drawNewBox = (x1, y1, x2, y2, label = null) => {
 }
 
 const toTextFile = () => {
-  const objects = visibleObjects.value.filter(obj => obj.type === 'rect' && obj.imageName === selectedImage.value.name);
+  const objects = visibleObjects.value.filter(
+    (obj) => obj.type === 'rect' && obj.imageName === selectedImage.value.name
+  )
 
-  let textContent = '';
+  let textContent = ''
 
   objects.forEach((obj) => {
-    const classId = obj.classId !== undefined ? obj.classId : 0;
-    
-    const imageWidth = selectedImage.value.width;
-    const imageHeight = selectedImage.value.height;
+    const classId = obj.classId !== undefined ? obj.classId : 0
 
-    const centerX = (obj.left + obj.width / 2) / imageWidth;
-    const centerY = (obj.top + obj.height / 2) / imageHeight;
-    const width = obj.width / imageWidth;
-    const height = obj.height / imageHeight;
+    const imageWidth = selectedImage.value.width
+    const imageHeight = selectedImage.value.height
 
-    const yoloString = `${classId} ${centerX.toFixed(6)} ${centerY.toFixed(6)} ${width.toFixed(6)} ${height.toFixed(6)}`;
-    textContent += yoloString + '\n';
-  });
+    const centerX = (obj.left + obj.width / 2) / imageWidth
+    const centerY = (obj.top + obj.height / 2) / imageHeight
+    const width = obj.width / imageWidth
+    const height = obj.height / imageHeight
 
-  const blob = new Blob([textContent], { type: 'text/plain' });
-  const blobURL = URL.createObjectURL(blob);
+    const yoloString = `${classId} ${centerX.toFixed(6)} ${centerY.toFixed(6)} ${width.toFixed(6)} ${height.toFixed(6)}`
+    textContent += yoloString + '\n'
+  })
 
-  const a = document.createElement('a');
-  a.href = blobURL;
-  a.download = `${selectedImage.value.name.split('.')[0]}.txt`;
-  a.click();
+  const blob = new Blob([textContent], { type: 'text/plain' })
+  const blobURL = URL.createObjectURL(blob)
 
-  URL.revokeObjectURL(blobURL);
-};
+  const a = document.createElement('a')
+  a.href = blobURL
+  a.download = `${selectedImage.value.name.split('.')[0]}.txt`
+  a.click()
+
+  URL.revokeObjectURL(blobURL)
+}
 
 const onMouseDown = (event) => {
   if (!isImageSelected.value) {
@@ -550,26 +553,30 @@ onMounted(() => {
         </div>
       </div>
       <div class="labels-container bg-white" ref="labelsContainer">
-        <h2 class="text-base text-dark font-medium">Labels</h2>
+        <h2 class="text-base text-dark font-medium mb-4">Labels</h2>
         <div class="default-labels">
-          <input
-            type="checkbox"
-            id="checkbox"
-            v-model="useDefaultClass"
-            @click="showModal = false"
-          />
-          <label for="checkbox">Default Label</label>
-          <select class="dropdown-select bg-light" v-model="defaultClass" @click="fetchClassList()">
-            <option disabled value="">Select class</option>
-            <option
-              v-for="(classItem, index) in classList"
-              :key="index"
-              :value="classItem"
-              :v-model="classItem"
+          <div class="checkbox-container">
+            <input
+              type="checkbox"
+              id="checkbox"
+              v-model="useDefaultClass"
+              @click="showModal = false"
+            />
+            <label for="checkbox" class="ml-2">Default Label</label>
+          </div>
+          <div class="multiselect-container">
+            <Multiselect
+              v-model="defaultClass"
+              :options="classList"
+              :searchable="true"
+              :close-on-select="true"
+              placeholder="Select class"
+              @open="fetchClassList"
+              class="dropdown-select bg-light"
             >
-              {{ classItem }}
-            </option>
-          </select>
+              <template v-slot:noOptions>No classes found</template>
+            </Multiselect>
+          </div>
         </div>
         <div v-if="canvas" class="labels-wrapper">
           <div v-for="obj in visibleObjects" :key="obj.id" class="label-item">
@@ -715,7 +722,7 @@ onMounted(() => {
   grid-template-areas:
     'left top'
     'left bottom';
-  gap: 32px 24px;
+  gap: 0px 24px;
 }
 
 .canvas-container {
@@ -801,31 +808,41 @@ onMounted(() => {
   grid-area: top;
   border-radius: 16px;
   padding: 16px;
-  height: 30vh;
+  height: 35vh;
+  display: flex;
+  flex-direction: column;
   position: relative;
 }
 
 .default-labels {
   display: flex;
-  flex-wrap: wrap;
+  align-items: start;
   width: 100%;
   gap: 12px;
+  margin-bottom: 4px;
 }
 
-.dropdown-select {
-  border-radius: 4px;
-  border: 1px solid #7585ff;
-  align-self: stretch;
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
 }
 
-input[type='checkbox']:hover {
-  border-radius: 4px;
-  border: 1px solid #7585ff;
+.multiselect-container {
+  flex-grow: 1;
+  min-width: 150px;
+}
+
+.multiselect {
+  padding: 2px 12px;
+  border-radius: 8px;
+  cursor: pointer;
 }
 
 .labels-wrapper {
-  height: 13vh;
+  flex-grow: 1;
   overflow-y: auto;
+  margin-bottom: 4px;
 }
 
 .label-item {
@@ -842,18 +859,14 @@ input[type='checkbox']:hover {
 }
 
 .submit-button {
-  text-align: center;
-  border-radius: 8px;
-  width: calc(100% - 32px);
-  position: absolute;
   bottom: 16px;
+  left: 16px;
+  right: 16px;
+  width: 100%;
 }
 
 .submit-button button {
-  display: block;
   width: 100%;
-  height: 100%;
-  border: none;
   border-radius: 8px;
   padding: 8px 16px;
   cursor: pointer;
