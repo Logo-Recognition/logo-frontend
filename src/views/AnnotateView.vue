@@ -155,37 +155,36 @@ const drawNewBox = (x1, y1, x2, y2, label = null) => {
   return rect
 }
 
-const toTextFile = async () => {
-  const canvasWidth = canvas.width
-  const canvasHeight = canvas.height
+const toTextFile = () => {
+  const objects = visibleObjects.value.filter(obj => obj.type === 'rect' && obj.imageName === selectedImage.value.name);
 
-  const objects = submittedBoxes.value
-
-  let textContent = ''
+  let textContent = '';
 
   objects.forEach((obj) => {
-    if (obj.type === 'rect') {
-      const classId = obj.classId !== undefined ? obj.classId : 0
-      const centerX = (obj.left + obj.width / 2) / canvasWidth
-      const centerY = (obj.top + obj.height / 2) / canvasHeight
-      const width = obj.width / canvasWidth
-      const height = obj.height / canvasHeight
+    const classId = obj.classId !== undefined ? obj.classId : 0;
+    
+    const imageWidth = selectedImage.value.width;
+    const imageHeight = selectedImage.value.height;
 
-      const yoloString = `${classId} ${centerX.toFixed(6)} ${centerY.toFixed(6)} ${width.toFixed(6)} ${height.toFixed(6)}`
-      textContent += yoloString + '\n'
-    }
-  })
+    const centerX = (obj.left + obj.width / 2) / imageWidth;
+    const centerY = (obj.top + obj.height / 2) / imageHeight;
+    const width = obj.width / imageWidth;
+    const height = obj.height / imageHeight;
 
-  const blob = new Blob([textContent], { type: 'text/plain' })
-  const blobURL = URL.createObjectURL(blob)
+    const yoloString = `${classId} ${centerX.toFixed(6)} ${centerY.toFixed(6)} ${width.toFixed(6)} ${height.toFixed(6)}`;
+    textContent += yoloString + '\n';
+  });
 
-  const a = document.createElement('a')
-  a.href = blobURL
-  a.download = `${selectedImage.value.name.split('.')[0]}.txt`
-  a.click()
+  const blob = new Blob([textContent], { type: 'text/plain' });
+  const blobURL = URL.createObjectURL(blob);
 
-  URL.revokeObjectURL(blobURL)
-}
+  const a = document.createElement('a');
+  a.href = blobURL;
+  a.download = `${selectedImage.value.name.split('.')[0]}.txt`;
+  a.click();
+
+  URL.revokeObjectURL(blobURL);
+};
 
 const onMouseDown = (event) => {
   if (!isImageSelected.value) {
