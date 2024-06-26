@@ -11,6 +11,8 @@ import IconEdit from '@/components/icons/IconEdit.vue'
 import BoxNameModal from '@/components/LabelModal.vue'
 import { API_URL } from '@/config.js'
 import axios from 'axios'
+import Multiselect from 'vue-multiselect'
+import 'vue-multiselect/dist/vue-multiselect.css'
 
 const canvasRef = ref(null)
 const labelsContainerRef = ref(null)
@@ -156,35 +158,37 @@ const drawNewBox = (x1, y1, x2, y2, label = null) => {
 }
 
 const toTextFile = () => {
-  const objects = visibleObjects.value.filter(obj => obj.type === 'rect' && obj.imageName === selectedImage.value.name);
+  const objects = visibleObjects.value.filter(
+    (obj) => obj.type === 'rect' && obj.imageName === selectedImage.value.name
+  )
 
-  let textContent = '';
+  let textContent = ''
 
   objects.forEach((obj) => {
-    const classId = obj.classId !== undefined ? obj.classId : 0;
-    
-    const imageWidth = selectedImage.value.width;
-    const imageHeight = selectedImage.value.height;
+    const classId = obj.classId !== undefined ? obj.classId : 0
 
-    const centerX = (obj.left + obj.width / 2) / imageWidth;
-    const centerY = (obj.top + obj.height / 2) / imageHeight;
-    const width = obj.width / imageWidth;
-    const height = obj.height / imageHeight;
+    const imageWidth = selectedImage.value.width
+    const imageHeight = selectedImage.value.height
 
-    const yoloString = `${classId} ${centerX.toFixed(6)} ${centerY.toFixed(6)} ${width.toFixed(6)} ${height.toFixed(6)}`;
-    textContent += yoloString + '\n';
-  });
+    const centerX = (obj.left + obj.width / 2) / imageWidth
+    const centerY = (obj.top + obj.height / 2) / imageHeight
+    const width = obj.width / imageWidth
+    const height = obj.height / imageHeight
 
-  const blob = new Blob([textContent], { type: 'text/plain' });
-  const blobURL = URL.createObjectURL(blob);
+    const yoloString = `${classId} ${centerX.toFixed(6)} ${centerY.toFixed(6)} ${width.toFixed(6)} ${height.toFixed(6)}`
+    textContent += yoloString + '\n'
+  })
 
-  const a = document.createElement('a');
-  a.href = blobURL;
-  a.download = `${selectedImage.value.name.split('.')[0]}.txt`;
-  a.click();
+  const blob = new Blob([textContent], { type: 'text/plain' })
+  const blobURL = URL.createObjectURL(blob)
 
-  URL.revokeObjectURL(blobURL);
-};
+  const a = document.createElement('a')
+  a.href = blobURL
+  a.download = `${selectedImage.value.name.split('.')[0]}.txt`
+  a.click()
+
+  URL.revokeObjectURL(blobURL)
+}
 
 const onMouseDown = (event) => {
   if (!isImageSelected.value) {
@@ -559,7 +563,18 @@ onMounted(() => {
             @click="showModal = false"
           />
           <label for="checkbox">Default Label</label>
-          <select class="dropdown-select bg-light" v-model="defaultClass" @click="fetchClassList()">
+          <Multiselect
+            v-model="defaultClass"
+            :options="classList"
+            :searchable="true"
+            :close-on-select="true"
+            placeholder="Select class"
+            @open="fetchClassList"
+            class="dropdown-select bg-light"
+          >
+            <template v-slot:noOptions>No classes found.</template>
+          </Multiselect>
+          <!-- <select class="dropdown-select bg-light" v-model="defaultClass" @click="fetchClassList()">
             <option disabled value="">Select class</option>
             <option
               v-for="(classItem, index) in classList"
@@ -569,7 +584,7 @@ onMounted(() => {
             >
               {{ classItem }}
             </option>
-          </select>
+          </select> -->
         </div>
         <div v-if="canvas" class="labels-wrapper">
           <div v-for="obj in visibleObjects" :key="obj.id" class="label-item">
@@ -700,6 +715,31 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.multiselect {
+  min-height: 40px;
+}
+.multiselect__tags {
+  min-height: 40px;
+  padding: 8px 40px 0 8px;
+  border-radius: 4px;
+  border: 1px solid #7585ff;
+  background: var(--light);
+}
+.multiselect__select {
+  height: 38px;
+}
+.multiselect__input, .multiselect__single {
+  background: var(--light);
+  padding: 0;
+  margin-bottom: 8px;
+}
+.multiselect__option--highlight {
+  background: #7585ff;
+}
+.multiselect__option--selected.multiselect__option--highlight {
+  background: #ff6b6b;
+}
+
 .annotate-container {
   padding: 32px 60px 40px 40px;
 }
