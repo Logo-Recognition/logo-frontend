@@ -2,6 +2,7 @@
   <div class="grid justify-items-stretch">
     <!-- <div>Checked name: {{ checkedName }}</div> -->
     <div class="flex justify-self-center justify-around w-3/4 items-center">
+      <!-- Checkbox for "Pepper" -->
       <div class="custom-checkbox">
         <input
           type="checkbox"
@@ -13,6 +14,7 @@
         <label for="pepper">Pepper</label>
       </div>
 
+      <!-- Checkbox for "Chromatic" -->
       <div class="custom-checkbox">
         <input
           type="checkbox"
@@ -27,12 +29,17 @@
   </div>
 </template>
 
+
 <script setup>
 import { ref, defineEmits } from 'vue'
 
+// Reactive reference to store the currently checked checkbox value
 const checkedName = ref('pepper')
+
+// Define emitted event for parent component communication
 const emit = defineEmits(['update:checkedName'])
 
+// Function to handle checkbox change events
 const onCheckboxChange = (event) => {
   if (event.target.checked) {
     checkedName.value = event.target.value
@@ -43,6 +50,7 @@ const onCheckboxChange = (event) => {
   }
 }
 </script>
+
 
 <style scoped>
 .flex {

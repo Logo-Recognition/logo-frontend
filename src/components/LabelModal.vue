@@ -5,10 +5,17 @@ import axios from 'axios'
 import { API_URL } from '@/config.js'
 import IconSearch from '@/components/icons/IconSearch.vue'
 
+const props = defineProps({
+  lastUsedClass: {
+    type: String,
+    default: ''
+  }
+})
+
 const classList = ref([])
 const filteredClassList = ref([])
 const search = ref('')
-const selectedClass = ref('')
+const selectedClass = ref(props.lastUsedClass)
 const emit = defineEmits(['close', 'submit', 'classSelected'])
 
 const fetchClassList = async () => {
@@ -21,11 +28,15 @@ const fetchClassList = async () => {
   }
 }
 
+// assigned selected class value to pass by
 const selectClass = (className) => {
   selectedClass.value = className
+  emit('classSelected', className)
+
   console.log('Selected Class:', selectedClass.value)
 }
 
+// emit submit when pressed on save button
 const handleSubmit = () => {
   if (selectedClass.value) {
     toast.success('Class added successfully!', {
@@ -33,20 +44,20 @@ const handleSubmit = () => {
     })
     emit('classSelected', selectedClass.value)
     emit('submit', selectedClass.value)
-    console.log('Selected Class:', selectedClass.value)
   } else {
     toast.warning('Please select a class first', {
       autoClose: 3000
     })
-    console.log('Please select a class first.')
   }
 }
 
+// emit close when pressed on cancel button or background area
 const cancelBoxDrawing = () => {
   selectedClass.value = ''
   emit('close')
 }
 
+// when using search, the relate content will store in filteredClassList
 const filterClasses = () => {
   if (search.value) {
     filteredClassList.value = classList.value.filter((classItem) =>
@@ -59,6 +70,10 @@ const filterClasses = () => {
 
 onMounted(() => {
   fetchClassList()
+  if (props.lastUsedClass) {
+    selectedClass.value = props.lastUsedClass
+    emit('classSelected', props.lastUsedClass)
+  }
 })
 
 watch(search, filterClasses)
@@ -74,7 +89,6 @@ watch(search, filterClasses)
             <IconSearch class="search-icon" />
             <input type="text" v-model="search" placeholder="Search classes" class="search-input" />
             <i class="fas fa-search search-icon"></i>
-
           </div>
           <ul>
             <li v-for="(classItem, index) in filteredClassList" :key="index">
@@ -222,7 +236,7 @@ watch(search, filterClasses)
 }
 
 .item-error {
- margin: 8px 16px;
+  margin: 8px 16px;
 }
 
 .button.is-success {

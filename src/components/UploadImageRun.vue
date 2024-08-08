@@ -3,10 +3,19 @@ import { ref } from 'vue'
 import { toast } from 'vue3-toastify'
 import PreviewImage from './PreviewImage.vue'
 import axios from 'axios'
-import IconShare from '@/components/icons/IconShare.vue'
+import IconDownload from '@/components/icons/IconDownload.vue'
 import IconView from '@/components/icons/IconView.vue'
+<<<<<<< HEAD
 import CamSelect from '@/components/CamSelect.vue'
+=======
+import IconArrowL from '@/components/icons/IconArrowL.vue'
+import IconArrowR from '@/components/icons/IconArrowR.vue'
+import LoadingIndicator from '@/components/LoadingIndicator.vue'
+>>>>>>> ecc6c685b39bb5d689399ead0227a9f45bc06a0b
 import JSZip from 'jszip'
+import { API_URL } from '@/config.js'
+
+// Props received from parent component
 const props = defineProps({
   Model: {
     type: String,
@@ -14,6 +23,7 @@ const props = defineProps({
   }
 })
 
+// Reactive variables declaration
 const previewImages = ref([])
 const fileInputRef = ref(null)
 const active = ref(false)
@@ -22,25 +32,28 @@ const processedImageUrls = ref([])
 const isLoading = ref(false)
 const currentImageIndex = ref(0)
 const showDropdown = ref(false)
-
 const selectedModel = ref('')
 
+// Function to toggle dropzone state
 const toggleActive = (isActive) => {
   active.value = isActive
 }
 
+// Function to display toast on successful upload
 const onUploadedSuccess = () => {
   toast.success('Images uploaded successfully!', {
     autoClose: 3000
   })
 }
 
+// Function to display toast on upload failure
 const onUploadedFail = () => {
   toast.error('Failed to upload images.', {
     autoClose: 3000
   })
 }
 
+// Function to handle file input changes
 const onFileChange = (event) => {
   const files = event.target.files || event.dataTransfer.files
   for (let index = 0; index < files.length; index++) {
@@ -56,24 +69,33 @@ const onFileChange = (event) => {
   }
 }
 
+// Function to remove an image from preview
 const removeImage = (index) => {
   previewImages.value.splice(index, 1)
 }
 
+// Function to clear all previewed images
 const clearImage = () => {
   previewImages.value = []
 }
 
+// Function to trigger file input dialog
 const triggerFileInput = () => {
   fileInputRef.value.click()
 }
 
+// Function to upload images to the server
 const uploadImage = async () => {
   if (previewImages.value.length === 0) {
     return;
   }
+<<<<<<< HEAD
 
   const formData = new FormData();
+=======
+  showDropdown.value = false
+  const formData = new FormData()
+>>>>>>> ecc6c685b39bb5d689399ead0227a9f45bc06a0b
   previewImages.value.forEach((image) => {
     formData.append('images', image.file);
   });
@@ -81,7 +103,7 @@ const uploadImage = async () => {
   isLoading.value = true;
 
   try {
-    const response = await axios.post('http://192.168.2.44:5000/api/model/run-realtime', formData, {
+    const response = await axios.post(`${API_URL}/api/model/run-realtime`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -107,6 +129,7 @@ const uploadImage = async () => {
   }
 }
 
+// Function to download all processed images as a ZIP file
 const downloadAllImages = async () => {
   if (processedImageUrls.value.length === 0) {
     toast.error('No images to download.', {
@@ -149,27 +172,33 @@ const downloadAllImages = async () => {
   }
 }
 
+// Function to show the next processed image
 const showNextImage = () => {
   if (currentImageIndex.value < processedImageUrls.value.length - 1) {
     currentImageIndex.value++
   }
 }
 
+// Function to show the previous processed image
 const showPreviousImage = () => {
   if (currentImageIndex.value > 0) {
     currentImageIndex.value--
   }
 }
+
+// Function to set the current image index
 const setImageIndex = (index) => {
   currentImageIndex.value = index
 }
 
+// Function to toggle dropdown visibility
 const toggleDropdown = () => {
   showDropdown.value = !showDropdown.value
 }
 </script>
 
 <template>
+  <!-- Modal content for uploading images -->
   <div class="modal-content-run">
     <h2 class="font-bold mb-5">Upload Images</h2>
     <div
@@ -200,6 +229,7 @@ const toggleDropdown = () => {
       </div>
     </div>
 
+    <!-- Display preview of uploaded images -->
     <div v-if="previewImages.length > 0" class="preview-container">
       <div class="preview-area">
         <div v-for="(image, index) in previewImages" :key="index" class="preview-items">
@@ -213,6 +243,7 @@ const toggleDropdown = () => {
     </div>
   </div>
 
+<<<<<<< HEAD
   <div id="show-picture-card" v-if="processedImageUrls.length > 0">
     <div class="flex justify-between">
       <div class="flex">
@@ -227,27 +258,75 @@ const toggleDropdown = () => {
       <div class="navigation-buttons flex items-center">
         <button @click="toggleDropdown"><IconView /></button>
         <button @click="downloadAllImages"><IconShare /></button>
+=======
+  <!-- Display while images are being processed -->
+  <div v-if="isLoading">
+    <div id="show-picture-card">
+      <div class="flex justify-between">
+        <div class="flex flex-col">
+          <h3>Result</h3>
+          <p class="text-[#5A5D6C]">{{ props.Model }}</p>
+        </div>
+        <div class="navigation-buttons flex items-center">
+          <button
+            @click="toggleDropdown"
+            :class="{ active: showDropdown }"
+            id="predicted-bar-button"
+            disabled
+          >
+            <IconView />
+          </button>
+          <button @click="downloadAllImages" disabled><IconDownload /></button>
+        </div>
+      </div>
+      <div class="show-predicted flex justify-around">
+        <div id="the-predicted-image" class="grid place-content-center"><LoadingIndicator /></div>
+>>>>>>> ecc6c685b39bb5d689399ead0227a9f45bc06a0b
       </div>
     </div>
-    <div class="show-predicted flex justify-around">
-      <button @click="showPreviousImage">&lt;</button>
-      <img
-        v-lazy="processedImageUrls[currentImageIndex]"
-        :alt="'Processed Image ' + currentImageIndex"
-        crossorigin="anonymous"
-      />
-      <button @click="showNextImage">&gt;</button>
-    </div>
-    <div v-if="showDropdown">
-      <div class="preview-container">
-        <div class="preview-area">
-          <div v-for="(image, index) in processedImageUrls" :key="index" class="preview-items">
-            <img
-              v-lazy="image"
-              class="preview-img"
-              @click="setImageIndex(index)"
-              crossorigin="anonymous"
-            />
+  </div>
+
+  <!-- Display after images are processed -->
+  <div v-else>
+    <div id="show-picture-card" v-if="processedImageUrls.length > 0">
+      <div class="flex justify-between">
+        <div class="flex flex-col">
+          <h3>Result</h3>
+          <p class="text-[#5A5D6C]">{{ selectedModel }}</p>
+        </div>
+        <p>{{ currentImageIndex + 1 }} / {{ processedImageUrls.length }}</p>
+        <div class="navigation-buttons flex items-center">
+          <button
+            @click="toggleDropdown"
+            :class="{ active: showDropdown }"
+            id="predicted-bar-button"
+          >
+            <IconView />
+          </button>
+          <button @click="downloadAllImages"><IconDownload /></button>
+        </div>
+      </div>
+      <div class="show-predicted flex justify-around">
+        <button @click="showPreviousImage"><IconArrowL /></button>
+        <img
+          v-lazy="processedImageUrls[currentImageIndex]"
+          :alt="'Processed Image ' + currentImageIndex"
+          crossorigin="anonymous"
+          id="the-predicted-image"
+        />
+        <button @click="showNextImage"><IconArrowR /></button>
+      </div>
+      <div v-if="showDropdown" class="mt-2">
+        <div class="preview-container">
+          <div class="preview-area">
+            <div v-for="(image, index) in processedImageUrls" :key="index" class="preview-items">
+              <img
+                v-lazy="image"
+                class="preview-img"
+                @click="setImageIndex(index)"
+                crossorigin="anonymous"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -377,7 +456,7 @@ const toggleDropdown = () => {
   font-weight: 700;
 }
 
-.show-predicted img {
+#the-predicted-image {
   width: 70%; /* Limit the maximum width */
   height: 400px; /* Maintain aspect ratio */
   object-fit: contain; /* Ensure the entire image fits within the set dimensions */
@@ -428,6 +507,7 @@ const toggleDropdown = () => {
   height: 100%;
   object-fit: cover;
 }
+
 .preview-area {
   display: inline-flex; /* Use flexbox layout */
   gap: 10px; /* Add spacing between items */
@@ -444,5 +524,13 @@ const toggleDropdown = () => {
   object-fit: fill;
   cursor: pointer;
   margin-top: 5px;
+}
+
+#predicted-bar-button {
+  color: #5a5d6c;
+}
+
+#predicted-bar-button.active {
+  color: #7585ff;
 }
 </style>

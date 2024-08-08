@@ -1,35 +1,37 @@
 <template>
   <div class="grid justify-items-stretch">
-    <!-- <div>Checked name: {{ checkedName }}</div> -->
     <div class="flex justify-self-center justify-around w-3/4 items-center">
+      <!-- Checkbox for "None" option -->
       <div class="custom-checkbox">
         <input
           type="checkbox"
           id="none"
           value="none"
-          :checked="checkedName === 'none'"
+          :checked="props.value === 'none'"
           @change="onCheckboxChange($event)"
         />
         <label for="none">None</label>
       </div>
 
+      <!-- Checkbox for "Vertical" option -->
       <div class="custom-checkbox">
         <input
           type="checkbox"
           id="Vertical"
           value="Vertical"
-          :checked="checkedName === 'Vertical'"
+          :checked="props.value === 'Vertical'"
           @change="onCheckboxChange($event)"
         />
         <label for="Vertical">Vertical</label>
       </div>
 
+      <!-- Checkbox for "Horizontal" option -->
       <div class="custom-checkbox">
         <input
           type="checkbox"
           id="Horizontal"
           value="Horizontal"
-          :checked="checkedName === 'Horizontal'"
+          :checked="props.value === 'Horizontal'"
           @change="onCheckboxChange($event)"
         />
         <label for="Horizontal">Horizontal</label>
@@ -38,22 +40,28 @@
   </div>
 </template>
 
-<script setup>
-import { ref, defineEmits } from 'vue'
 
-const checkedName = ref('none')
+<script setup>
+import { ref, defineProps, defineEmits } from 'vue'
+
+// Define props received from parent component
+const props = defineProps({
+  value: String
+});
+
+// Define emitted event for parent component communication
 const emit = defineEmits(['update:checkedName'])
 
+// Reactive reference to store the currently checked checkbox value
+const checkedName = ref(props.value)
+
+// Function to handle checkbox change events
 const onCheckboxChange = (event) => {
-  if (event.target.checked) {
-    checkedName.value = event.target.value
-    emit('update:checkedName', checkedName.value)
-  } else {
-    // Prevent unchecking the currently checked checkbox
-    event.target.checked = true
-  }
+  checkedName.value = event.target.value
+  emit('update:checkedName', checkedName.value)
 }
 </script>
+
 
 <style scoped>
 .flex {

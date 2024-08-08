@@ -9,23 +9,29 @@ import IconContrast from '@/components/icons/IconContrast.vue';
 import { ref } from 'vue';
 import { defineEmits } from 'vue';
 
+// Define emitted event for parent component communication
 const emit = defineEmits(['data-emitted']);
-const FocusingAugment = ref('Rotate');
 
+// Reactive variable for the currently focused augment
+const FocusingAugment = ref('Rotate'); // Initially set to 'Rotate'
+
+// Function to update the currently focused augment
 const updateFocusingAugment = (augment) => {
-  FocusingAugment.value = augment;
-  sendData();
+  FocusingAugment.value = augment; // Update the reactive variable
+  sendData(); // Emit data to parent component
 };
 
+// Function to emit data to parent component
 const sendData = () => {
-  const data = FocusingAugment.value; // Replace with actual data you want to pass
-  emit('data-emitted', data);
+  const data = FocusingAugment.value; // Get the current focused augment
+  emit('data-emitted', data); // Emit data to parent component
 };
 </script>
 
 <template>
   <div id="OptionBar" class="flex justify-around">
     <div class="flex justify-around w-3/4 items-center">
+      <!-- Icon components with click events to update focused augment -->
       <IconRotate class="cursor-pointer button" :class="{ 'active': FocusingAugment === 'Rotate' }" @click="updateFocusingAugment('Rotate')" />
       <IconFlip class="cursor-pointer button" :class="{ 'active': FocusingAugment === 'Flip' }" @click="updateFocusingAugment('Flip')" />
       <IconNoise class="cursor-pointer button" :class="{ 'active': FocusingAugment === 'Noise' }" @click="updateFocusingAugment('Noise')" />
@@ -36,6 +42,7 @@ const sendData = () => {
     </div>
   </div>
 </template>
+
 
 <style scoped>
 #OptionBar {

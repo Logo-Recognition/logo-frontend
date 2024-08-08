@@ -1,37 +1,43 @@
 <script setup>
 import IconClose from './icons/IconClose.vue'
 import { defineProps, ref } from 'vue'
+import { API_URL } from '@/config.js'
 
-const pathPublic = 'http://192.168.2.44:5000/api/class'
+// API path for class addition
+const pathPublic = `${API_URL}/api/class`
+
+// Props received from parent component
 const props = defineProps({
-  fetchClasses: Function,
-  togglePopup: Function
+  fetchClasses: Function, // Function to fetch classes after adding new ones
+  togglePopup: Function // Function to toggle the visibility of the popup
 })
 
-const inputData = ref('')
-const isValid = ref(false)
-const errorMessage = ref('')
+// Reactive variables
+const inputData = ref('') // Input field for comma-separated class names
+const isValid = ref(false) // Flag indicating if input is valid
+const errorMessage = ref('') // Error message for displaying validation errors
 
+// Function to submit form data
 const submitData = () => {
   if (validateInput()) {
-    addClass(inputData.value)
-    closePopup() // Optionally close the popup after submitting data
+    addClass(inputData.value) // Call function to add classes
+    closePopup() // Close the popup after submitting data
   }
 }
 
+// Function to process and add new classes
 const addClass = async (classNames) => {
   const newClasses = classNames
-    .split(',')
-    .map(name => name.trim())
-    .filter(name => name !== '')
+    .split(',') // Split input string by comma
+    .map(name => name.trim()) // Trim whitespace around each class name
+    .filter(name => name !== '') // Filter out empty class names
 
   for (const className of newClasses) {
-    await PostClass(className)
+    await PostClass(className) // Call function to post each class name
   }
-  
-
 }
 
+// Function to post a single class name
 const PostClass = async (newClassName) => {
   try {
     const response = await fetch(pathPublic, {
@@ -39,32 +45,34 @@ const PostClass = async (newClassName) => {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ bucket_name: newClassName })
+      body: JSON.stringify({ bucket_name: newClassName }) // Send class name in JSON format
     })
-    const data = await response.json()
+    const data = await response.json() // Parse response JSON
 
     if (data.success) {
-      props.fetchClasses(null)
+      props.fetchClasses(null) // Fetch classes after successful addition
     } else {
-      errorMessage.value = data.error || 'Failed to add the class.'
+      errorMessage.value = data.error || 'Failed to add the class.' // Set error message on failure
       console.error(errorMessage.value)
     }
   } catch (err) {
-    errorMessage.value = 'An error occurred while adding the new class.'
+    errorMessage.value = 'An error occurred while adding the new class.' // Set error message on exception
     console.error(err)
   }
 }
 
+// Function to validate input data
 const validateInput = () => {
   const inputValues = inputData.value
-    .split(',')
-    .map((name) => name.trim())
-    .filter((name) => name !== '')
+    .split(',') // Split input string by comma
+    .map((name) => name.trim()) // Trim whitespace around each value
+    .filter((name) => name !== '') // Filter out empty values
 
-  const inputPattern = /^[a-z0-9]+$/
-  const isAnyValueTooShort = inputValues.some((value) => value.length < 3)
-  const isAnyValueInvalid = inputValues.some((value) => !inputPattern.test(value))
+  const inputPattern = /^[a-z0-9]+$/ // Regex pattern for lowercase letters and digits
+  const isAnyValueTooShort = inputValues.some((value) => value.length < 3) // Check for values shorter than 3 characters
+  const isAnyValueInvalid = inputValues.some((value) => !inputPattern.test(value)) // Check for invalid values
 
+  // Validate input based on conditions
   if (inputValues.length === 0) {
     errorMessage.value = 'Please enter at least one class name.'
   } else if (isAnyValueTooShort && isAnyValueInvalid) {
@@ -77,23 +85,27 @@ const validateInput = () => {
     errorMessage.value = ''
   }
 
-  isValid.value = errorMessage.value === ''
+  isValid.value = errorMessage.value === '' // Set validity flag based on error message
 
-  return isValid.value
+  return isValid.value // Return validity flag
 }
 
+// Function to close the popup
 const closePopup = () => {
-  props.togglePopup(null)
+  props.togglePopup(null) // Call function from props to toggle popup visibility
 }
 </script>
+
 
 <template>
   <div id="AddClassPopup">
     <div id="popup-inner" class="flex-col space-y-5">
+      <!-- Popup header with title and close button -->
       <div id="title" class="flex justify-between">
         <p>Add New Classes</p>
         <button class="popup-close" @click="closePopup"><IconClose /></button>
       </div>
+      <!-- Input area for entering class names -->
       <div id="inputclass-box" class="flex-col">
         <p id="text-advice">Add a comma separated list of class names</p>
         <input
@@ -103,10 +115,12 @@ const closePopup = () => {
           id="text-input"
           :class="{ 'valid-box': isValid, 'invalid-box': !isValid }"
         />
+        <!-- Display error message if validation fails -->
         <p v-if="errorMessage" class="error-message">
           {{ errorMessage }}
         </p>
       </div>
+      <!-- Button area for submitting or canceling -->
       <div id="button-line" class="flex">
         <button @click="submitData" id="SaveButton">Save</button>
         <button @click="closePopup" id="CloseButton">Cancel</button>
@@ -114,6 +128,7 @@ const closePopup = () => {
     </div>
   </div>
 </template>
+
 
 <style scoped>
 #AddClassPopup {

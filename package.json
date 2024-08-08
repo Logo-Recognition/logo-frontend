@@ -19,10 +19,13 @@
     "jszip": "^3.10.1",
     "pinia": "^2.1.7",
     "pinia-plugin-persist": "^1.0.0",
+    "streamsaver": "^2.0.6",
     "vue": "^3.4.21",
     "vue-annotator": "^0.13.2",
     "vue-axios": "^3.5.2",
+    "vue-content-loader": "^2.0.1",
     "vue-lazyload": "^3.0.0",
+    "vue-multiselect": "^3.0.0",
     "vue-router": "^4.3.0",
     "vue-slider-component": "^3.2.24",
     "vue3-toastify": "^0.2.1"
