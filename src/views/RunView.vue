@@ -3,7 +3,6 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import IconDropdown from '@/components/icons/IconDropdown.vue'
 import IconSearch from '@/components/icons/IconSearch.vue'
 import UploadImageRun from '@/components/UploadImageRun.vue'
-
 // Initialize the selected model with a default value
 const model = ref('RT-DETR')
 const modellist = ref(['RT-DETR', 'YOLOV8'])
@@ -73,6 +72,9 @@ const filteredModels = computed(() => {
       </div>
     </div>
     <UploadImageRun :Model="model" />
+    <div>
+    </div>
+    
   </main>
 </template>
 

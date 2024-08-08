@@ -5,6 +5,7 @@ import PreviewImage from './PreviewImage.vue'
 import axios from 'axios'
 import IconShare from '@/components/icons/IconShare.vue'
 import IconView from '@/components/icons/IconView.vue'
+import CamSelect from '@/components/CamSelect.vue'
 import JSZip from 'jszip'
 const props = defineProps({
   Model: {
@@ -69,35 +70,40 @@ const triggerFileInput = () => {
 
 const uploadImage = async () => {
   if (previewImages.value.length === 0) {
-    return
+    return;
   }
 
-  const formData = new FormData()
+  const formData = new FormData();
   previewImages.value.forEach((image) => {
-    formData.append('images', image.file)
-  })
-  formData.append('model', props.Model === 'RT-DETR' ? 'rtdetr' : props.Model.toLowerCase())
-  isLoading.value = true
+    formData.append('images', image.file);
+  });
+  formData.append('model', props.Model === 'RT-DETR' ? 'rtdetr' : props.Model.toLowerCase());
+  isLoading.value = true;
 
   try {
     const response = await axios.post('http://192.168.2.44:5000/api/model/run-realtime', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
-    })
+    });
 
-    uploadMessage.value = 'Images uploaded successfully!'
-    console.log('Server response:', response)
-    processedImageUrls.value = response.data.processed_image_urls
-    onUploadedSuccess()
+    // Assume response.data is an array of objects as per your example
+    console.log('Server response:', response.data);
+
+    // Extract predicted_url(s) from the response
+    const urls = response.data.map(item => item.predicted_url);
+    processedImageUrls.value = urls;
+
+    uploadMessage.value = 'Images uploaded successfully!';
+    onUploadedSuccess();
   } catch (error) {
-    uploadMessage.value = 'Error uploading images.'
-    console.error('Error uploading images:', error)
-    onUploadedFail()
+    uploadMessage.value = 'Error uploading images.';
+    console.error('Error uploading images:', error);
+    onUploadedFail();
   } finally {
-    isLoading.value = false
-    currentImageIndex.value = 0
-    selectedModel.value = props.Model
+    isLoading.value = false;
+    currentImageIndex.value = 0;
+    selectedModel.value = props.Model;
   }
 }
 
@@ -209,10 +215,14 @@ const toggleDropdown = () => {
 
   <div id="show-picture-card" v-if="processedImageUrls.length > 0">
     <div class="flex justify-between">
-      <div class="flex flex-col">
-        <h3>Result</h3>
-        <p class="text-[#5A5D6C]">{{ selectedModel }}</p>
+      <div class="flex">
+        <div class="flex flex-col">
+          <h3>Result</h3>
+          <p class="text-[#5A5D6C]">{{ selectedModel }}</p>
+        </div>
+        <CamSelect/>
       </div>
+
       <p>{{ currentImageIndex + 1 }} / {{ processedImageUrls.length }}</p>
       <div class="navigation-buttons flex items-center">
         <button @click="toggleDropdown"><IconView /></button>
