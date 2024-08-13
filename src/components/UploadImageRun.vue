@@ -118,6 +118,8 @@ const uploadImage = async () => {
   } catch (error) {
     uploadMessage.value = 'Error uploading images.'
     console.error('Error uploading images:', error)
+    processedImageUrls.value = []
+    previewImages.value = []
     onUploadedFail()
   } finally {
     isLoading.value = false
@@ -195,15 +197,12 @@ const toggleDropdown = () => {
 
 const handleTabChange = (tab) => {
   console.log('Tab changed to:', tab)
-  if ( tab === "cam") {
-    processedImageUrls.value = CamdUrls.value 
-  }
-  else
-  {
+  if (tab === 'cam') {
+    processedImageUrls.value = CamdUrls.value
+  } else {
     processedImageUrls.value = DefaultUrls.value
   }
 }
-
 </script>
 
 <template>
@@ -281,19 +280,22 @@ const handleTabChange = (tab) => {
   <!-- Display after images are processed -->
   <div v-else>
     <div id="show-picture-card" v-if="processedImageUrls.length > 0">
-      <div class="flex justify-between">
-        <div class="flex items-center">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center flex-1">
           <div class="flex flex-col">
             <h3>Result</h3>
             <p class="text-[#5A5D6C]">{{ selectedModel }}</p>
           </div>
           <div v-if="selectedModel != 'RT-DETR'">
-            <CamSelect @tab-changed="handleTabChange"/>
+            <CamSelect @tab-changed="handleTabChange" />
           </div>
-          
         </div>
-        <p>{{ currentImageIndex + 1 }} / {{ processedImageUrls.length }}</p>
-        <div class="navigation-buttons flex items-center">
+
+        <div class="flex-1 text-center">
+          <p>{{ currentImageIndex + 1 }} / {{ processedImageUrls.length }}</p>
+        </div>
+
+        <div class="navigation-buttons flex items-center flex-1 justify-end">
           <button
             @click="toggleDropdown"
             :class="{ active: showDropdown }"
