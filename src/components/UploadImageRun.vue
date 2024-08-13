@@ -5,6 +5,7 @@ import PreviewImage from './PreviewImage.vue'
 import axios from 'axios'
 import IconDownload from '@/components/icons/IconDownload.vue'
 import IconView from '@/components/icons/IconView.vue'
+import CamSelect from '@/components/CamSelect.vue'
 import IconArrowL from '@/components/icons/IconArrowL.vue'
 import IconArrowR from '@/components/icons/IconArrowR.vue'
 import LoadingIndicator from '@/components/LoadingIndicator.vue'
@@ -29,6 +30,8 @@ const isLoading = ref(false)
 const currentImageIndex = ref(0)
 const showDropdown = ref(false)
 const selectedModel = ref('')
+const DefaultUrls = ref([])
+const CamdUrls = ref([])
 
 // Function to toggle dropzone state
 const toggleActive = (isActive) => {
@@ -100,13 +103,23 @@ const uploadImage = async () => {
       }
     })
 
+    // Assume response.data is an array of objects as per your example
+    console.log('Server response:', response.data)
+
+    // Extract predicted_url(s) from the response
+    const urls = response.data.map((item) => item.predicted_url)
+    const heaturls = response.data.map((item) => item.heatmap_url)
+    processedImageUrls.value = urls
+    DefaultUrls.value = urls
+    CamdUrls.value = heaturls
+
     uploadMessage.value = 'Images uploaded successfully!'
-    console.log('Server response:', response)
-    processedImageUrls.value = response.data.processed_image_urls
     onUploadedSuccess()
   } catch (error) {
     uploadMessage.value = 'Error uploading images.'
     console.error('Error uploading images:', error)
+    processedImageUrls.value = []
+    previewImages.value = []
     onUploadedFail()
   } finally {
     isLoading.value = false
@@ -180,6 +193,15 @@ const setImageIndex = (index) => {
 // Function to toggle dropdown visibility
 const toggleDropdown = () => {
   showDropdown.value = !showDropdown.value
+}
+
+const handleTabChange = (tab) => {
+  console.log('Tab changed to:', tab)
+  if (tab === 'cam') {
+    processedImageUrls.value = CamdUrls.value
+  } else {
+    processedImageUrls.value = DefaultUrls.value
+  }
 }
 </script>
 
@@ -258,13 +280,22 @@ const toggleDropdown = () => {
   <!-- Display after images are processed -->
   <div v-else>
     <div id="show-picture-card" v-if="processedImageUrls.length > 0">
-      <div class="flex justify-between">
-        <div class="flex flex-col">
-          <h3>Result</h3>
-          <p class="text-[#5A5D6C]">{{ selectedModel }}</p>
+      <div class="flex justify-between items-center">
+        <div class="flex items-center flex-1">
+          <div class="flex flex-col">
+            <h3>Result</h3>
+            <p class="text-[#5A5D6C]">{{ selectedModel }}</p>
+          </div>
+          <div v-if="selectedModel != 'RT-DETR'">
+            <CamSelect @tab-changed="handleTabChange" />
+          </div>
         </div>
-        <p>{{ currentImageIndex + 1 }} / {{ processedImageUrls.length }}</p>
-        <div class="navigation-buttons flex items-center">
+
+        <div class="flex-1 text-center">
+          <p>{{ currentImageIndex + 1 }} / {{ processedImageUrls.length }}</p>
+        </div>
+
+        <div class="navigation-buttons flex items-center flex-1 justify-end">
           <button
             @click="toggleDropdown"
             :class="{ active: showDropdown }"
