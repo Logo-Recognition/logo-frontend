@@ -5,7 +5,7 @@ import IconSearch from '@/components/icons/IconSearch.vue'
 import UploadImageRun from '@/components/UploadImageRun.vue'
 // Initialize the selected model with a default value
 const model = ref('RT-DETR')
-const modellist = ref(['RT-DETR', 'YOLOV8'])
+const modellist = ref(['RT-DETR', 'YOLOV8', 'YOLOV10'])
 
 // Initialize a reactive state for the dropdown visibility
 const isDropdownOpen = ref(false)
@@ -56,19 +56,26 @@ const filteredModels = computed(() => {
         <button class="dropbtn flex items-center justify-around" @click="toggleDropdown">
           {{ model }}
           <div class="w-1"></div>
-          <IconDropdown /> <!-- Icon for dropdown -->
+          <IconDropdown />
+          <!-- Icon for dropdown -->
         </button>
 
         <!-- Dropdown content -->
         <div class="dropdown-content" :class="{ show: isDropdownOpen }">
           <!-- Search input -->
           <div class="serch-wrapper p-2">
-            <IconSearch id="icon-serch" /> <!-- Search icon -->
+            <IconSearch id="icon-serch" />
+            <!-- Search icon -->
             <input type="text" v-model="searchQuery" placeholder="Search" class="dropdown-search" />
           </div>
 
           <!-- List of model options -->
-          <a v-for="modelItem in filteredModels" :key="modelItem" href="#" @click.prevent="selectModel(modelItem)">
+          <a
+            v-for="modelItem in filteredModels"
+            :key="modelItem"
+            href="#"
+            @click.prevent="selectModel(modelItem)"
+          >
             {{ modelItem }}
           </a>
         </div>
@@ -77,9 +84,7 @@ const filteredModels = computed(() => {
 
     <!-- Child component that depends on selected model -->
     <UploadImageRun :Model="model" />
-    <div>
-    </div>
-    
+    <div></div>
   </main>
 </template>
 

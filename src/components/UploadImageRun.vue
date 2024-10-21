@@ -286,7 +286,7 @@ const handleTabChange = (tab) => {
             <h3>Result</h3>
             <p class="text-[#5A5D6C]">{{ selectedModel }}</p>
           </div>
-          <div v-if="selectedModel != 'RT-DETR'">
+          <div v-if="selectedModel == 'YOLOV8'">
             <CamSelect @tab-changed="handleTabChange" />
           </div>
         </div>
