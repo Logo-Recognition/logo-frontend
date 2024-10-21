@@ -99,7 +99,7 @@ const removeImage = (index) => {
           <input class="file" type="file" multiple @change="onFileChange" accept="image/*" />
           <img alt="Upload image" class="m-5" src="@/assets/images/upload-btn.svg" width="90" />
           <span class="text-primary font-normal text-sm"
-            ><span class="text-secondary">Click hear </span>to upload or drop image</span
+            ><span class="text-secondary">Click here </span>to upload or drop image</span
           >
         </div>
         <div v-if="previewImages.length > 0" class="preview-container">
