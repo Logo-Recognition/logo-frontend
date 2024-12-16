@@ -7,6 +7,7 @@ import { ref, watch, computed, onMounted } from 'vue'
 import Slider from '@vueform/slider'
 import { useParametersStore } from '@/stores/Augment.js'
 import { API_URL } from '@/config.js'
+import { toast } from 'vue3-toastify'
 
 const store = useParametersStore()
 
@@ -52,7 +53,7 @@ const isImage = ref(false)
 const selectedRotation = ref(0)
 const selectedFlip = ref('none')
 const selectedNoiseLevel = ref(0)
-const selectedNoiseType = ref('pepper') 
+const selectedNoiseType = ref('pepper')
 const selectedScale = ref(1)
 const selectedBrightness = ref(1)
 const selectedSaturation = ref(1)
@@ -63,7 +64,7 @@ const selectedFlipAp = ref('none')
 const selectedNoiseLevelAp = ref(0)
 const selectedNoiseTypeAp = ref('pepper') // 'pepper' or 'chromatic'
 
-//status show of each CollapseBox 
+//status show of each CollapseBox
 const showCollapseBoxRotation = ref(false)
 const showCollapseBoxFlip = ref(false)
 const showCollapseBoxNoise = ref(false)
@@ -76,7 +77,6 @@ const showCollapseBoxContrast = ref(false)
 const formatTooltip = (value) => {
   return value.toFixed(1)
 }
-
 
 //handle each value update
 const handleRotationUpdate = (value) => {
@@ -357,6 +357,9 @@ const Apply = () => {
         showCollapseBoxRotation.value = true
       }
       updateRotate('rotate', selectedRotation.value)
+      toast.success('Rotate saved successfully!', {
+        autoClose: 3000
+      })
       break
     case 'Flip':
       if (selectedFlip.value == 'none') {
@@ -388,6 +391,9 @@ const Apply = () => {
       if (selectedNoiseTypeAp.value == 'pepper') {
         //'pepper' or 'chromatic'
         updateRotate('pepper_noise', selectedNoiseLevel.value)
+        toast.success('Pepper noise saved successfully!', {
+        autoClose: 3000
+      })
       } else {
         updateRotate('gaussian_noise', selectedNoiseLevel.value)
       }
@@ -698,7 +704,11 @@ onMounted(() => {
         </div>
 
         <!-- Preview of augmented image -->
-        <div v-if="selectedImageSrc" class="flex place-content-center mt-8" id="show-preview-image-section">
+        <div
+          v-if="selectedImageSrc"
+          class="flex place-content-center mt-8"
+          id="show-preview-image-section"
+        >
           <img :src="selectedImageSrc" alt="Selected Image" id="AugmentedImage" />
         </div>
 
@@ -721,7 +731,7 @@ onMounted(() => {
 <style scoped>
 #main {
   width: 100%;
-
+  /* overflow: auto; */
   padding: 10px;
 }
 #title {
@@ -766,12 +776,14 @@ onMounted(() => {
   margin: 30px;
 }
 #Right-Box {
-  width: 70%;
+  width: 75%;
   background-color: #fefefe;
   min-height: 381px;
   border-radius: 16px;
   padding: 20px;
-  margin: 30px;
+  margin-top: 30px;
+  margin-right: 60px;
+  margin-bottom: 30px;
 }
 #AugmentedImage {
   border-radius: 16px;

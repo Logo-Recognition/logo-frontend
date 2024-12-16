@@ -48,7 +48,7 @@ const filteredModels = computed(() => {
 </script>
 
 <template>
-  <main class="flex-col">
+  <div class="flex-col">
     <div id="title">
       <!-- Dropdown component -->
       <div class="dropdown">
@@ -85,11 +85,15 @@ const filteredModels = computed(() => {
     <!-- Child component that depends on selected model -->
     <UploadImageRun :Model="model" />
     <div></div>
-  </main>
+  </div>
 </template>
 
 <style scoped>
 /* Scoped styles for the component */
+
+.flex-col {
+  overflow: auto;
+}
 
 /* Styling for the title section */
 #title {
