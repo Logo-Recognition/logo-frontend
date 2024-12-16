@@ -5,7 +5,8 @@ import IconSearch from '@/components/icons/IconSearch.vue'
 import UploadImageRun from '@/components/UploadImageRun.vue'
 // Initialize the selected model with a default value
 const model = ref('RT-DETR')
-const modellist = ref(['RT-DETR', 'YOLOV8', 'YOLOV10'])
+const detectionModel = ref(['RT-DETR', 'YOLOV8', 'YOLOV10'])
+// const classificationModel = ref(['MobileNet', 'EfficientNet'])
 
 // Initialize a reactive state for the dropdown visibility
 const isDropdownOpen = ref(false)
@@ -41,7 +42,7 @@ onBeforeUnmount(() => {
 
 // Computed property to filter models based on search query
 const filteredModels = computed(() => {
-  return modellist.value.filter((model) =>
+  return detectionModel.value.filter((model) =>
     model.toLowerCase().includes(searchQuery.value.toLowerCase())
   )
 })
@@ -63,7 +64,7 @@ const filteredModels = computed(() => {
         <!-- Dropdown content -->
         <div class="dropdown-content" :class="{ show: isDropdownOpen }">
           <!-- Search input -->
-          <div class="serch-wrapper p-2">
+          <div class="search-wrapper p-2">
             <IconSearch id="icon-serch" />
             <!-- Search icon -->
             <input type="text" v-model="searchQuery" placeholder="Search" class="dropdown-search" />
@@ -179,7 +180,7 @@ const filteredModels = computed(() => {
 }
 
 /* Styles for search wrapper */
-.serch-wrapper {
+.search-wrapper {
   position: relative;
 }
 
