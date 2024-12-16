@@ -6,7 +6,7 @@ import IconAugment from './icons/IconAugment.vue'
 import IconDataset from './icons/IconDataset.vue'
 import IconModelRun from './icons/IconModelRun.vue'
 import IconLogout from './icons/IconLogout.vue'
-// import IconOCR from './icons/IconOCR.vue';
+import IconOCR from './icons/IconOCR.vue';
 const emit = defineEmits(['openModal'])
 
 const openModal = () => {
@@ -28,7 +28,7 @@ const openModal = () => {
         </button>
         <div id="logo-management" class="w-full flex flex-col justify-start">
           <span class="menu-title">LOGO MANAGEMENT</span>
-          <router-link to="/" class="button">
+          <router-link to="/class" class="button">
             <IconClasses />
             <span class="text">Classes</span>
           </router-link>
@@ -46,19 +46,19 @@ const openModal = () => {
           </router-link>
         </div>
         <div id="models" class="w-full flex flex-col justify-start pt-6">
-          <span class="menu-title">MODELS</span>
+          <span class="menu-title">LOGO PREDICTION</span>
           <router-link to="/model" class="button">
             <IconModelRun />
             <span class="text">Run</span>
           </router-link>
         </div>
-        <!-- <div id="ocr" class="w-full flex flex-col justify-start pt-6">
-                    <span class="menu-title">TEXT CONVERT</span>
-                    <router-link to='/ocr' class="button">
-                        <IconOCR/>
-                        <span class="text">OCR</span>
-                    </router-link>
-                </div> -->
+        <div id="ocr" class="w-full flex flex-col justify-start pt-6">
+          <span class="menu-title">TEXT CONVERT</span>
+          <router-link to="/ocr" class="button">
+            <IconOCR />
+            <span class="text">OCR</span>
+          </router-link>
+        </div>
       </div>
     </div>
 
