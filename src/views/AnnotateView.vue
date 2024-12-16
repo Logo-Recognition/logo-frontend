@@ -547,8 +547,8 @@ onMounted(() => {
             <span class="tooltip-text">Save YOLO format</span>
           </div>
         </div>
-        <!-- <canvas ref="canvasRef" class="canvas-wrapper" width="715" height="460"></canvas> -->
-        <canvas ref="canvasRef" class="canvas-wrapper" width="830" height="530"></canvas>
+        <canvas ref="canvasRef" class="canvas-wrapper" width="715" height="460"></canvas>
+        <!-- <canvas ref="canvasRef" class="canvas-wrapper" width="830" height="530"></canvas> -->
 
         <div class="mouse-coordinates">
           X: {{ mouseCoordinates.x }}, Y: {{ mouseCoordinates.y }}
