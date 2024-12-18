@@ -8,7 +8,7 @@ import UploadImageRun from '@/components/UploadImageRun.vue'
 const model = ref('RT-DETR')
 const classmodel = ref('Mobilenetv3')
 const detectionModel = ref(['RT-DETR', 'YOLOV8', 'YOLOV10'])
-const classificationModel = ref(['Mobilenetv3', 'Efficientnetv2','Inceptionv2'])
+const classificationModel = ref(['Mobilenetv3'])
 
 // Initialize a reactive state for the dropdown visibility
 const isDropdownOpenModel = ref(false)
