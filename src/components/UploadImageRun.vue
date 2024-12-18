@@ -17,6 +17,10 @@ const props = defineProps({
   Model: {
     type: String,
     required: true
+  },
+  classModel: {
+    type: String,
+    required: true
   }
 })
 
@@ -90,10 +94,16 @@ const uploadImage = async () => {
   }
   showDropdown.value = false
   const formData = new FormData()
+  formData.append(
+    'detection_model',
+    props.Model === 'RT-DETR' ? 'rtdetr' : props.Model.toLowerCase()
+  )
+  formData.append('classification_model', props.classModel.toLowerCase())
   previewImages.value.forEach((image) => {
     formData.append('images', image.file)
   })
-  formData.append('model', props.Model === 'RT-DETR' ? 'rtdetr' : props.Model.toLowerCase())
+  // formData.append('model', props.Model === 'RT-DETR' ? 'rtdetr' : props.Model.toLowerCase())
+
   isLoading.value = true
 
   try {
