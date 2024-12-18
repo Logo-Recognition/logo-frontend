@@ -2,89 +2,175 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import IconDropdown from '@/components/icons/IconDropdown.vue'
 import IconSearch from '@/components/icons/IconSearch.vue'
+import IconToArrow from '@/components/icons/IconToArrow.vue'
 import UploadImageRun from '@/components/UploadImageRun.vue'
 // Initialize the selected model with a default value
 const model = ref('RT-DETR')
-const modellist = ref(['RT-DETR', 'YOLOV8'])
+const classmodel = ref('Mobilenetv3')
+const detectionModel = ref(['RT-DETR', 'YOLOV8', 'YOLOV10'])
+const classificationModel = ref(['Mobilenetv3', 'Efficientnetv2','Inceptionv2'])
 
 // Initialize a reactive state for the dropdown visibility
-const isDropdownOpen = ref(false)
-const searchQuery = ref('')
+const isDropdownOpenModel = ref(false)
+const isDropdownOpenClass = ref(false)
+const searchQueryModel = ref('') // Search for Detection Model
+const searchQueryClass = ref('') // Search for Classification Model
 
 // Function to toggle the dropdown visibility
-function toggleDropdown() {
-  isDropdownOpen.value = !isDropdownOpen.value
+function toggleDropdownModel() {
+  isDropdownOpenModel.value = !isDropdownOpenModel.value
+}
+
+function toggleDropdownClass() {
+  isDropdownOpenClass.value = !isDropdownOpenClass.value
 }
 
 // Function to select a model and close the dropdown
 function selectModel(selectedModel) {
   model.value = selectedModel
-  isDropdownOpen.value = false
+  isDropdownOpenModel.value = false
+}
+
+function selectClass(selectedClass) {
+  classmodel.value = selectedClass
+  isDropdownOpenClass.value = false
 }
 
 // Close the dropdown if the user clicks outside of it
 function closeDropdown(event) {
   if (!event.target.closest('.dropdown')) {
-    isDropdownOpen.value = false
+    isDropdownOpenModel.value = false
+  }
+}
+
+function closeDropdownClass(event) {
+  if (!event.target.closest('.dropdown')) {
+    isDropdownOpenClass.value = false
   }
 }
 
 // Listen for clicks outside the dropdown
 onMounted(() => {
   window.addEventListener('click', closeDropdown)
+  window.addEventListener('click', closeDropdownClass)
 })
 
 // Clean up event listener on component unmount
 onBeforeUnmount(() => {
   window.removeEventListener('click', closeDropdown)
+  window.removeEventListener('click', closeDropdownClass)
 })
 
 // Computed property to filter models based on search query
 const filteredModels = computed(() => {
-  return modellist.value.filter((model) =>
-    model.toLowerCase().includes(searchQuery.value.toLowerCase())
+  return detectionModel.value.filter((model) =>
+    model.toLowerCase().includes(searchQueryModel.value.toLowerCase())
+  )
+})
+const filteredClass = computed(() => {
+  return classificationModel.value.filter((classmodel) =>
+    classmodel.toLowerCase().includes(searchQueryClass.value.toLowerCase())
   )
 })
 </script>
 
 <template>
-  <main class="flex-col">
+  <div class="flex-col">
     <div id="title">
+      <h2 class="font-bold mb-5">Select Model</h2>
       <!-- Dropdown component -->
-      <div class="dropdown">
-        <!-- Dropdown toggle button -->
-        <button class="dropbtn flex items-center justify-around" @click="toggleDropdown">
-          {{ model }}
-          <div class="w-1"></div>
-          <IconDropdown /> <!-- Icon for dropdown -->
-        </button>
+      <div class="flex justify-between">
+        <div class="dropdown flex-row" id="Model-Dropdown">
+          <div id="ModelTitilText">Detection Model</div>
+          <!-- Dropdown toggle button -->
+          <div>
+            <button class="dropbtn flex items-center justify-around" @click="toggleDropdownModel">
+              {{ model }}
+              <div class="w-1"></div>
+              <IconDropdown />
+              <!-- Icon for dropdown -->
+            </button>
 
-        <!-- Dropdown content -->
-        <div class="dropdown-content" :class="{ show: isDropdownOpen }">
-          <!-- Search input -->
-          <div class="serch-wrapper p-2">
-            <IconSearch id="icon-serch" /> <!-- Search icon -->
-            <input type="text" v-model="searchQuery" placeholder="Search" class="dropdown-search" />
+            <!-- Dropdown content -->
+            <div class="dropdown-content" :class="{ show: isDropdownOpenModel }">
+              <!-- Search input -->
+              <div class="search-wrapper p-2">
+                <IconSearch id="icon-serch" />
+                <!-- Search icon -->
+                <input
+                  type="text"
+                  v-model="searchQueryModel"
+                  placeholder="Search"
+                  class="dropdown-search"
+                />
+              </div>
+
+              <!-- List of model options -->
+              <a
+                v-for="classItem in filteredModels"
+                :key="classItem"
+                href="#"
+                @click.prevent="selectModel(classItem)"
+              >
+                {{ classItem }}
+              </a>
+            </div>
           </div>
+        </div>
 
-          <!-- List of model options -->
-          <a v-for="modelItem in filteredModels" :key="modelItem" href="#" @click.prevent="selectModel(modelItem)">
-            {{ modelItem }}
-          </a>
+        <IconToArrow class="self-center" />
+        <div class="dropdown flex" id="Class-Dropdown">
+          <div id="ModelTitilText">Classification Model</div>
+          <div>
+            <!-- Dropdown toggle button -->
+            <button class="dropbtn flex items-center justify-around" @click="toggleDropdownClass">
+              {{ classmodel }}
+              <div class="w-1"></div>
+              <IconDropdown />
+              <!-- Icon for dropdown -->
+            </button>
+
+            <!-- Dropdown content -->
+            <div class="dropdown-content" :class="{ show: isDropdownOpenClass }">
+              <!-- Search input -->
+              <div class="search-wrapper p-2">
+                <IconSearch id="icon-serch" />
+                <!-- Search icon -->
+                <input
+                  type="text"
+                  v-model="searchQueryClass"
+                  placeholder="Search"
+                  class="dropdown-search"
+                />
+              </div>
+
+              <!-- List of model options -->
+              <a
+                v-for="classItem in filteredClass"
+                :key="classItem"
+                href="#"
+                @click.prevent="selectClass(classItem)"
+              >
+                {{ classItem }}
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Child component that depends on selected model -->
-    <UploadImageRun :Model="model" />
-    <div>
-    </div>
-    
-  </main>
+    <UploadImageRun :Model="model" :classModel="classmodel" />
+    <div></div>
+  </div>
 </template>
 
 <style scoped>
 /* Scoped styles for the component */
+
+.flex-col {
+  overflow: auto;
+}
 
 /* Styling for the title section */
 #title {
@@ -112,7 +198,7 @@ const filteredModels = computed(() => {
   display: none;
   position: absolute;
   background-color: #fefefe;
-  min-width: 160px;
+  /* min-width: 160px; */
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 1;
   top: 100%; /* Position the dropdown below the button */
@@ -138,7 +224,7 @@ const filteredModels = computed(() => {
   background-color: #eff1ff;
 }
 
-/* Show dropdown content when isDropdownOpen is true */
+/* Show dropdown content when isDropdownOpenModel is true */
 .dropdown-content.show {
   display: block;
 }
@@ -166,11 +252,12 @@ const filteredModels = computed(() => {
 .dropdown {
   position: relative;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
 }
 
 /* Styles for search wrapper */
-.serch-wrapper {
+.search-wrapper {
   position: relative;
 }
 
@@ -180,5 +267,26 @@ const filteredModels = computed(() => {
   top: 50%;
   left: 12px;
   transform: translateY(-45%);
+}
+
+#ModelTitilText {
+  color: #7e7e7e;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: -0.02em;
+  text-align: left;
+  text-underline-position: from-font;
+  text-decoration-skip-ink: none;
+  margin-right: 20px;
+}
+
+#title {
+  width: 95%; /* Adjust the width percentage as needed */
+  height: auto;
+  border-radius: 16px;
+  background-color: #fefefe;
+  padding: 20px;
+  margin: 30px;
 }
 </style>

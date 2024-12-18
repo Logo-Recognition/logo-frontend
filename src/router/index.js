@@ -5,12 +5,18 @@ import AugmentView from '@/views/AugmentView.vue'
 import RunView from '@/views/RunView.vue'
 import AnnotateView from '@/views/AnnotateView.vue'
 import OcrView from '@/views/OcrView.vue'
+import WorkspaceView from '@/views/WorkspaceView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
+      name: 'workspace',
+      component: WorkspaceView
+    },
+    {
+      path: '/class',
       name: 'class',
       component: ClassView
     },

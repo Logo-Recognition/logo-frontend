@@ -171,7 +171,7 @@ onMounted(async () => {
 <template>
   <main id="Dataset-page" class="p-10 bg-background w-full">
     <h1 class="text-lg font-medium text-black">Dataset</h1>
-    <div id="source-img" class="flex flex-col bg-white rounded-3xl px-8 py-6 mt-9">
+    <div id="source-img" class="flex flex-col bg-white rounded-2xl px-8 py-6 mt-9">
       <div class="flex flex-row justify-start items-center">
         <IconSourceImage />
         <span class="text-base font-medium text-sub-primary pl-3">Source Image</span>
@@ -181,7 +181,7 @@ onMounted(async () => {
         <span class="text-sm font-normal text-black pl-8">Classes: {{ classes }}</span>
       </div>
     </div>
-    <div id="train-test-split" class="flex flex-col bg-white rounded-3xl px-8 py-6 mt-9">
+    <div id="train-test-split" class="flex flex-col bg-white rounded-2xl px-8 py-6 mt-9">
         <div class="flex flex-row justify-start items-center mb-4">
             <IconTrainTestSplit />
             <span class="text-base font-medium text-sub-primary pl-3 ">Train/Test Split</span>
@@ -217,7 +217,7 @@ onMounted(async () => {
         </div>
         <Slider v-model="range" class="slider" @slide="onDrag" :tooltips="false"/>
     </div>
-    <div id="augment" class="flex flex-row bg-white rounded-3xl px-8 py-6 mt-6">
+    <div id="augment" class="flex flex-row bg-white rounded-2xl px-8 py-6 mt-6">
       <div class="flex flex-row justify-between items-center h-8 w-full">
         <div class="flex flex-row justify-start items-center">
           <IconAugment style="color: #459E19;"/>
@@ -230,7 +230,7 @@ onMounted(async () => {
         <Toggle class="toggle-bt" v-model="augmentParameterStore.isAugment" :change="updateIsAugment"></Toggle>
       </div>
     </div>
-    <div id="action" class="flex flex-row bg-white rounded-3xl px-8 py-6 mt-6">
+    <div id="action" class="flex flex-row bg-white rounded-2xl px-8 py-6 mt-6">
         <button class="rounded-lg bg-secondary font-medium text-xs text-white px-4 py-2 w-32 shadow" @click="onDownload">Create</button>
         <button class="rounded-lg border border-dark-grey font-medium text-xs text-dark-grey px-4 py-2 w-16 ml-4 shadow " @click="onReset">Reset</button>
     </div>
