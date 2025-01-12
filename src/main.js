@@ -14,7 +14,6 @@ const app = createApp(App)
 pinia.use(piniaPersist)
 app.use(VueLazyload)
 app.use(pinia)
-app.use(router)
 app.use(Vue3Toastify, {
   position: 'top-right',
   transition: 'Vue-Toastify__bounce'
@@ -23,4 +22,4 @@ app.use(VueLazyload, {
   preLoad: 1.3,
   attempt: 1
 })
-app.mount('#app')
+app.use(router).mount('#app')
