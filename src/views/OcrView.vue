@@ -1,11 +1,11 @@
 <script setup>
 import OcrItem from '@/components/OcrItem.vue';
 import UploadImageOcr from '@/components/UploadImageOcr.vue'
-import IconDownload from '@/components/icons/IconDownload.vue'
-import IconView from '@/components/icons/IconView.vue'
+import IconDownload from '@/assets/icons/IconDownload.vue'
+import IconView from '@/assets/icons/IconView.vue'
 import LoadingIndicator from '@/components/LoadingIndicator.vue';
-import IconArrowL from '@/components/icons/IconArrowL.vue'
-import IconArrowR from '@/components/icons/IconArrowR.vue'
+import IconArrowL from '@/assets/icons/IconArrowL.vue'
+import IconArrowR from '@/assets/icons/IconArrowR.vue'
 import JSZip from 'jszip'
 import { toast } from 'vue3-toastify'
 

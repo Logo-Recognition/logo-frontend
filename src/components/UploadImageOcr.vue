@@ -8,7 +8,7 @@ import { API_URL } from '@/config.js'
 const previewImages = ref([])
 const fileInputRef = ref(null)
 const active = ref(false)
-const emit = defineEmits(['send-data','loading'])
+const emit = defineEmits(['send-data', 'loading'])
 const uploadMessage = ref('')
 const isLoading = ref(false)
 const selectedFile = ref()
@@ -60,7 +60,7 @@ const uploadImage = async () => {
   selectedFile.value.forEach((file) => {
     formData.append('images', file)
   })
-  emit('loading',true)
+  emit('loading', true)
   try {
     const response = await axios.post(`${API_URL}/api/ocr`, formData, {
       headers: {
@@ -69,21 +69,20 @@ const uploadImage = async () => {
     })
     uploadMessage.value = 'Images uploaded successfully!'
     console.log('Server response:', response)
-    emit('loading',false)
-    emit('send-data',response.data)
+    emit('loading', false)
+    emit('send-data', response.data)
     onUploadedSuccess()
   } catch (error) {
     uploadMessage.value = 'Error uploading images.'
     console.error('Error uploading images:', error)
     onUploadedFail()
-    emit('loading',false)
+    emit('loading', false)
   } finally {
     isLoading.value = false
     selectedFile.value = []
     previewImages.value = []
   }
 }
-
 </script>
 
 <template>
@@ -147,7 +146,7 @@ const uploadImage = async () => {
 .modal-content-ocr {
   height: auto;
   border-radius: 16px;
-  background-color: #FEFEFE;
+  background-color: #fefefe;
   margin-block: 24px;
   padding-inline: 32px;
   padding-block: 24px;

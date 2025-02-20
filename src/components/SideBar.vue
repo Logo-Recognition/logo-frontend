@@ -1,12 +1,12 @@
 <script setup>
-import IconClasses from '@/components/icons/IconClasses.vue'
-import IconUploadImage from '@/components/icons/IconUploadImage.vue'
-import IconAnnotate from './icons/IconAnnotate.vue'
-import IconAugment from './icons/IconAugment.vue'
-import IconDataset from './icons/IconDataset.vue'
-import IconModelRun from './icons/IconModelRun.vue'
-import IconLogout from './icons/IconLogout.vue'
-import IconOCR from './icons/IconOCR.vue';
+import IconClasses from '@/assets/icons/IconClasses.vue'
+import IconUploadImage from '@/assets/icons/IconUploadImage.vue'
+import IconAnnotate from '@/assets/icons/IconAnnotate.vue'
+import IconAugment from '@/assets/icons/IconAugment.vue'
+import IconDataset from '@/assets/icons/IconDataset.vue'
+import IconModelRun from '@/assets/icons/IconModelRun.vue'
+import IconLogout from '@/assets/icons/IconLogout.vue'
+// import IconOCR from '@/assets/icons/IconOCR.vue'
 const emit = defineEmits(['openModal'])
 
 const openModal = () => {
@@ -52,13 +52,13 @@ const openModal = () => {
             <span class="text">Run</span>
           </router-link>
         </div>
-        <div id="ocr" class="w-full flex flex-col justify-start pt-6">
+        <!-- <div id="ocr" class="w-full flex flex-col justify-start pt-6">
           <span class="menu-title">TEXT CONVERT</span>
           <router-link to="/ocr" class="button">
             <IconOCR />
             <span class="text">OCR</span>
           </router-link>
-        </div>
+        </div> -->
       </div>
     </div>
 

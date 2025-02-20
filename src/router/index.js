@@ -1,53 +1,48 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import LoginView from '../views/LoginView.vue'
+// import LoginView from '../views/LoginView.vue'
 import DefaultLayout from '@/layouts/ProjectLayout.vue'
 
 const routes = [
-  {
-    path: '/',
-    name: 'login',
-    component: LoginView
-  },
+  // {
+  //   path: '/',
+  //   name: 'login',
+  //   component: LoginView
+  // },
   {
     path: '/',
     component: DefaultLayout,
     meta: { requiresAuth: true },
     children: [
       {
-        path: 'workspace',
-        name: 'workspace',
-        component: () => import('../views/WorkspaceView.vue')
-      },
-      {
         path: 'class',
         name: 'class',
         component: () => import('../views/ClassView.vue')
       },
       {
-        path: '/annotate',
+        path: 'annotate',
         name: 'annotate',
         component: () => import('../views/AnnotateView.vue')
       },
       {
-        path: '/augment',
+        path: 'augment',
         name: 'augment',
         component: () => import('../views/AugmentView.vue')
       },
       {
-        path: '/dataset',
+        path: 'dataset',
         name: 'dataset',
         component: () => import('../views/DatasetView.vue')
       },
       {
-        path: '/model',
+        path: 'model',
         name: 'model',
         component: () => import('../views/RunView.vue')
-      },
-      {
-        path: '/ocr',
-        name: 'ocr',
-        component: () => import('../views/OcrView.vue')
       }
+      // {
+      //   path: 'ocr',
+      //   name: 'ocr',
+      //   component: () => import('../views/OcrView.vue')
+      // }
     ]
   }
 ]
