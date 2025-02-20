@@ -1,7 +1,7 @@
 <script setup>
 import Popup from '@/components/AddClassessPopup.vue'
-import IconPlus from '@/components/icons/IconPlus.vue'
-import IconBin from '@/components/icons/IconBin.vue'
+import IconPlus from '@/assets/icons/IconPlus.vue'
+import IconBin from '@/assets/icons/IconBin.vue'
 import { API_URL } from '@/config.js'
 
 import { ref, onMounted } from 'vue'

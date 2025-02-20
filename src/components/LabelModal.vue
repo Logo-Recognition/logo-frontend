@@ -3,7 +3,7 @@ import { ref, onMounted, watch } from 'vue'
 import { toast } from 'vue3-toastify'
 import axios from 'axios'
 import { API_URL } from '@/config.js'
-import IconSearch from '@/components/icons/IconSearch.vue'
+import IconSearch from '@/assets/icons/IconSearch.vue'
 
 const props = defineProps({
   lastUsedClass: {
