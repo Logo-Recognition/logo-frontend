@@ -1,22 +1,23 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
-import IconDropdown from '@/components/icons/IconDropdown.vue'
-import IconSearch from '@/components/icons/IconSearch.vue'
-import IconToArrow from '@/components/icons/IconToArrow.vue'
+import IconDropdown from '@/assets/icons/IconDropdown.vue'
+import IconSearch from '@/assets/icons/IconSearch.vue'
+import IconToArrow from '@/assets/icons/IconToArrow.vue'
 import UploadImageRun from '@/components/UploadImageRun.vue'
-// Initialize the selected model with a default value
+import ScrapeData from '@/components/ScrapeData.vue'
+
 const model = ref('RT-DETR')
 const classmodel = ref('Mobilenetv3')
 const detectionModel = ref(['RT-DETR', 'YOLOV8', 'YOLOV10'])
-const classificationModel = ref(['Mobilenetv3', 'Efficientnetv2','Inceptionv2'])
+const classificationModel = ref(['Mobilenetv3', 'Efficientnetv2', 'Inceptionv2'])
 
-// Initialize a reactive state for the dropdown visibility
 const isDropdownOpenModel = ref(false)
 const isDropdownOpenClass = ref(false)
-const searchQueryModel = ref('') // Search for Detection Model
-const searchQueryClass = ref('') // Search for Classification Model
+const searchQueryModel = ref('')
+const searchQueryClass = ref('')
 
-// Function to toggle the dropdown visibility
+const activeTab = ref('upload')
+
 function toggleDropdownModel() {
   isDropdownOpenModel.value = !isDropdownOpenModel.value
 }
@@ -77,18 +78,15 @@ const filteredClass = computed(() => {
 <template>
   <div class="flex-col">
     <div id="title">
-      <h2 class="font-bold mb-5">Select Model</h2>
-      <!-- Dropdown component -->
+      <h3 class="font-bold mb-5">Select Model</h3>
       <div class="flex justify-between">
         <div class="dropdown flex-row" id="Model-Dropdown">
           <div id="ModelTitilText">Detection Model</div>
-          <!-- Dropdown toggle button -->
           <div>
-            <button class="dropbtn flex items-center justify-around" @click="toggleDropdownModel">
+            <button class="dropbtn flex items-center" @click="toggleDropdownModel">
               {{ model }}
               <div class="w-1"></div>
               <IconDropdown />
-              <!-- Icon for dropdown -->
             </button>
 
             <!-- Dropdown content -->
@@ -159,9 +157,33 @@ const filteredClass = computed(() => {
       </div>
     </div>
 
-    <!-- Child component that depends on selected model -->
-    <UploadImageRun :Model="model" :classModel="classmodel" />
-    <div></div>
+    <div id="title">
+      <div class="flex border rounded-lg bg-gray-100 w-fit">
+        <button
+          :class="[
+            'px-4 py-2 font-semibold rounded-lg',
+            activeTab === 'upload' ? 'bg-white text-black shadow' : 'text-gray-500'
+          ]"
+          @click="activeTab = 'upload'"
+        >
+          Upload Image
+        </button>
+        <button
+          :class="[
+            'px-4 py-2 font-semibold rounded-lg',
+            activeTab === 'scrape' ? 'bg-white text-black shadow' : 'text-gray-500'
+          ]"
+          @click="activeTab = 'scrape'"
+        >
+          Scrape Image
+        </button>
+      </div>
+
+      <div class="mt-4">
+        <UploadImageRun v-if="activeTab === 'upload'" :Model="model" :classModel="classmodel" />
+        <ScrapeData v-if="activeTab === 'scrape'" />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -174,7 +196,7 @@ const filteredClass = computed(() => {
 
 /* Styling for the title section */
 #title {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 500;
   gap: 0px;
   margin: 30px;
@@ -184,9 +206,13 @@ const filteredClass = computed(() => {
 .dropbtn {
   width: fit-content;
   height: 50px;
-  padding: 16px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 16px;
+  padding-right: 16px;
   border-radius: 8px;
   text-align: start;
+  font-size: 0.875rem;
   display: flex;
   align-items: center;
   background-color: #eff1ff;

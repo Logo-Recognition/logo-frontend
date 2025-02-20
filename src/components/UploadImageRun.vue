@@ -3,11 +3,11 @@ import { ref } from 'vue'
 import { toast } from 'vue3-toastify'
 import PreviewImage from './PreviewImage.vue'
 import axios from 'axios'
-import IconDownload from '@/components/icons/IconDownload.vue'
-import IconView from '@/components/icons/IconView.vue'
+import IconDownload from '@/assets/icons/IconDownload.vue'
+import IconView from '@/assets/icons/IconView.vue'
 import CamSelect from '@/components/CamSelect.vue'
-import IconArrowL from '@/components/icons/IconArrowL.vue'
-import IconArrowR from '@/components/icons/IconArrowR.vue'
+import IconArrowL from '@/assets/icons/IconArrowL.vue'
+import IconArrowR from '@/assets/icons/IconArrowR.vue'
 import LoadingIndicator from '@/components/LoadingIndicator.vue'
 import JSZip from 'jszip'
 import { API_URL } from '@/config.js'
@@ -217,48 +217,45 @@ const handleTabChange = (tab) => {
 
 <template>
   <!-- Modal content for uploading images -->
-  <div class="modal-content-run">
-    <h2 class="font-bold mb-5">Upload Images</h2>
-    <div
-      @dragenter.prevent="toggleActive(true)"
-      @dragleave.prevent="toggleActive(false)"
-      @dragover.prevent
-      @drop.prevent="onFileChange"
-      :class="{ 'active-dropzone': active }"
-    >
-      <div class="upload-content-run content-around flex">
-        <input
-          class="file-run"
-          ref="fileInputRef"
-          type="file"
-          multiple
-          @change="onFileChange"
-          accept="image/*"
-        />
-        <img alt="Upload image" class="m-5" src="@/assets/images/upload-btn.svg" width="90" />
-        <div class="content-around">
-          <p class="text-[#052443]">Upload or Drop image here</p>
-          <p class="text-[#7E7E7E]">Limit PNG,JPG,JPEG</p>
-        </div>
+  <div
+    @dragenter.prevent="toggleActive(true)"
+    @dragleave.prevent="toggleActive(false)"
+    @dragover.prevent
+    @drop.prevent="onFileChange"
+    :class="{ 'active-dropzone': active }"
+  >
+    <div class="upload-content-run content-around flex">
+      <input
+        class="file-run"
+        ref="fileInputRef"
+        type="file"
+        multiple
+        @change="onFileChange"
+        accept="image/*"
+      />
+      <img alt="Upload image" class="m-5" src="@/assets/images/upload-btn.svg" width="90" />
+      <div class="content-around">
+        <p class="text-[#052443]">Upload or Drop image here</p>
+        <p class="text-[#7E7E7E]">Limit PNG,JPG,JPEG</p>
+      </div>
 
-        <button class="browse-button content-center justify-self-end" @click="triggerFileInput">
-          Browse files
-        </button>
+      <button class="browse-button content-center justify-self-end" @click="triggerFileInput">
+        Browse files
+      </button>
+    </div>
+  </div>
+
+  <!-- Display preview of uploaded images -->
+  <div v-if="previewImages.length > 0" class="preview-container">
+    <div class="preview-area">
+      <div v-for="(image, index) in previewImages" :key="index" class="preview-items">
+        <PreviewImage :src="image.url" @img-removed="removeImage(index)"></PreviewImage>
       </div>
     </div>
-
-    <!-- Display preview of uploaded images -->
-    <div v-if="previewImages.length > 0" class="preview-container">
-      <div class="preview-area">
-        <div v-for="(image, index) in previewImages" :key="index" class="preview-items">
-          <PreviewImage :src="image.url" @img-removed="removeImage(index)"></PreviewImage>
-        </div>
-      </div>
-    </div>
-    <div class="flex flex-row">
-      <button class="create-button" @click="uploadImage">Create</button>
-      <button class="clear-button ml-1" @click="clearImage">Clear</button>
-    </div>
+  </div>
+  <div class="flex flex-row">
+    <button class="create-button" @click="uploadImage">Create</button>
+    <button class="clear-button ml-1" @click="clearImage">Clear</button>
   </div>
 
   <!-- Display while images are being processed -->
