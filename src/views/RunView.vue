@@ -30,7 +30,6 @@ const activeTab = ref('upload')
 
 const currentImageIndex = ref(0)
 
-// Computed property to filter models based on search query
 const filteredModels = computed(() => {
   return detectionModel.value.filter((selectedDetectionModel) =>
     selectedDetectionModel.toLowerCase().includes(searchQueryModel.value.toLowerCase())
@@ -57,13 +56,11 @@ const handleUploadedImages = (imageUrls) => {
   processedImageUrls.value = imageUrls
 }
 
-// Update results from ScrapeData
 const scrapingCompleted = (imageUrls) => {
-  processedImageUrls.value = imageUrls // Set the image URLs from ScrapeData
-  isLoading.value = false // Update loading state when done
+  processedImageUrls.value = imageUrls
+  isLoading.value = false
 }
 
-// Toggle dropdown visibility
 function toggleDropdownModel() {
   isDropdownOpenModel.value = !isDropdownOpenModel.value
 }
@@ -140,18 +137,15 @@ const showPreviousImage = () => {
   }
 }
 
-// Function to set the current image index
 const setImageIndex = (index) => {
   currentImageIndex.value = index
 }
 
-// Listen for clicks outside the dropdown
 onMounted(() => {
   window.addEventListener('click', closeDropdown)
   window.addEventListener('click', closeDropdownClass)
 })
 
-// Clean up event listener on component unmount
 onBeforeUnmount(() => {
   window.removeEventListener('click', closeDropdown)
   window.removeEventListener('click', closeDropdownClass)
@@ -384,15 +378,13 @@ onBeforeUnmount(() => {
   display: none;
   position: absolute;
   background-color: #fefefe;
-  /* min-width: 160px; */
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 1;
-  top: 100%; /* Position the dropdown below the button */
+  top: 100%;
   border-radius: 10px;
-  border: 1px solid #7585ff; /* Border style */
+  border: 1px solid #7585ff;
 }
 
-/* Search input styles */
 .dropdown-search {
   width: 100%;
   height: 38px;
@@ -403,38 +395,32 @@ onBeforeUnmount(() => {
   border: 1px solid #ddd;
 }
 
-/* Focus styles for search input */
 .dropdown-search:focus {
   border: 1px solid #7585ff;
-  outline: none; /* Remove default outline */
+  outline: none;
   background-color: #eff1ff;
 }
 
-/* Show dropdown content when isDropdownOpenModel is true */
 .dropdown-content.show {
   display: block;
 }
 
-/* Styles for links inside the dropdown */
 .dropdown-content a {
   color: black;
   padding: 12px 16px;
   text-decoration: none;
   display: block;
-  border-bottom: 1px solid #ddd; /* Add this line to set a bottom border */
+  border-bottom: 1px solid #ddd;
 }
 
-/* Remove border from the last link element */
 .dropdown-content a:last-child {
   border-bottom: none;
 }
 
-/* Hover styles for links inside the dropdown */
 .dropdown-content a:hover {
   background-color: #eff1ff;
 }
 
-/* Dropdown container styling */
 .dropdown {
   position: relative;
   display: flex;
@@ -442,12 +428,10 @@ onBeforeUnmount(() => {
   align-items: center;
 }
 
-/* Styles for search wrapper */
 .search-wrapper {
   position: relative;
 }
 
-/* Search icon positioning */
 #icon-serch {
   position: absolute;
   top: 50%;
@@ -468,7 +452,7 @@ onBeforeUnmount(() => {
 }
 
 #title {
-  width: 95%; /* Adjust the width percentage as needed */
+  width: 95%;
   height: auto;
   border-radius: 16px;
   background-color: #fefefe;
@@ -477,7 +461,7 @@ onBeforeUnmount(() => {
 }
 
 #show-picture-card {
-  width: 95%; /* Adjust the width percentage as needed */
+  width: 95%;
   height: auto;
   border-radius: 16px;
   background-color: #fefefe;
@@ -492,17 +476,16 @@ onBeforeUnmount(() => {
 }
 
 #the-predicted-image {
-  width: 70%; /* Limit the maximum width */
-  height: 400px; /* Maintain aspect ratio */
-  object-fit: contain; /* Ensure the entire image fits within the set dimensions */
-  /* border-radius: 16px; */
+  width: 70%;
+  height: 400px;
+  object-fit: contain;
   border: 1px dashed #3745be;
   padding: auto;
 }
 
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 columns */
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   justify-items: center;
 }
@@ -522,7 +505,7 @@ onBeforeUnmount(() => {
 .dropdown-container {
   display: flex;
   flex-wrap: wrap;
-  max-width: 300px; /* Adjust as needed */
+  max-width: 300px; 
   background-color: white;
   border: 1px solid #ccc;
   padding: 10px;
@@ -544,12 +527,12 @@ onBeforeUnmount(() => {
 }
 
 .preview-area {
-  display: inline-flex; /* Use flexbox layout */
-  gap: 10px; /* Add spacing between items */
+  display: inline-flex; 
+  gap: 10px;
 }
 
 .preview-items {
-  flex: 0 0 auto; /* Prevent items from shrinking */
+  flex: 0 0 auto;
 }
 
 .preview-img {

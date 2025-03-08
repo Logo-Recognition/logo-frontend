@@ -88,7 +88,7 @@ const minEndSelectableDate = computed(() => {
 const maxSelectableDate = computed(() => {
   const today = new Date()
   today.setDate(today.getDate() - 1)
-  return today.toISOString().split('T')[0] // Format as YYYY-MM-DD
+  return today.toISOString().split('T')[0]
 })
 
 watch(startDate, (newStartDate) => {

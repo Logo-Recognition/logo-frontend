@@ -5,7 +5,6 @@ import PreviewImage from './PreviewImage.vue'
 import axios from 'axios'
 import { API_URL } from '@/config.js'
 
-// Props received from parent component
 const props = defineProps({
   Model: {
     type: String,
@@ -17,7 +16,6 @@ const props = defineProps({
   }
 })
 
-// Reactive variables declaration
 const previewImages = ref([])
 const fileInputRef = ref(null)
 const active = ref(false)
@@ -32,26 +30,22 @@ const CamdUrls = ref([])
 
 const emits = defineEmits(['uploading-completed'])
 
-// Function to toggle dropzone state
 const toggleActive = (isActive) => {
   active.value = isActive
 }
 
-// Function to display toast on successful upload
 const onUploadedSuccess = () => {
   toast.success('Images uploaded successfully!', {
     autoClose: 3000
   })
 }
 
-// Function to display toast on upload failure
 const onUploadedFail = () => {
   toast.error('Failed to upload images.', {
     autoClose: 3000
   })
 }
 
-// Function to handle file input changes
 const onFileChange = (event) => {
   const files = event.target.files || event.dataTransfer.files
   for (let index = 0; index < files.length; index++) {
@@ -67,22 +61,18 @@ const onFileChange = (event) => {
   }
 }
 
-// Function to remove an image from preview
 const removeImage = (index) => {
   previewImages.value.splice(index, 1)
 }
 
-// Function to clear all previewed images
 const clearImage = () => {
   previewImages.value = []
 }
 
-// Function to trigger file input dialog
 const triggerFileInput = () => {
   fileInputRef.value.click()
 }
 
-// Function to upload images to the server
 const uploadImage = async () => {
   if (previewImages.value.length === 0) {
     return
@@ -208,7 +198,7 @@ const uploadImage = async () => {
   opacity: 0px;
   background: #7585ff;
   color: #fefefe;
-  margin-left: auto !important; /* Pushes the button to the end of the flex container */
+  margin-left: auto !important;
   margin-right: 20px !important;
   margin: auto;
   padding: auto;
