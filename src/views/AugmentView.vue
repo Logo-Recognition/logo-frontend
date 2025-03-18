@@ -6,9 +6,9 @@ import NoiseSelectBar from '@/components/NoiseSelectBar.vue'
 import { ref, watch, computed, onMounted } from 'vue'
 import Slider from '@vueform/slider'
 import { useParametersStore } from '@/stores/Augment.js'
-import { API_URL } from '@/config.js'
 import { toast } from 'vue3-toastify'
 
+const apiUrl = import.meta.env.VITE_API_HOST;
 const store = useParametersStore()
 
 // // Accessing augmentation parameters
@@ -19,7 +19,7 @@ const updateRotate = (type, value) => {
   store.updateAugmentationParam(type, value)
 }
 
-const pathImage = `${API_URL}/api/annotated-images`
+const pathImage = `${apiUrl}/api/annotated-images`
 const images = ref([])
 
 //fetch api to get all image in dataset
