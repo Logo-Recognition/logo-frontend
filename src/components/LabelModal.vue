@@ -2,7 +2,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { toast } from 'vue3-toastify'
 import axios from 'axios'
-import IconSearch from '@/components/icons/IconSearch.vue'
+import IconSearch from '@/assets/icons/IconSearch.vue'
 
 const props = defineProps({
   lastUsedClass: {
@@ -10,7 +10,9 @@ const props = defineProps({
     default: ''
   }
 })
+
 const apiUrl = import.meta.env.VITE_API_HOST;
+
 const classList = ref([])
 const filteredClassList = ref([])
 const search = ref('')

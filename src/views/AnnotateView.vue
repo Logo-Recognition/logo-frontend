@@ -3,11 +3,11 @@ import { ref, onMounted, computed } from 'vue'
 import { fabric } from 'fabric'
 import { toast } from 'vue3-toastify'
 import { ContentLoader } from 'vue-content-loader'
-import IconCursorPointer from '@/components/icons/IconCursorPointer.vue'
-import IconBoundingBox from '@/components/icons/IconBoundingBox.vue'
-import IconTxtFile from '@/components/icons/IconTxtFile.vue'
-import IconBin from '@/components/icons/IconBin.vue'
-import IconEdit from '@/components/icons/IconEdit.vue'
+import IconCursorPointer from '@/assets/icons/IconCursorPointer.vue'
+import IconBoundingBox from '@/assets/icons/IconBoundingBox.vue'
+import IconTxtFile from '@/assets/icons/IconTxtFile.vue'
+import IconBin from '@/assets/icons/IconBin.vue'
+import IconEdit from '@/assets/icons/IconEdit.vue'
 import BoxNameModal from '@/components/LabelModal.vue'
 import axios from 'axios'
 import Multiselect from 'vue-multiselect'
@@ -550,8 +550,8 @@ onMounted(() => {
             <span class="tooltip-text">Save YOLO format</span>
           </div>
         </div>
-        <canvas ref="canvasRef" class="canvas-wrapper" width="715" height="460"></canvas>
-        <!-- <canvas ref="canvasRef" class="canvas-wrapper" width="830" height="530"></canvas> -->
+        <!-- <canvas ref="canvasRef" class="canvas-wrapper" width="715" height="460"></canvas> -->
+        <canvas ref="canvasRef" class="canvas-wrapper" width="830" height="530"></canvas>
 
         <div class="mouse-coordinates">
           X: {{ mouseCoordinates.x }}, Y: {{ mouseCoordinates.y }}

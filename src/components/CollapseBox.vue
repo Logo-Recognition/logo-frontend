@@ -1,14 +1,14 @@
 <script setup>
 import { computed } from 'vue'
 
-import IconRotate from '@/components/icons/IconRotate.vue'
-import IconFlip from '@/components/icons/IconFlip.vue'
-import IconNoise from '@/components/icons/IconNoise.vue'
-import IconScailing from '@/components/icons/IconScailing.vue'
-import IconBright from '@/components/icons/IconBright.vue'
-import IconSaturation from '@/components/icons/IconSaturation.vue'
-import IconContrast from '@/components/icons/IconContrast.vue'
-import IconClose from './icons/IconClose.vue'
+import IconRotate from '@/assets/icons/IconRotate.vue'
+import IconFlip from '@/assets/icons/IconFlip.vue'
+import IconNoise from '@/assets/icons/IconNoise.vue'
+import IconScailing from '@/assets/icons/IconScailing.vue'
+import IconBright from '@/assets/icons/IconBright.vue'
+import IconSaturation from '@/assets/icons/IconSaturation.vue'
+import IconContrast from '@/assets/icons/IconContrast.vue'
+import IconClose from '@/assets/icons/IconClose.vue'
 
 // Define props received from parent component
 const props = defineProps({
@@ -78,7 +78,6 @@ function closePopup() {
 }
 </script>
 
-
 <template>
   <div id="Box" class="flex relative">
     <!-- Display the icon component dynamically based on iconComponent computed property -->
@@ -97,7 +96,6 @@ function closePopup() {
     </button>
   </div>
 </template>
-
 
 <style scoped>
 #Box {

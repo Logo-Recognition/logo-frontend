@@ -1,51 +1,65 @@
-import DatasetView from '@/views/DatasetView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
-import ClassView from '@/views/ClassView.vue'
-import AugmentView from '@/views/AugmentView.vue'
-import RunView from '@/views/RunView.vue'
-import AnnotateView from '@/views/AnnotateView.vue'
-import OcrView from '@/views/OcrView.vue'
-import WorkspaceView from '@/views/WorkspaceView.vue'
+// import LoginView from '../views/LoginView.vue'
+import DefaultLayout from '@/layouts/ProjectLayout.vue'
+
+const routes = [
+  // {
+  //   path: '/',
+  //   name: 'login',
+  //   component: LoginView
+  // },
+  {
+    path: '/',
+    component: DefaultLayout,
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: 'class',
+        name: 'class',
+        component: () => import('../views/ClassView.vue')
+      },
+      {
+        path: 'annotate',
+        name: 'annotate',
+        component: () => import('../views/AnnotateView.vue')
+      },
+      {
+        path: 'augment',
+        name: 'augment',
+        component: () => import('../views/AugmentView.vue')
+      },
+      {
+        path: 'dataset',
+        name: 'dataset',
+        component: () => import('../views/DatasetView.vue')
+      },
+      {
+        path: 'model',
+        name: 'model',
+        component: () => import('../views/RunView.vue')
+      }
+      // {
+      //   path: 'ocr',
+      //   name: 'ocr',
+      //   component: () => import('../views/OcrView.vue')
+      // }
+    ]
+  }
+]
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
-    {
-      path: '/',
-      name: 'workspace',
-      component: WorkspaceView
-    },
-    {
-      path: '/class',
-      name: 'class',
-      component: ClassView
-    },
-    {
-      path: '/augment', // New path
-      name: 'augment', // Name for the route
-      component: AugmentView // Component to render
-    },
-    {
-      path: '/model', // New path
-      name: 'model', // Name for the route
-      component: RunView // Component to render
-    },
-    {
-      path: '/dataset',
-      name: 'dataset',
-      component: DatasetView
-    },
-    {
-      path: '/annotate',
-      name: 'annotate',
-      component: AnnotateView
-    },
-    {
-      path: '/ocr',
-      name: 'ocr',
-      component: OcrView
-    }
-  ]
+  routes
 })
+
+// router.beforeEach((to, from, next) => {
+//   const isAuthenticated = localStorage.getItem('token')
+
+//   if (to.meta.requiresAuth && !isAuthenticated) {
+//     next('/')
+//   } else {
+//     next()
+//   }
+// })
 
 export default router

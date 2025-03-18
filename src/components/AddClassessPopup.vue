@@ -1,5 +1,5 @@
 <script setup>
-import IconClose from './icons/IconClose.vue'
+import IconClose from '@/assets/icons/IconClose.vue'
 import { defineProps, ref } from 'vue'
 const apiUrl = import.meta.env.VITE_API_HOST;
 
@@ -29,8 +29,8 @@ const submitData = () => {
 const addClass = async (classNames) => {
   const newClasses = classNames
     .split(',') // Split input string by comma
-    .map(name => name.trim()) // Trim whitespace around each class name
-    .filter(name => name !== '') // Filter out empty class names
+    .map((name) => name.trim()) // Trim whitespace around each class name
+    .filter((name) => name !== '') // Filter out empty class names
 
   for (const className of newClasses) {
     await PostClass(className) // Call function to post each class name
@@ -76,11 +76,13 @@ const validateInput = () => {
   if (inputValues.length === 0) {
     errorMessage.value = 'Please enter at least one class name.'
   } else if (isAnyValueTooShort && isAnyValueInvalid) {
-    errorMessage.value = 'Invalid input! Please enter values containing only lowercase letters or numbers with a length greater than 3.'
+    errorMessage.value =
+      'Invalid input! Please enter values containing only lowercase letters or numbers with a length greater than 3.'
   } else if (isAnyValueTooShort) {
     errorMessage.value = 'Invalid input! Please enter values with a length greater than 3.'
   } else if (isAnyValueInvalid) {
-    errorMessage.value = 'Invalid input! Please enter values containing only lowercase letters or numbers.'
+    errorMessage.value =
+      'Invalid input! Please enter values containing only lowercase letters or numbers.'
   } else {
     errorMessage.value = ''
   }
@@ -95,7 +97,6 @@ const closePopup = () => {
   props.togglePopup(null) // Call function from props to toggle popup visibility
 }
 </script>
-
 
 <template>
   <div id="AddClassPopup">
@@ -128,7 +129,6 @@ const closePopup = () => {
     </div>
   </div>
 </template>
-
 
 <style scoped>
 #AddClassPopup {

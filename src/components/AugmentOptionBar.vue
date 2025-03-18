@@ -1,11 +1,11 @@
 <script setup>
-import IconRotate from '@/components/icons/IconRotate.vue';
-import IconFlip from '@/components/icons/IconFlip.vue';
-import IconNoise from '@/components/icons/IconNoise.vue';
-import IconScailing from '@/components/icons/IconScailing.vue';
-import IconBright from '@/components/icons/IconBright.vue';
-import IconSaturation from '@/components/icons/IconSaturation.vue';
-import IconContrast from '@/components/icons/IconContrast.vue';
+import IconRotate from '@/assets/icons/IconRotate.vue';
+import IconFlip from '@/assets/icons/IconFlip.vue';
+import IconNoise from '@/assets/icons/IconNoise.vue';
+import IconScailing from '@/assets/icons/IconScailing.vue';
+import IconBright from '@/assets/icons/IconBright.vue';
+import IconSaturation from '@/assets/icons/IconSaturation.vue';
+import IconContrast from '@/assets/icons/IconContrast.vue';
 import { ref } from 'vue';
 import { defineEmits } from 'vue';
 

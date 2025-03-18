@@ -1,7 +1,7 @@
 <script setup>
-import IconSourceImage from '@/components/icons/IconSourceImage.vue';
-import IconTrainTestSplit from '@/components/icons/IconTrainTestSplit.vue';
-import IconAugment from '@/components/icons/IconAugment.vue';
+import IconSourceImage from '@/assets/icons/IconSourceImage.vue';
+import IconTrainTestSplit from '@/assets/icons/IconTrainTestSplit.vue';
+import IconAugment from '@/assets/icons/IconAugment.vue';
 import { ref,onMounted,watch } from 'vue';
 import Slider from '@vueform/slider';
 import Toggle from '@vueform/toggle';
