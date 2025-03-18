@@ -1,7 +1,8 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, defineEmits, watch } from 'vue'
-import { API_URL } from '@/config.js'
 import { toast } from 'vue3-toastify'
+
+const apiUrl = import.meta.env.VITE_API_HOST;
 
 const keyword = ref('')
 const startDate = ref('')
@@ -109,7 +110,7 @@ const startScraping = async () => {
 
   try {
     const response = await fetch(
-      `${API_URL}/api/scrape?keyword=${encodeURIComponent(keyword.value)}&start_date=${startDate.value}&end_date=${endDate.value}`
+      `${apiUrl}/api/scrape?keyword=${encodeURIComponent(keyword.value)}&start_date=${startDate.value}&end_date=${endDate.value}`
     )
 
     if (!response.ok) {
