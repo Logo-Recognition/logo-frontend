@@ -1,10 +1,10 @@
 <script setup>
 import IconClose from '@/assets/icons/IconClose.vue'
 import { defineProps, ref } from 'vue'
-import { API_URL } from '@/config.js'
+const apiUrl = import.meta.env.VITE_API_HOST;
 
 // API path for class addition
-const pathPublic = `${API_URL}/api/class`
+const pathPublic = `${apiUrl}/api/class`
 
 // Props received from parent component
 const props = defineProps({

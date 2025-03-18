@@ -9,13 +9,16 @@ import IconTxtFile from '@/assets/icons/IconTxtFile.vue'
 import IconBin from '@/assets/icons/IconBin.vue'
 import IconEdit from '@/assets/icons/IconEdit.vue'
 import BoxNameModal from '@/components/LabelModal.vue'
-import { API_URL } from '@/config.js'
 import axios from 'axios'
 import Multiselect from 'vue-multiselect'
+
+const apiUrl = import.meta.env.VITE_API_HOST;
+
 
 const canvasRef = ref(null)
 const labelsContainerRef = ref(null)
 let canvas = null
+
 
 const mode = ref('pointer')
 let isDragging = false
@@ -45,7 +48,7 @@ const selectedImage = ref({ name: '', width: 0.0, height: 0.0 })
 
 const fetchClassList = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/class`)
+    const response = await axios.get(`${apiUrl}/api/class`)
     classList.value = response.data.classes
   } catch (error) {
     console.error('Error fetching class list:', error)
@@ -397,7 +400,7 @@ const saveAnnotations = async () => {
 
     console.log('annotatedData:', annotatedData)
 
-    const response = await fetch(`${API_URL}/api/annotated-images`, {
+    const response = await fetch(`${apiUrl}/api/annotated-images`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -438,7 +441,7 @@ const fetchImages = async (tab) => {
 
   try {
     const endpoint = tab.toLowerCase() === 'unannotated' ? 'images' : 'annotated-images'
-    const response = await fetch(`${API_URL}/api/${endpoint}`)
+    const response = await fetch(`${apiUrl}/api/${endpoint}`)
     if (response.ok) {
       let images = []
 

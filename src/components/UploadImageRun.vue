@@ -3,7 +3,6 @@ import { ref, defineEmits } from 'vue'
 import { toast } from 'vue3-toastify'
 import PreviewImage from './PreviewImage.vue'
 import axios from 'axios'
-import { API_URL } from '@/config.js'
 
 const props = defineProps({
   Model: {
@@ -15,6 +14,8 @@ const props = defineProps({
     required: true
   }
 })
+
+const apiUrl = import.meta.env.VITE_API_HOST;
 
 const previewImages = ref([])
 const fileInputRef = ref(null)
@@ -94,7 +95,7 @@ const uploadImage = async () => {
   isLoading.value = true
 
   try {
-    const response = await axios.post(`${API_URL}/api/model/run-realtime`, formData, {
+    const response = await axios.post(`${apiUrl}/api/model/run-realtime`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }

@@ -1,18 +1,19 @@
 <script setup>
 import Popup from '@/components/AddClassessPopup.vue'
-import IconPlus from '@/assets/icons/IconPlus.vue'
-import IconBin from '@/assets/icons/IconBin.vue'
-import { API_URL } from '@/config.js'
+import IconPlus from '@/components/icons/IconPlus.vue'
+import IconBin from '@/components/icons/IconBin.vue'
 
 import { ref, onMounted } from 'vue'
 
+const apiUrl = import.meta.env.VITE_API_HOST;
+console.log(apiUrl);
 // Defining reactive variables
 const classes = ref([]) // the list of classes
 // const input_content = ref('')
 const popupTriggers = ref({
   buttonTrigger: false // Determines if the popup should be displayed
 })
-const pathPublic = `${API_URL}/api/class` // API endpoint for classes
+const pathPublic = `${apiUrl}/api/class` // API endpoint for classes
 
 const isLoading = ref(true) // Indicates if the data is being loaded
 const error = ref(null) // Holds any error messages
