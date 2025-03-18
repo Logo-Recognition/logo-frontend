@@ -3,12 +3,12 @@ import IconSourceImage from '@/components/icons/IconSourceImage.vue';
 import IconTrainTestSplit from '@/components/icons/IconTrainTestSplit.vue';
 import IconAugment from '@/components/icons/IconAugment.vue';
 import { ref,onMounted,watch } from 'vue';
-import {API_URL} from '@/config.js'
 import Slider from '@vueform/slider';
 import Toggle from '@vueform/toggle';
 import { useParametersStore } from '@/stores/Augment.js'
 import { toast } from 'vue3-toastify';
 import streamSaver from 'streamsaver';
+const apiUrl = import.meta.env.VITE_API_HOST;
 
 const augmentParameterStore = useParametersStore()
 const range = ref([augmentParameterStore.trainTestSplitParam.trainSize, augmentParameterStore.trainTestSplitParam.trainSize+augmentParameterStore.trainTestSplitParam.validSize]);
@@ -94,7 +94,7 @@ const onDownload = async () => {
       }
     })
 
-    const response = await fetch(`${API_URL}/api/dataset/download`, {
+    const response = await fetch(`${apiUrl}/api/dataset/download`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -154,7 +154,7 @@ const onReset = () => {
 
 onMounted(async () => {
   try {
-    const response = await fetch(`${API_URL}/api/dataset`);
+    const response = await fetch(`${apiUrl}/api/dataset`);
     if(response.ok){
       const responseData = await response.json();
       classes.value = responseData["total_classes"];

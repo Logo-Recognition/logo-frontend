@@ -2,7 +2,6 @@
 import { ref, onMounted, watch } from 'vue'
 import { toast } from 'vue3-toastify'
 import axios from 'axios'
-import { API_URL } from '@/config.js'
 import IconSearch from '@/components/icons/IconSearch.vue'
 
 const props = defineProps({
@@ -11,7 +10,7 @@ const props = defineProps({
     default: ''
   }
 })
-
+const apiUrl = import.meta.env.VITE_API_HOST;
 const classList = ref([])
 const filteredClassList = ref([])
 const search = ref('')
@@ -20,7 +19,7 @@ const emit = defineEmits(['close', 'submit', 'classSelected'])
 
 const fetchClassList = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/class`)
+    const response = await axios.get(`${apiUrl}/api/class`)
     classList.value = response.data.classes
     filteredClassList.value = classList.value
   } catch (error) {
