@@ -1,16 +1,17 @@
-import './index.css'
-import Vue3Toastify from 'vue3-toastify'
-import 'vue3-toastify/dist/index.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import piniaPersist from 'pinia-plugin-persist'
-import VueLazyload from 'vue-lazyload'
 import './assets/main.css'
+import './index.css'
 import App from './App.vue'
 import router from './router'
+import piniaPersist from 'pinia-plugin-persist'
+import VueLazyload from 'vue-lazyload'
+import Vue3Toastify from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 
-const pinia = createPinia()
 const app = createApp(App)
+const pinia = createPinia()
+
 pinia.use(piniaPersist)
 app.use(VueLazyload)
 app.use(pinia)

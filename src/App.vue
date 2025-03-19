@@ -10,7 +10,6 @@ import { RouterView } from 'vue-router'
 
 <style scoped>
 #app {
-  /* height: 100vh; */
   display: flex;
   flex-direction: column;
 }

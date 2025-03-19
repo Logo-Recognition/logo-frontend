@@ -1,13 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
-// import LoginView from '../views/LoginView.vue'
 import DefaultLayout from '@/layouts/ProjectLayout.vue'
 
 const routes = [
-  // {
-  //   path: '/',
-  //   name: 'login',
-  //   component: LoginView
-  // },
   {
     path: '/',
     component: DefaultLayout,
@@ -38,11 +32,6 @@ const routes = [
         name: 'model',
         component: () => import('../views/RunView.vue')
       }
-      // {
-      //   path: 'ocr',
-      //   name: 'ocr',
-      //   component: () => import('../views/OcrView.vue')
-      // }
     ]
   }
 ]
@@ -51,15 +40,5 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes
 })
-
-// router.beforeEach((to, from, next) => {
-//   const isAuthenticated = localStorage.getItem('token')
-
-//   if (to.meta.requiresAuth && !isAuthenticated) {
-//     next('/')
-//   } else {
-//     next()
-//   }
-// })
 
 export default router
