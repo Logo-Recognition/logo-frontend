@@ -8,7 +8,6 @@ import Slider from '@vueform/slider'
 import { useParametersStore } from '@/stores/Augment.js'
 import { toast } from 'vue3-toastify'
 
-const apiUrl = import.meta.env.VITE_API_HOST;
 const store = useParametersStore()
 
 // // Accessing augmentation parameters
@@ -19,7 +18,7 @@ const updateRotate = (type, value) => {
   store.updateAugmentationParam(type, value)
 }
 
-const pathImage = `${apiUrl}/api/annotated-images`
+const pathImage = `/api/annotated-images`
 const images = ref([])
 
 //fetch api to get all image in dataset

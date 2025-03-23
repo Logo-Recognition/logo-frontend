@@ -8,7 +8,6 @@ import Toggle from '@vueform/toggle';
 import { useParametersStore } from '@/stores/Augment.js'
 import { toast } from 'vue3-toastify';
 import streamSaver from 'streamsaver';
-const apiUrl = import.meta.env.VITE_API_HOST;
 
 const augmentParameterStore = useParametersStore()
 const range = ref([augmentParameterStore.trainTestSplitParam.trainSize, augmentParameterStore.trainTestSplitParam.trainSize+augmentParameterStore.trainTestSplitParam.validSize]);
@@ -94,7 +93,7 @@ const onDownload = async () => {
       }
     })
 
-    const response = await fetch(`${apiUrl}/api/dataset/download`, {
+    const response = await fetch(`/api/dataset/download`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -154,7 +153,7 @@ const onReset = () => {
 
 onMounted(async () => {
   try {
-    const response = await fetch(`${apiUrl}/api/dataset`);
+    const response = await fetch(`/api/dataset`);
     if(response.ok){
       const responseData = await response.json();
       classes.value = responseData["total_classes"];
