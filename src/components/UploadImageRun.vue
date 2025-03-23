@@ -15,7 +15,6 @@ const props = defineProps({
   }
 })
 
-const apiUrl = import.meta.env.VITE_API_HOST;
 
 const previewImages = ref([])
 const fileInputRef = ref(null)
@@ -95,7 +94,7 @@ const uploadImage = async () => {
   isLoading.value = true
 
   try {
-    const response = await axios.post(`${apiUrl}/api/model/run-realtime`, formData, {
+    const response = await axios.post(`/api/model/run-realtime`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }

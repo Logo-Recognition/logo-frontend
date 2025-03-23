@@ -11,7 +11,6 @@ const props = defineProps({
   }
 })
 
-const apiUrl = import.meta.env.VITE_API_HOST;
 
 const classList = ref([])
 const filteredClassList = ref([])
@@ -21,7 +20,7 @@ const emit = defineEmits(['close', 'submit', 'classSelected'])
 
 const fetchClassList = async () => {
   try {
-    const response = await axios.get(`${apiUrl}/api/class`)
+    const response = await axios.get(`/api/class`)
     classList.value = response.data.classes
     filteredClassList.value = classList.value
   } catch (error) {

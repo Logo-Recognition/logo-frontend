@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 import { toast } from 'vue3-toastify'
 import PreviewImage from './PreviewImage.vue'
-const apiUrl = import.meta.env.VITE_API_HOST;
 
 
 const props = defineProps({
@@ -69,7 +68,7 @@ const sendImagesToServer = async () => {
     const formData = new FormData()
     images.forEach((file) => formData.append('files[]', file))
 
-    const response = await fetch(`${apiUrl}/api/images`, {
+    const response = await fetch(`/api/images`, {
       method: 'POST',
       body: formData
     })

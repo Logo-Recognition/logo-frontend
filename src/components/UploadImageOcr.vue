@@ -4,7 +4,6 @@ import { toast } from 'vue3-toastify'
 import PreviewImage from './PreviewImage.vue'
 import axios from 'axios'
 
-const apiUrl = import.meta.env.VITE_API_HOST;
 
 const previewImages = ref([])
 const fileInputRef = ref(null)
@@ -63,7 +62,7 @@ const uploadImage = async () => {
   })
   emit('loading', true)
   try {
-    const response = await axios.post(`${apiUrl}/api/ocr`, formData, {
+    const response = await axios.post(`/api/ocr`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
