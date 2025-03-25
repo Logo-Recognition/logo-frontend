@@ -8,7 +8,7 @@ const routes = [
     meta: { requiresAuth: true },
     children: [
       {
-        path: 'class',
+        path: '',
         name: 'class',
         component: () => import('../views/ClassView.vue')
       },
