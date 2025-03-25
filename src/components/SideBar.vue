@@ -61,6 +61,7 @@ const openModal = () => {
   flex-direction: column;
   justify-content: space-between;
   height: 100vh;
+  min-width: 240px;
   width: 240px;
   border-right: 1px solid #d9d9d9;
   background-color: #071b40;
