@@ -4,11 +4,12 @@ import DefaultLayout from '@/layouts/ProjectLayout.vue'
 const routes = [
   {
     path: '/',
+    redirect: '/class',
     component: DefaultLayout,
     meta: { requiresAuth: true },
     children: [
       {
-        path: '',
+        path: 'class',
         name: 'class',
         component: () => import('../views/ClassView.vue')
       },

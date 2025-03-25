@@ -5,7 +5,6 @@ import IconAnnotate from '@/assets/icons/IconAnnotate.vue'
 import IconAugment from '@/assets/icons/IconAugment.vue'
 import IconDataset from '@/assets/icons/IconDataset.vue'
 import IconModelRun from '@/assets/icons/IconModelRun.vue'
-import IconLogout from '@/assets/icons/IconLogout.vue'
 const emit = defineEmits(['openModal'])
 
 const openModal = () => {
@@ -27,7 +26,7 @@ const openModal = () => {
         </button>
         <div id="logo-management" class="w-full flex flex-col justify-start">
           <span class="menu-title">LOGO MANAGEMENT</span>
-          <router-link to="/" class="button">
+          <router-link to="/class" class="button">
             <IconClasses />
             <span class="text">Classes</span>
           </router-link>
@@ -53,20 +52,6 @@ const openModal = () => {
         </div>
       </div>
     </div>
-
-    <div
-      id="user-card"
-      class="flex flex-row h-24 items-center border-t border-light-accent p-6 bg-light"
-    >
-      <div id="user-avatar" class="w-10 h-10 bg-primary rounded-full"></div>
-      <div class="flex flex-col justify-center px-4">
-        <span class="text-sm text-primary-dark font-medium">Deko Ahmed</span>
-        <span class="text-xs text-neutral-dark-grey font-normal">38deko@gmail.com</span>
-      </div>
-      <button>
-        <IconLogout />
-      </button>
-    </div>
   </aside>
 </template>
 
@@ -76,6 +61,7 @@ const openModal = () => {
   flex-direction: column;
   justify-content: space-between;
   height: 100vh;
+  width: 240px;
   border-right: 1px solid #d9d9d9;
   background-color: #071b40;
 }
