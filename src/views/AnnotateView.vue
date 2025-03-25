@@ -12,12 +12,9 @@ import BoxNameModal from '@/components/LabelModal.vue'
 import axios from 'axios'
 import Multiselect from 'vue-multiselect'
 
-
-
 const canvasRef = ref(null)
 const labelsContainerRef = ref(null)
 let canvas = null
-
 
 const mode = ref('pointer')
 let isDragging = false
@@ -549,8 +546,8 @@ onMounted(() => {
             <span class="tooltip-text">Save YOLO format</span>
           </div>
         </div>
-        <!-- <canvas ref="canvasRef" class="canvas-wrapper" width="715" height="460"></canvas> -->
-        <canvas ref="canvasRef" class="canvas-wrapper" width="830" height="530"></canvas>
+        <canvas ref="canvasRef" class="canvas-wrapper" width="725" height="460"></canvas>
+        <!-- <canvas ref="canvasRef" class="canvas-wrapper" width="830" height="530"></canvas> -->
 
         <div class="mouse-coordinates">
           X: {{ mouseCoordinates.x }}, Y: {{ mouseCoordinates.y }}
