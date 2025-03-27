@@ -57,7 +57,7 @@ const onDrag = (value) => {
 const isDownloading = ref(false);
 
 const onDownload = async () => {
-  if (augmentParameterStore.trainTestSplitParam.trainSize == 0) {
+  if (Math.round(images.value*augmentParameterStore.trainTestSplitParam.trainSize/100) == 0) {
     toast.error("Train set size cannot be zero.")
     return
   }

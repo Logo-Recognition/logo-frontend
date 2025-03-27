@@ -112,12 +112,17 @@ const startScraping = async () => {
       `/api/scrape?keyword=${encodeURIComponent(keyword.value)}&start_date=${startDate.value}&end_date=${endDate.value}`
     )
 
-    if (!response.ok) {
-      throw new Error('Failed to start scraping.')
-    }
-
     const data = await response.json()
     console.log('Scraping response:', data)
+
+    if (!response.ok) {
+      
+      if (response.status === 503) {
+      throw new Error(`Waiting ${data.retry_after} seconds for available key`)
+      console.log(response)
+      }
+      throw new Error('Failed to start scraping.')
+    }
 
     if (data.predicted_url && Array.isArray(data.predicted_url)) {
       processedImageUrls.value = data.predicted_url.map((item) => item.image_url).filter(Boolean)
@@ -133,8 +138,8 @@ const startScraping = async () => {
       autoClose: 3000
     })
   } catch (error) {
-    console.error(error)
-    toast.error('An error occurred while starting the scraping.', {
+    console.log(error.message)
+    toast.error(error.message || 'An unexpected error occurred', {
       autoClose: 3000
     })
   } finally {
