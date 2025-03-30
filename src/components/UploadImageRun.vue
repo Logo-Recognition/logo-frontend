@@ -67,6 +67,7 @@ const removeImage = (index) => {
 
 const clearImage = () => {
   previewImages.value = []
+  fileInputRef.value.value = ''
 }
 
 const triggerFileInput = () => {
