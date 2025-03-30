@@ -85,7 +85,7 @@ function closePopup() {
       <component :is="iconComponent" />
     </div>
     <!-- Display formatted title and value -->
-    <div class="flex flex-col w-2/5 ml-5">
+    <div class="flex flex-col w-3/5 ml-5">
       <div id="text-title">{{ formattedTitle }}</div>
       <div id="text">{{ formattedValue }}</div>
     </div>
