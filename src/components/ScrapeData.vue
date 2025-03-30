@@ -71,7 +71,7 @@ onUnmounted(() => document.removeEventListener('click', closeDropdown))
 
 const minStartSelectableDate = computed(() => {
   const today = new Date()
-  today.setDate(today.getDate() - 7)
+  today.setDate(today.getDate() - 5)
   return today.toISOString().split('T')[0]
 })
 
@@ -81,7 +81,7 @@ const minEndSelectableDate = computed(() => {
   }
 
   const today = new Date()
-  today.setDate(today.getDate() - 7)
+  today.setDate(today.getDate() - 5)
   return today.toISOString().split('T')[0]
 })
 
