@@ -164,7 +164,16 @@ const uploadImage = async () => {
     </div>
   </div>
   <div class="flex flex-row">
-    <button class="create-button" @click="uploadImage">Create</button>
+    <button
+      @click="uploadImage"
+      :disabled="isLoading"
+      class="create-button"
+      :class="isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-500 hover:bg-indigo-600'"
+    >
+      {{ isLoading ? 'Predicting...' : 'Create' }}
+    </button>
+
+
     <button class="clear-button ml-1" @click="clearImage">Clear</button>
   </div>
 </template>
